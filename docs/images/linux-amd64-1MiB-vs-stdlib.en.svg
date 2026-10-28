@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="606" viewBox="0 0 980 606" role="img" aria-labelledby="t">
+<title id="t">Throughput of moego and encoding/base64</title>
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; }
+  .ink2 { fill: #52514e; }
+  .muted { fill: #6f6d68; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .moego { fill: #2a78d6; }
+  .peer { fill: #898781; }
+  .num { font-variant-numeric: tabular-nums; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #ffffff; }
+    .ink2 { fill: #c3c2b7; }
+    .muted { fill: #9a9891; }
+    .axis { stroke: #383835; }
+    .moego { fill: #3987e5; }
+  }
+</style>
+<rect class="surface" width="980" height="606" rx="8"/>
+<text x="24.0" y="36.0" class="ink" font-size="18" text-anchor="start" font-weight="600">Throughput of moego and encoding/base64</text>
+<text x="24.0" y="58.0" class="ink2" font-size="13" text-anchor="start">1 MiB of raw data in GB/s, longer is faster; top-right multiplier: moego throughput ÷ encoding/base64 throughput</text>
+<text x="24.0" y="78.0" class="muted" font-size="12" text-anchor="start">Intel(R) Xeon(R) CPU E5-2667 v4 @ 3.20GHz · linux/amd64 · go1.26.6 · GOMAXPROCS=1 · median of 6 samples each</text>
+<text x="24.0" y="98.0" class="muted" font-size="12" text-anchor="start">Shared KVM virtual machine; results apply to this machine only</text>
+<text x="24.0" y="132.0" class="ink2" font-size="12" text-anchor="start">Encoding and decoding: these 8 scenarios share one scale</text>
+<text x="24.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Encode into a preallocated buffer</text>
+<text x="474.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">13.0×</text>
+<line class="axis" x1="142" y1="170" x2="142" y2="206"/>
+<text x="134.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M142.0,173.0H413.6A4,4 0 0 1 417.6,177.0V181.0A4,4 0 0 1 413.6,185.0H142.0Z"><title>moego 12.31 GB/s</title></path>
+<text x="423.6" y="183.0" class="ink" font-size="12" text-anchor="start" font-weight="600">12.31</text>
+<text x="134.0" y="201.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M142.0,191.0H159.1A4,4 0 0 1 163.1,195.0V199.0A4,4 0 0 1 159.1,203.0H142.0Z"><title>encoding/base64 0.94 GB/s</title></path>
+<text x="169.1" y="201.0" class="ink2" font-size="12" text-anchor="start">0.94</text>
+<text x="506.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Decode into a preallocated buffer</text>
+<text x="956.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">13.1×</text>
+<line class="axis" x1="624" y1="170" x2="624" y2="206"/>
+<text x="616.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M624.0,173.0H908.0A4,4 0 0 1 912.0,177.0V181.0A4,4 0 0 1 908.0,185.0H624.0Z"><title>moego 12.86 GB/s</title></path>
+<text x="918.0" y="183.0" class="ink" font-size="12" text-anchor="start" font-weight="600">12.86</text>
+<text x="616.0" y="201.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M624.0,191.0H641.9A4,4 0 0 1 645.9,195.0V199.0A4,4 0 0 1 641.9,203.0H624.0Z"><title>encoding/base64 0.98 GB/s</title></path>
+<text x="651.9" y="201.0" class="ink2" font-size="12" text-anchor="start">0.98</text>
+<text x="24.0" y="238.0" class="ink" font-size="13" text-anchor="start" font-weight="600">EncodeToString</text>
+<text x="474.0" y="238.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">10.7×</text>
+<line class="axis" x1="142" y1="248" x2="142" y2="284"/>
+<text x="134.0" y="261.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M142.0,251.0H324.1A4,4 0 0 1 328.1,255.0V259.0A4,4 0 0 1 324.1,263.0H142.0Z"><title>moego 8.31 GB/s</title></path>
+<text x="334.1" y="261.0" class="ink" font-size="12" text-anchor="start" font-weight="600">8.31</text>
+<text x="134.0" y="279.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M142.0,269.0H155.4A4,4 0 0 1 159.4,273.0V277.0A4,4 0 0 1 155.4,281.0H142.0Z"><title>encoding/base64 0.78 GB/s</title></path>
+<text x="165.4" y="279.0" class="ink2" font-size="12" text-anchor="start">0.78</text>
+<text x="506.0" y="238.0" class="ink" font-size="13" text-anchor="start" font-weight="600">DecodeString</text>
+<text x="956.0" y="238.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">10.1×</text>
+<line class="axis" x1="624" y1="248" x2="624" y2="284"/>
+<text x="616.0" y="261.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M624.0,251.0H823.6A4,4 0 0 1 827.6,255.0V259.0A4,4 0 0 1 823.6,263.0H624.0Z"><title>moego 9.10 GB/s</title></path>
+<text x="833.6" y="261.0" class="ink" font-size="12" text-anchor="start" font-weight="600">9.10</text>
+<text x="616.0" y="279.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M624.0,269.0H640.1A4,4 0 0 1 644.1,273.0V277.0A4,4 0 0 1 640.1,281.0H624.0Z"><title>encoding/base64 0.90 GB/s</title></path>
+<text x="650.1" y="279.0" class="ink2" font-size="12" text-anchor="start">0.90</text>
+<text x="24.0" y="316.0" class="ink" font-size="13" text-anchor="start" font-weight="600">data URL by concatenation</text>
+<text x="474.0" y="316.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">6.22×</text>
+<line class="axis" x1="142" y1="326" x2="142" y2="362"/>
+<text x="134.0" y="339.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M142.0,329.0H225.3A4,4 0 0 1 229.3,333.0V337.0A4,4 0 0 1 225.3,341.0H142.0Z"><title>moego 3.90 GB/s</title></path>
+<text x="235.3" y="339.0" class="ink" font-size="12" text-anchor="start" font-weight="600">3.90</text>
+<text x="134.0" y="357.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M142.0,347.0H152.0A4,4 0 0 1 156.0,351.0V355.0A4,4 0 0 1 152.0,359.0H142.0Z"><title>encoding/base64 0.63 GB/s</title></path>
+<text x="162.0" y="357.0" class="ink2" font-size="12" text-anchor="start">0.63</text>
+<text x="506.0" y="316.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Decode a data URL</text>
+<text x="956.0" y="316.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">9.56×</text>
+<line class="axis" x1="624" y1="326" x2="624" y2="362"/>
+<text x="616.0" y="339.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M624.0,329.0H813.5A4,4 0 0 1 817.5,333.0V337.0A4,4 0 0 1 813.5,341.0H624.0Z"><title>moego 8.64 GB/s</title></path>
+<text x="823.5" y="339.0" class="ink" font-size="12" text-anchor="start" font-weight="600">8.64</text>
+<text x="616.0" y="357.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M624.0,347.0H640.2A4,4 0 0 1 644.2,351.0V355.0A4,4 0 0 1 640.2,359.0H624.0Z"><title>encoding/base64 0.90 GB/s</title></path>
+<text x="650.2" y="357.0" class="ink2" font-size="12" text-anchor="start">0.90</text>
+<text x="24.0" y="394.0" class="ink" font-size="13" text-anchor="start" font-weight="600">data URL in one allocation</text>
+<text x="474.0" y="394.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">8.77×</text>
+<line class="axis" x1="142" y1="404" x2="142" y2="440"/>
+<text x="134.0" y="417.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M142.0,407.0H306.7A4,4 0 0 1 310.7,411.0V415.0A4,4 0 0 1 306.7,419.0H142.0Z"><title>moego 7.53 GB/s</title></path>
+<text x="316.7" y="417.0" class="ink" font-size="12" text-anchor="start" font-weight="600">7.53</text>
+<text x="134.0" y="435.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M142.0,425.0H157.2A4,4 0 0 1 161.2,429.0V433.0A4,4 0 0 1 157.2,437.0H142.0Z"><title>encoding/base64 0.86 GB/s</title></path>
+<text x="167.2" y="435.0" class="ink2" font-size="12" text-anchor="start">0.86</text>
+<text x="506.0" y="394.0" class="ink" font-size="13" text-anchor="start" font-weight="600">data URL into a reused buffer</text>
+<text x="956.0" y="394.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">12.9×</text>
+<line class="axis" x1="624" y1="404" x2="624" y2="440"/>
+<text x="616.0" y="417.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M624.0,407.0H891.6A4,4 0 0 1 895.6,411.0V415.0A4,4 0 0 1 891.6,419.0H624.0Z"><title>moego 12.13 GB/s</title></path>
+<text x="901.6" y="417.0" class="ink" font-size="12" text-anchor="start" font-weight="600">12.13</text>
+<text x="616.0" y="435.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M624.0,425.0H641.1A4,4 0 0 1 645.1,429.0V433.0A4,4 0 0 1 641.1,437.0H624.0Z"><title>encoding/base64 0.94 GB/s</title></path>
+<text x="651.1" y="435.0" class="ink2" font-size="12" text-anchor="start">0.94</text>
+<text x="24.0" y="474.0" class="ink2" font-size="12" text-anchor="start">Validation, on a different scale: moego&#x27;s ValidateString writes no decoded bytes; the others decode in full and return the length</text>
+<text x="24.0" y="502.0" class="ink" font-size="13" text-anchor="start" font-weight="600">ValidateString vs DecodeString</text>
+<text x="474.0" y="502.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">36.7×</text>
+<line class="axis" x1="142" y1="512" x2="142" y2="548"/>
+<text x="134.0" y="525.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M142.0,515.0H426.0A4,4 0 0 1 430.0,519.0V523.0A4,4 0 0 1 426.0,527.0H142.0Z"><title>moego 31.40 GB/s</title></path>
+<text x="436.0" y="525.0" class="ink" font-size="12" text-anchor="start" font-weight="600">31.40</text>
+<text x="134.0" y="543.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M142.0,533.0H145.9A3.924947993898821,3.924947993898821 0 0 1 149.8,536.9V541.1A3.924947993898821,3.924947993898821 0 0 1 145.9,545.0H142.0Z"><title>encoding/base64 0.86 GB/s</title></path>
+<text x="155.8" y="543.0" class="ink2" font-size="12" text-anchor="start">0.86</text>
+<text x="506.0" y="502.0" class="ink" font-size="13" text-anchor="start" font-weight="600">ValidateString vs Decode, reused buffer</text>
+<text x="956.0" y="502.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">31.9×</text>
+<line class="axis" x1="624" y1="512" x2="624" y2="548"/>
+<text x="616.0" y="525.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego</text>
+<path class="moego" d="M624.0,515.0H906.8A4,4 0 0 1 910.8,519.0V523.0A4,4 0 0 1 906.8,527.0H624.0Z"><title>moego 31.27 GB/s</title></path>
+<text x="916.8" y="525.0" class="ink" font-size="12" text-anchor="start" font-weight="600">31.27</text>
+<text x="616.0" y="543.0" class="ink2" font-size="12" text-anchor="end">encoding/base64</text>
+<path class="peer" d="M624.0,533.0H629.0A4,4 0 0 1 633.0,537.0V541.0A4,4 0 0 1 629.0,545.0H624.0Z"><title>encoding/base64 0.98 GB/s</title></path>
+<text x="639.0" y="543.0" class="ink2" font-size="12" text-anchor="start">0.98</text>
+<text x="24.0" y="586.0" class="muted" font-size="12" text-anchor="start">Measured with bench/rounds.py, drawn by bench/plot.py</text>
+</svg>

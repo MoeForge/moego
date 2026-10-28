@@ -1,0 +1,109 @@
+name: Test and benchmark
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Go ${{ matrix.go }} / linux-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.23.x', '1.26.x']
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    env:
+      MOEGO_REQUIRE_AVX2: ${{ matrix.arch == 'amd64' && '1' || '0' }}
+      GOTOOLCHAIN: local
+      GOPROXY: 'off'
+      GOSUMDB: 'off'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go }}
+          cache: false
+      - name: Verify production module has no external dependencies
+        run: test "$(go list -m all)" = "$(go list -m)"
+      - name: Check formatting and assembly declarations
+        run: |
+          test -z "$(gofmt -l base64)"
+          go vet ./...
+      - name: Native correctness and protected-page boundaries
+        run: go test -count=1 -v ./...
+      - name: Race detector
+        run: go test -race -count=1 ./...
+      - name: Pointer checks
+        run: go test -gcflags=all=-d=checkptr=2 -count=1 ./...
+      - name: Portable fallback
+        run: go test -tags=purego -count=1 ./...
+
+  benchmark:
+    name: Benchmark / linux-${{ matrix.arch }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      MOEGO_REQUIRE_AVX2: ${{ matrix.arch == 'amd64' && '1' || '0' }}
+      GOTOOLCHAIN: local
+      GOMAXPROCS: '1'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: bench/go.mod
+          cache-dependency-path: bench/go.sum
+      - name: Check native SIMD support before measuring
+        run: go test -run 'Test(AMD64|ARM64)Block' -count=1 ./base64
+      - name: Download pinned competitors
+        working-directory: bench
+        run: go mod download
+      - name: Check competing implementations and report tool
+        working-directory: bench
+        run: |
+          go test -count=1 ./...
+          python3 -m unittest test_compare.py test_rounds.py test_plot.py
+      - name: Record machine and compiler
+        run: |
+          mkdir -p bench/results
+          go version > bench/results/environment.txt
+          go env GOOS GOARCH GOAMD64 >> bench/results/environment.txt
+          uname -a >> bench/results/environment.txt
+          lscpu >> bench/results/environment.txt
+          git rev-parse HEAD >> bench/results/environment.txt
+      # Shared hosted runners provide regression evidence, not a release claim
+      # that a particular CPU or production deployment meets the speed target.
+      - name: Run sequential benchmarks
+        working-directory: bench
+        run: go test -run '^$' -bench . -benchmem -benchtime=200ms -count=5 -cpu=1 > results/bench.txt
+      - name: Upload raw measurements
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: benchmark-linux-${{ matrix.arch }}-${{ github.run_id }}
+          path: bench/results/
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,3 @@
+*.test
+bench/bench.txt
+bench/__pycache__/
