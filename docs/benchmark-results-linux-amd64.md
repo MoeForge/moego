@@ -1,49 +1,91 @@
-# moego Linux AMD64 性能
+# base64 performance on Linux AMD64
 
-moego 与 `encoding/base64` 及其他 Go Base64 实现在一台 Linux AMD64 机器上的对比，包括 1 KiB 到 4 MiB 的全部结果，以及如何复现这些数字。
+`base64` compared with `encoding/base64` and other Go Base64 packages on one
+Linux AMD64 machine: every result from 1 KiB to 4 MiB, and how to reproduce
+the numbers.
+[简体中文](benchmark-results-linux-amd64.zh_CN.md)
 
-## 测试环境
+## Test environment
 
-以下数字于 2026-10-26 测得。测试机是多人共用的 KVM 虚拟机：Intel Xeon E5-2667 v4 @ 3.20GHz（Broadwell-EP），支持 AVX2，没有 AVX-512；linux/amd64，Go 1.26.6（默认的 `GOAMD64=v1`），`GOMAXPROCS=1`。测量时机器上还有其他用户的负载。
+The numbers were measured on 2026-10-26 on a KVM virtual machine shared with
+other users: Intel Xeon E5-2667 v4 @ 3.20GHz (Broadwell-EP, AVX2, no
+AVX-512), linux/amd64, Go 1.26.6 with the default `GOAMD64=v1`,
+`GOMAXPROCS=1`. Other users' load was on the machine during the
+measurement.
 
-对比的实现是 Go 1.26.6 的 `encoding/base64`、[emmansun/base64](https://github.com/emmansun/base64) v0.11.0、[segmentio/asm](https://github.com/segmentio/asm) v1.2.1、[cloudwego/base64x](https://github.com/cloudwego/base64x) v0.1.7 和 [cristalhq/base64](https://github.com/cristalhq/base64) v0.1.2。这台 CPU 没有 AVX-512，emmansun/base64 的 AVX-512 VBMI 路径不会启用；emmansun/base64、segmentio/asm 和 cloudwego/base64x 都走各自的 AVX2 路径。
+The packages compared are `encoding/base64` of Go 1.26.6,
+[`emmansun/base64`](https://github.com/emmansun/base64) v0.11.0,
+[`segmentio/asm`](https://github.com/segmentio/asm) v1.2.1,
+[`cloudwego/base64x`](https://github.com/cloudwego/base64x) v0.1.7 and
+[`cristalhq/base64`](https://github.com/cristalhq/base64) v0.1.2. This CPU
+has no AVX-512, so the AVX-512 VBMI path of `emmansun/base64` is not used;
+`emmansun/base64`, `segmentio/asm` and `cloudwego/base64x` each take their
+AVX2 path.
 
-## 方法
+## Workloads
 
-- 用 `bench/` 中的基准测试编译出一个测试二进制，所有样本都来自这个二进制。
-- [bench/rounds.py](../bench/rounds.md) 串行采样：每个场景的每种大小单独启动一个进程，参数为 `-benchtime=200ms -count=1 -cpu=1`。采样进程用 `taskset` 固定在一个 vCPU 上。
-- 共 6 轮，每轮把六个实现的执行顺序左旋一位，每个实现在每个顺位上各跑一次。每项结果是 6 个样本的中位数。
-- 数据是固定种子生成的伪随机二进制数据，有 1 KiB、32 KiB、256 KiB、1 MiB、4 MiB 五种大小。吞吐量都按编码前的原始字节数计算，编码和解码可以直接对照。
+Every package is measured at the same call boundary:
 
-## 各实现的调用方式
+- **Encode and decode into a preallocated buffer**: input and output
+  buffers are allocated once and reused, so only encoding or decoding is
+  measured. The decode target has 8 bytes more than `DecodedLen` for every
+  package, because some packages write past the end of the result.
+- **`EncodeToString` and `DecodeString`**: each package's own string API,
+  including the allocation of the result and GC.
+- **data URL by concatenation**: `"data:" + mime + ";base64," +
+  EncodeToString(src)`. **Decode a data URL**: split at the comma with
+  `strings.Cut`, then call `DecodeString`.
+- **data URL in one allocation**: `base64` calls `EncodeDataURL`. The other
+  packages do the same thing by hand: allocate the final length once, write
+  the prefix, encode into the same memory with their own `Encode`, and
+  return it as a string without a copy. This compares encoding speed, not
+  the saved allocation.
+- **data URL into a reused buffer**: `base64` calls `AppendDataURL`; the
+  other packages write the prefix and the output of `Encode` into one
+  reused byte slice.
+- **Validation**: `base64` calls `ValidateString`. The other packages have
+  no such API and return the length after `DecodeString` (allocating
+  decode) or after `Decode` into a preallocated buffer (reused output).
 
-每个实现都通过相同的调用边界测量：
+Every result is checked after it is measured. `TestCompetitors` also
+compares the output of every package with `encoding/base64` over all tail
+lengths and SIMD block boundaries. All inputs are valid standard Base64
+without line breaks.
 
-- **预分配编码、解码**：输入和输出缓冲区预先分配、反复使用，只测编解码本身。解码目标比 `DecodedLen` 多留 8 字节，每个实现都一样，因为有的实现写入时会越过结果末尾。
-- **`EncodeToString`、`DecodeString`**：各包自己的字符串 API，包括结果的分配和 GC。
-- **data URL 拼接**：`"data:" + mime + ";base64," + EncodeToString(src)`。**data URL 解码**：用 `strings.Cut` 在逗号处切开，再调用 `DecodeString`。
-- **单次分配 data URL**：moego 调用 `EncodeDataURL`。其他实现用同样的做法：按最终长度分配一次，写入前缀，再用各自的 `Encode` 编码到同一块内存里，不复制就作为字符串返回。这样比较的是编码速度，而不是省掉的分配。
-- **复用缓冲区 data URL**：moego 调用 `AppendDataURL`；其他实现把前缀和 `Encode` 的输出写进同一个复用的 byte slice。
-- **校验计长**：moego 调用 `ValidateString`。其他实现没有对应的 API，分别用 `DecodeString`（分配后解码）或 `Decode` 到预先分配的缓冲区（复用输出），再返回长度。
+## Method
 
-每项测量结束后都会核对结果。`TestCompetitors` 另外把每个实现的输出和 `encoding/base64` 对比，覆盖各种尾部长度和 SIMD 块边界。所有输入都是合法、不含换行的标准 Base64。
+- One test binary is built from the benchmarks in `bench/`, and every
+  sample comes from it.
+- [bench/rounds.py](../bench/rounds.md) samples serially: each size of each
+  scenario runs in its own process with `-benchtime=200ms -count=1
+  -cpu=1`, pinned to one vCPU with `taskset`.
+- There are 6 rounds. Each round rotates the order of the six packages by
+  one, so each package runs once in every position. Each result is the
+  median of 6 samples.
+- The data is pseudo-random binary data from a fixed seed, in five sizes:
+  1 KiB, 32 KiB, 256 KiB, 1 MiB and 4 MiB. Throughput is computed from the
+  raw bytes before encoding, so encoding and decoding can be compared
+  directly.
 
-## 结果
+## Results
 
-下表和 README 中的图来自同一次完整测量。吞吐量单位为 GB/s，按原始数据量计算；倍数为对方的中位耗时除以 moego 的中位耗时；“最快的其他实现”是该行中除 moego 以外最快的实现。
+The table and the charts in the README come from the same complete run.
+Throughput is in GB/s of raw data; a multiplier is the other package's
+median time divided by the median time of `base64`; "fastest other" is the
+fastest package in the row apart from `base64`.
 
-| 场景 | 大小 | moego 耗时 (μs) | moego (GB/s) | encoding/base64 (GB/s) | 最快的其他实现 (GB/s) | 相比 encoding/base64 | 相比最快的其他实现 |
+| Scenario | Size | base64 time (μs) | base64 (GB/s) | encoding/base64 (GB/s) | Fastest other (GB/s) | vs encoding/base64 | vs fastest other |
 |---|---|--:|--:|--:|---|--:|--:|
-| 预分配编码 | 1 KiB | 0.07712 | 13.28 | 0.93 | emmansun/base64 9.94 | 14.2× | 1.34× |
-| 预分配编码 | 32 KiB | 2.112 | 15.51 | 0.94 | emmansun/base64 11.57 | 16.5× | 1.34× |
-| 预分配编码 | 256 KiB | 21.38 | 12.26 | 0.94 | emmansun/base64 10.50 | 13.0× | 1.17× |
-| 预分配编码 | 1 MiB | 85.18 | 12.31 | 0.94 | emmansun/base64 10.56 | 13.0× | 1.17× |
-| 预分配编码 | 4 MiB | 341.6 | 12.28 | 0.94 | emmansun/base64 10.55 | 13.0× | 1.16× |
-| 预分配解码 | 1 KiB | 0.09566 | 10.71 | 0.94 | emmansun/base64 6.64 | 11.4× | 1.61× |
-| 预分配解码 | 32 KiB | 2.479 | 13.22 | 0.98 | emmansun/base64 9.96 | 13.5× | 1.33× |
-| 预分配解码 | 256 KiB | 20.54 | 12.76 | 0.98 | emmansun/base64 9.78 | 13.1× | 1.31× |
-| 预分配解码 | 1 MiB | 81.52 | 12.86 | 0.98 | emmansun/base64 9.85 | 13.1× | 1.31× |
-| 预分配解码 | 4 MiB | 326.4 | 12.85 | 0.98 | emmansun/base64 9.82 | 13.1× | 1.31× |
+| Encode into a preallocated buffer | 1 KiB | 0.07712 | 13.28 | 0.93 | emmansun/base64 9.94 | 14.2× | 1.34× |
+| Encode into a preallocated buffer | 32 KiB | 2.112 | 15.51 | 0.94 | emmansun/base64 11.57 | 16.5× | 1.34× |
+| Encode into a preallocated buffer | 256 KiB | 21.38 | 12.26 | 0.94 | emmansun/base64 10.50 | 13.0× | 1.17× |
+| Encode into a preallocated buffer | 1 MiB | 85.18 | 12.31 | 0.94 | emmansun/base64 10.56 | 13.0× | 1.17× |
+| Encode into a preallocated buffer | 4 MiB | 341.6 | 12.28 | 0.94 | emmansun/base64 10.55 | 13.0× | 1.16× |
+| Decode into a preallocated buffer | 1 KiB | 0.09566 | 10.71 | 0.94 | emmansun/base64 6.64 | 11.4× | 1.61× |
+| Decode into a preallocated buffer | 32 KiB | 2.479 | 13.22 | 0.98 | emmansun/base64 9.96 | 13.5× | 1.33× |
+| Decode into a preallocated buffer | 256 KiB | 20.54 | 12.76 | 0.98 | emmansun/base64 9.78 | 13.1× | 1.31× |
+| Decode into a preallocated buffer | 1 MiB | 81.52 | 12.86 | 0.98 | emmansun/base64 9.85 | 13.1× | 1.31× |
+| Decode into a preallocated buffer | 4 MiB | 326.4 | 12.85 | 0.98 | emmansun/base64 9.82 | 13.1× | 1.31× |
 | `EncodeToString` | 1 KiB | 0.2445 | 4.19 | 0.67 | emmansun/base64 3.37 | 6.21× | 1.24× |
 | `EncodeToString` | 32 KiB | 6.017 | 5.45 | 0.71 | emmansun/base64 3.88 | 7.67× | 1.40× |
 | `EncodeToString` | 256 KiB | 43.57 | 6.02 | 0.72 | emmansun/base64 4.39 | 8.34× | 1.37× |
@@ -54,50 +96,69 @@ moego 与 `encoding/base64` 及其他 Go Base64 实现在一台 Linux AMD64 机�
 | `DecodeString` | 256 KiB | 37.92 | 6.91 | 0.88 | emmansun/base64 4.86 | 7.88× | 1.42× |
 | `DecodeString` | 1 MiB | 115.3 | 9.10 | 0.90 | emmansun/base64 5.86 | 10.1× | 1.55× |
 | `DecodeString` | 4 MiB | 602.4 | 6.96 | 0.84 | emmansun/base64 4.07 | 8.32× | 1.71× |
-| data URL 拼接 | 1 KiB | 0.4958 | 2.07 | 0.57 | emmansun/base64 1.83 | 3.60× | 1.13× |
-| data URL 拼接 | 32 KiB | 12.33 | 2.66 | 0.62 | emmansun/base64 2.22 | 4.27× | 1.20× |
-| data URL 拼接 | 256 KiB | 92.69 | 2.83 | 0.64 | cloudwego/base64x 2.50 | 4.44× | 1.13× |
-| data URL 拼接 | 1 MiB | 268.9 | 3.90 | 0.63 | emmansun/base64 3.22 | 6.22× | 1.21× |
-| data URL 拼接 | 4 MiB | 854.8 | 4.91 | 0.62 | emmansun/base64 3.80 | 7.98× | 1.29× |
-| data URL 解码 | 1 KiB | 0.2732 | 3.75 | 0.78 | emmansun/base64 2.82 | 4.79× | 1.33× |
-| data URL 解码 | 32 KiB | 5.567 | 5.89 | 0.84 | emmansun/base64 3.86 | 7.04× | 1.52× |
-| data URL 解码 | 256 KiB | 38.81 | 6.75 | 0.87 | emmansun/base64 4.46 | 7.72× | 1.52× |
-| data URL 解码 | 1 MiB | 121.4 | 8.64 | 0.90 | emmansun/base64 5.31 | 9.56× | 1.63× |
-| data URL 解码 | 4 MiB | 545.9 | 7.68 | 0.83 | segmentio/asm 4.14 | 9.25× | 1.86× |
-| 单次分配 data URL | 1 KiB | 0.2571 | 3.98 | 0.76 | emmansun/base64 3.04 | 5.21× | 1.31× |
-| 单次分配 data URL | 32 KiB | 6.159 | 5.32 | 0.81 | emmansun/base64 3.84 | 6.54× | 1.39× |
-| 单次分配 data URL | 256 KiB | 41.28 | 6.35 | 0.84 | emmansun/base64 4.57 | 7.56× | 1.39× |
-| 单次分配 data URL | 1 MiB | 139.2 | 7.53 | 0.86 | emmansun/base64 5.15 | 8.77× | 1.46× |
-| 单次分配 data URL | 4 MiB | 465.4 | 9.01 | 0.80 | segmentio/asm 5.88 | 11.2× | 1.53× |
-| 复用缓冲区 data URL | 1 KiB | 0.08859 | 11.56 | 0.92 | emmansun/base64 8.61 | 12.5× | 1.34× |
-| 复用缓冲区 data URL | 32 KiB | 2.201 | 14.88 | 0.94 | emmansun/base64 11.04 | 15.8× | 1.35× |
-| 复用缓冲区 data URL | 256 KiB | 21.68 | 12.09 | 0.94 | emmansun/base64 10.25 | 12.8× | 1.18× |
-| 复用缓冲区 data URL | 1 MiB | 86.45 | 12.13 | 0.94 | emmansun/base64 10.29 | 12.9× | 1.18× |
-| 复用缓冲区 data URL | 4 MiB | 346.0 | 12.12 | 0.94 | emmansun/base64 10.29 | 12.9× | 1.18× |
-| 校验计长 vs 分配后解码 | 1 KiB | 0.05545 | 18.47 | 0.80 | emmansun/base64 3.02 | 23.2× | 6.12× |
-| 校验计长 vs 分配后解码 | 32 KiB | 0.9931 | 32.99 | 0.85 | emmansun/base64 4.18 | 38.9× | 7.89× |
-| 校验计长 vs 分配后解码 | 256 KiB | 8.442 | 31.05 | 0.89 | emmansun/base64 5.16 | 34.9× | 6.02× |
-| 校验计长 vs 分配后解码 | 1 MiB | 33.40 | 31.40 | 0.86 | emmansun/base64 4.95 | 36.7× | 6.34× |
-| 校验计长 vs 分配后解码 | 4 MiB | 133.3 | 31.45 | 0.87 | emmansun/base64 6.08 | 36.0× | 5.18× |
-| 校验计长 vs 复用输出 | 1 KiB | 0.05508 | 18.59 | 0.93 | emmansun/base64 6.57 | 19.9× | 2.83× |
-| 校验计长 vs 复用输出 | 32 KiB | 0.9889 | 33.14 | 0.97 | emmansun/base64 9.96 | 34.0× | 3.33× |
-| 校验计长 vs 复用输出 | 256 KiB | 8.478 | 30.92 | 0.98 | emmansun/base64 9.70 | 31.6× | 3.19× |
-| 校验计长 vs 复用输出 | 1 MiB | 33.54 | 31.27 | 0.98 | emmansun/base64 9.73 | 31.9× | 3.21× |
-| 校验计长 vs 复用输出 | 4 MiB | 133.1 | 31.52 | 0.98 | emmansun/base64 9.77 | 32.2× | 3.22× |
+| data URL by concatenation | 1 KiB | 0.4958 | 2.07 | 0.57 | emmansun/base64 1.83 | 3.60× | 1.13× |
+| data URL by concatenation | 32 KiB | 12.33 | 2.66 | 0.62 | emmansun/base64 2.22 | 4.27× | 1.20× |
+| data URL by concatenation | 256 KiB | 92.69 | 2.83 | 0.64 | cloudwego/base64x 2.50 | 4.44× | 1.13× |
+| data URL by concatenation | 1 MiB | 268.9 | 3.90 | 0.63 | emmansun/base64 3.22 | 6.22× | 1.21× |
+| data URL by concatenation | 4 MiB | 854.8 | 4.91 | 0.62 | emmansun/base64 3.80 | 7.98× | 1.29× |
+| Decode a data URL | 1 KiB | 0.2732 | 3.75 | 0.78 | emmansun/base64 2.82 | 4.79× | 1.33× |
+| Decode a data URL | 32 KiB | 5.567 | 5.89 | 0.84 | emmansun/base64 3.86 | 7.04× | 1.52× |
+| Decode a data URL | 256 KiB | 38.81 | 6.75 | 0.87 | emmansun/base64 4.46 | 7.72× | 1.52× |
+| Decode a data URL | 1 MiB | 121.4 | 8.64 | 0.90 | emmansun/base64 5.31 | 9.56× | 1.63× |
+| Decode a data URL | 4 MiB | 545.9 | 7.68 | 0.83 | segmentio/asm 4.14 | 9.25× | 1.86× |
+| data URL in one allocation | 1 KiB | 0.2571 | 3.98 | 0.76 | emmansun/base64 3.04 | 5.21× | 1.31× |
+| data URL in one allocation | 32 KiB | 6.159 | 5.32 | 0.81 | emmansun/base64 3.84 | 6.54× | 1.39× |
+| data URL in one allocation | 256 KiB | 41.28 | 6.35 | 0.84 | emmansun/base64 4.57 | 7.56× | 1.39× |
+| data URL in one allocation | 1 MiB | 139.2 | 7.53 | 0.86 | emmansun/base64 5.15 | 8.77× | 1.46× |
+| data URL in one allocation | 4 MiB | 465.4 | 9.01 | 0.80 | segmentio/asm 5.88 | 11.2× | 1.53× |
+| data URL into a reused buffer | 1 KiB | 0.08859 | 11.56 | 0.92 | emmansun/base64 8.61 | 12.5× | 1.34× |
+| data URL into a reused buffer | 32 KiB | 2.201 | 14.88 | 0.94 | emmansun/base64 11.04 | 15.8× | 1.35× |
+| data URL into a reused buffer | 256 KiB | 21.68 | 12.09 | 0.94 | emmansun/base64 10.25 | 12.8× | 1.18× |
+| data URL into a reused buffer | 1 MiB | 86.45 | 12.13 | 0.94 | emmansun/base64 10.29 | 12.9× | 1.18× |
+| data URL into a reused buffer | 4 MiB | 346.0 | 12.12 | 0.94 | emmansun/base64 10.29 | 12.9× | 1.18× |
+| ValidateString vs DecodeString | 1 KiB | 0.05545 | 18.47 | 0.80 | emmansun/base64 3.02 | 23.2× | 6.12× |
+| ValidateString vs DecodeString | 32 KiB | 0.9931 | 32.99 | 0.85 | emmansun/base64 4.18 | 38.9× | 7.89× |
+| ValidateString vs DecodeString | 256 KiB | 8.442 | 31.05 | 0.89 | emmansun/base64 5.16 | 34.9× | 6.02× |
+| ValidateString vs DecodeString | 1 MiB | 33.40 | 31.40 | 0.86 | emmansun/base64 4.95 | 36.7× | 6.34× |
+| ValidateString vs DecodeString | 4 MiB | 133.3 | 31.45 | 0.87 | emmansun/base64 6.08 | 36.0× | 5.18× |
+| ValidateString vs Decode, reused buffer | 1 KiB | 0.05508 | 18.59 | 0.93 | emmansun/base64 6.57 | 19.9× | 2.83× |
+| ValidateString vs Decode, reused buffer | 32 KiB | 0.9889 | 33.14 | 0.97 | emmansun/base64 9.96 | 34.0× | 3.33× |
+| ValidateString vs Decode, reused buffer | 256 KiB | 8.478 | 30.92 | 0.98 | emmansun/base64 9.70 | 31.6× | 3.19× |
+| ValidateString vs Decode, reused buffer | 1 MiB | 33.54 | 31.27 | 0.98 | emmansun/base64 9.73 | 31.9× | 3.21× |
+| ValidateString vs Decode, reused buffer | 4 MiB | 133.1 | 31.52 | 0.98 | emmansun/base64 9.77 | 32.2× | 3.22× |
 
-校验计长的两组里，moego 只检查输入并算出解码后的长度，不写出解码结果；其他实现要完整解码。两边做的工作不同，这两组的倍数不代表解码速度，解码速度看“预分配解码”和 `DecodeString`。
+In the two validation groups, `base64` only checks the input and computes
+the decoded length without writing the decoded bytes, while the other
+packages decode in full. The work differs, so these multipliers do not
+measure decoding speed; for that, see the preallocated decode and
+`DecodeString` rows.
 
-## 重复测量
+## Repeated runs
 
-同一份代码做了三次完整测量，每一项 moego 的中位耗时都低于所有其他实现；差距最小的是 data URL 拼接，中位耗时最少只比最快的其他实现少 5%。
+Three complete runs of the same code each gave `base64` a lower median time
+than every other package on every row. The closest is data URL by
+concatenation, where the median time was as little as 5% below the fastest
+other package.
 
-## 不清零分配
+## Allocation without zeroing
 
-在 amd64 和 arm64 上，`EncodeToString`、`DecodeString` 和 `EncodeDataURL` 默认通过 `//go:linkname` 调用 `runtime.mallocgc` 分配结果，不先清零；用 `-tags moego_zeroalloc` 编译会改用普通的 `make`（见 [README](../README.zh_CN.md)）。在同一台机器上，用 `moego_zeroalloc` 构建的二进制单独测了 `BenchmarkNewAPI` 和 `BenchmarkDataURL` 的 30 项，方法同上。
+On amd64 and arm64, `EncodeToString`, `DecodeString` and `EncodeDataURL`
+allocate their result through `runtime.mallocgc` with `//go:linkname`,
+without zeroing it first; building with `-tags moego_zeroalloc` switches
+to an ordinary `make` (see the
+[README](../README.md#result-buffers-are-not-zeroed-first)). On the same
+machine, a binary built with `moego_zeroalloc` was measured separately on
+the 30 rows of `BenchmarkNewAPI` and `BenchmarkDataURL`, with the same
+method.
 
-其中分配结果的 25 项都变慢了，moego 的中位耗时增加 8%–83%。受影响最大的是 `EncodeToString`：相比最快的其他实现，默认构建为 1.24–1.58 倍，`moego_zeroalloc` 为 0.95–1.08 倍。除 4 MiB 的 `EncodeToString` 外，moego 的中位耗时仍低于所有其他实现。
+The 25 rows that allocate their result all got slower; the median time of
+`base64` rose by 8%–83%. `EncodeToString` is affected most: against the
+fastest other package it is 1.24–1.58 times as fast in the default build
+and 0.95–1.08 times as fast with `moego_zeroalloc`. Apart from
+`EncodeToString` at 4 MiB, the median time of `base64` is still below that
+of every other package.
 
-| 大小 | 默认构建 moego 耗时 (μs) | 相比最快的其他实现 | `moego_zeroalloc` moego 耗时 (μs) | 相比最快的其他实现 |
+| Size | Default build, base64 time (μs) | vs fastest other | `moego_zeroalloc`, base64 time (μs) | vs fastest other |
 |---|--:|--:|--:|--:|
 | 1 KiB | 0.2445 | 1.24× | 0.2813 | 1.08× |
 | 32 KiB | 6.017 | 1.40× | 8.039 | 1.05× |
@@ -105,18 +166,29 @@ moego 与 `encoding/base64` 及其他 Go Base64 实现在一台 Linux AMD64 机�
 | 1 MiB | 126.2 | 1.51× | 176.2 | 1.08× |
 | 4 MiB | 606.1 | 1.58× | 1,111 | 0.95× |
 
-默认构建和 `moego_zeroalloc` 不是在同一次运行中测的，差值里也包含运行之间的波动。复用缓冲区 data URL、预分配编解码和校验计长不分配结果，不受这个选项影响。
+The default build and `moego_zeroalloc` were not measured in the same run,
+so the difference includes run-to-run variation. data URL into a reused
+buffer, preallocated encode and decode, and validation do not allocate a
+result and are not affected.
 
-## 局限
+## Limitations
 
-- 只测了一台多人共用的 KVM 虚拟机，结果只代表这台机器。其他用户的负载会改变可用的 L3 缓存和内存带宽；分配结果的场景还受 GC 和堆状态影响。
-- 换成别的 CPU，结果可能不同。比如在支持 AVX-512 VBMI 的 CPU 上，emmansun/base64 会走 AVX-512 路径，这里没有测到。
-- 当前版本的 arm64 NEON 路径还没有测过速度。
-- 预分配编码在 256 KiB 及以上约为最快的其他实现的 1.17 倍，低于 1 KiB 和 32 KiB 时的 1.34 倍。
+- Only one shared KVM virtual machine was measured, and the results apply
+  to this machine only. Other users' load changes the L3 cache and memory
+  bandwidth available; scenarios that allocate their result also depend on
+  GC and heap state.
+- Other CPUs may give different results. On a CPU with AVX-512 VBMI, for
+  example, `emmansun/base64` takes an AVX-512 path that was not measured
+  here.
+- The speed of the arm64 NEON path has not been measured for this version.
+- Encoding into a preallocated buffer is about 1.17 times as fast as the
+  fastest other package from 256 KiB up, below the 1.34 times at 1 KiB and
+  32 KiB.
 
-## 复现
+## Reproducing
 
-在 `bench/` 目录运行，需要 Go 1.26、Python 3 和 bash；Linux 上用 `taskset` 固定 CPU：
+Run from `bench/` with Go 1.26, Python 3 and bash; on Linux, `taskset` pins
+the CPU:
 
 ```sh
 go test ./...
@@ -136,4 +208,13 @@ python3 plot.py results/linux-amd64 --output ../docs/images --lang zh --note "�
 python3 plot.py results/linux-amd64 --output ../docs/images --lang en --note "Shared KVM virtual machine; results apply to this machine only"
 ```
 
-把 `taskset -c 2` 中的 2 换成一个空闲 CPU 的编号；`--output` 的目录必须尚不存在。`compare.py` 逐项列出 moego 与最快的其他实现的中位耗时和吞吐量倍数；`plot.py` 生成 README 中的中文图（`.zh.svg`）和英文图（`.en.svg`）。`moego_zeroalloc` 的对照用 `go test -c -tags moego_zeroalloc` 构建二进制，只选 `BenchmarkNewAPI` 和 `BenchmarkDataURL` 的 30 项，再用 `compare.py --suite newapi` 和 `--suite dataurl` 对比。参数和输出文件的说明见 [bench/README.md](../bench/README.md) 和 [bench/rounds.md](../bench/rounds.md)。
+Replace the 2 in `taskset -c 2` with the number of an idle CPU; the
+`--output` directory must not exist yet. `compare.py` lists the median time
+and throughput multiplier of `base64` against the fastest other package for
+every row; `plot.py` draws the Chinese (`.zh.svg`) and English (`.en.svg`)
+charts of the README. For the `moego_zeroalloc` comparison, build the
+binary with `go test -c -tags moego_zeroalloc`, select only the 30 rows of
+`BenchmarkNewAPI` and `BenchmarkDataURL`, and compare with
+`compare.py --suite newapi` and `--suite dataurl`. Options and output files
+are described in [bench/README.md](../bench/README.md) and
+[bench/rounds.md](../bench/rounds.md) (in Chinese).

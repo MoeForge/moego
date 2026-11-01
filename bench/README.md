@@ -71,7 +71,7 @@ taskset -c 2 python3 rounds.py --binary /tmp/moego-bench.test \
 python3 compare.py --suite all results/linux-amd64/combined.txt
 ```
 
-脚本使用 bash 数组。`taskset` 把采样固定在一个 CPU 上（Linux），把 2 换成一个空闲 CPU 的编号。`--output` 的目录必须尚不存在。输出文件的说明见 [rounds.md](rounds.md)；[Linux AMD64 实测](../docs/benchmark-results-linux-amd64.md)用的就是这组参数。
+脚本使用 bash 数组。`taskset` 把采样固定在一个 CPU 上（Linux），把 2 换成一个空闲 CPU 的编号。`--output` 的目录必须尚不存在。输出文件的说明见 [rounds.md](rounds.md)；[Linux AMD64 实测](../docs/benchmark-results-linux-amd64.zh_CN.md)用的就是这组参数。
 
 ## compare.py
 
@@ -102,4 +102,4 @@ python3 -m unittest test_compare.py test_rounds.py test_plot.py
 
 ## 记录结果
 
-发布测量结果时，请写明 Go 版本、操作系统、CPU 和被测的提交。不同系统、不同 CPU 的结果不能互相代替，Linux AMD64 和 Linux ARM64 需要分别测量；交叉编译只能说明代码能够构建。Linux AMD64 的结果见 [docs/benchmark-results-linux-amd64.md](../docs/benchmark-results-linux-amd64.md)，当前版本的 ARM64 还没有测过速度。
+发布测量结果时，请写明 Go 版本、操作系统、CPU 和被测的提交。不同系统、不同 CPU 的结果不能互相代替，Linux AMD64 和 Linux ARM64 需要分别测量；交叉编译只能说明代码能够构建。Linux AMD64 的结果见 [docs/benchmark-results-linux-amd64.zh_CN.md](../docs/benchmark-results-linux-amd64.zh_CN.md)，当前版本的 ARM64 还没有测过速度。

@@ -1,0 +1,521 @@
+{"bucket": "path del.del.out multipath", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "{\"[x]\":0}", "path": "[x]"}}
+{"bucket": "path del.del.out plain", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "{\"first\":\"[1,2]\"}", "path": "first.1"}}
+{"bucket": "path docset.docset.err1 #count", "area": "path", "op": "docset", "field": "docset.err1", "case": {"doc": "0", "path": "#"}}
+{"bucket": "path docset.docset.err1 lines", "area": "path", "op": "docset", "field": "docset.err1", "case": {"doc": "", "path": "..#", "lines": true}}
+{"bucket": "path docset.docset.err1 pipe", "area": "path", "op": "docset", "field": "docset.err1", "case": {"doc": "0", "path": "|"}}
+{"bucket": "path docset.docset.err1 plain", "area": "path", "op": "docset", "field": "docset.err1", "case": {"doc": "0", "path": "@"}}
+{"bucket": "path docset.docset.err1 wildcard", "area": "path", "op": "docset", "field": "docset.err1", "case": {"doc": "0", "path": "*"}}
+{"bucket": "path docset.docset.out1 plain", "area": "path", "op": "docset", "field": "docset.out1", "case": {"doc": "[0,0]", "path": "\\1"}}
+{"bucket": "path docset.docset.out2 literal", "area": "path", "op": "docset", "field": "docset.out2", "case": {"doc": "0", "path": "!1", "raw": "null"}}
+{"bucket": "path docset.docset.out2 multipath", "area": "path", "op": "docset", "field": "docset.out2", "case": {"doc": "0", "path": "{\"", "raw": "7"}}
+{"bucket": "path docset.docset.out2 plain", "area": "path", "op": "docset", "field": "docset.out2", "case": {"doc": "0", "path": "9\\", "raw": "{\"\":[]}"}}
+{"bucket": "path docset.docset.out3 multipath", "area": "path", "op": "docset", "field": "docset.out3", "case": {"doc": "0", "path": "[b", "raw": "[]"}}
+{"bucket": "path docset.docset.out3 plain", "area": "path", "op": "docset", "field": "docset.out3", "case": {"doc": "0", "path": "\"", "raw": "7"}}
+{"bucket": "path get.Index #.map", "area": "path", "op": "get", "field": "Index", "case": {"doc": "{\"#\":{\"[x]\":0}}", "path": "#.\\[?]"}}
+{"bucket": "path get.Index #count", "area": "path", "op": "get", "field": "Index", "case": {"doc": "{\"#\":0}", "path": "#"}}
+{"bucket": "path get.Index @flatten", "area": "path", "op": "get", "field": "Index", "case": {"doc": " \r\n 0\t", "path": "@flatten"}}
+{"bucket": "path get.Index @join", "area": "path", "op": "get", "field": "Index", "case": {"doc": " 0", "path": "@join"}}
+{"bucket": "path get.Index @pretty", "area": "path", "op": "get", "field": "Index", "case": {"doc": "0", "path": "@pretty:{\"prefix\"\" \""}}
+{"bucket": "path get.Index @reverse", "area": "path", "op": "get", "field": "Index", "case": {"doc": "\n0", "path": "@reverse"}}
+{"bucket": "path get.Index @this", "area": "path", "op": "get", "field": "Index", "case": {"doc": "\n0", "path": "@this"}}
+{"bucket": "path get.Index @valid", "area": "path", "op": "get", "field": "Index", "case": {"doc": "\t0", "path": "@valid"}}
+{"bucket": "path get.Index @values", "area": "path", "op": "get", "field": "Index", "case": {"doc": "\n[]", "path": "@values"}}
+{"bucket": "path get.Index lines", "area": "path", "op": "get", "field": "Index", "case": {"doc": "0\n0", "path": "..1", "lines": true}}
+{"bucket": "path get.Index multipath", "area": "path", "op": "get", "field": "Index", "case": {"doc": "[0,0]", "path": "[]1"}}
+{"bucket": "path get.Index plain", "area": "path", "op": "get", "field": "Index", "case": {"doc": "{\n  \"\": 0\n}", "path": ""}}
+{"bucket": "path get.Index query", "area": "path", "op": "get", "field": "Index", "case": {"doc": "[0]", "path": "#("}}
+{"bucket": "path get.Index wildcard", "area": "path", "op": "get", "field": "Index", "case": {"doc": "{\"a\":0}", "path": "*"}}
+{"bucket": "path get.Indexes #.map", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[]", "path": "#."}}
+{"bucket": "path get.Indexes lines", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "", "path": "..#.", "lines": true}}
+{"bucket": "path get.Indexes multipath", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[]", "path": "[())#.", "sub": "5", "raw": "7"}}
+{"bucket": "path get.Indexes query", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[0]", "path": "#()#"}}
+{"bucket": "path get.Num #.map", "area": "path", "op": "get", "field": "Num", "case": {"doc": " [ { \"age\" : 0 } ]", "path": "#.*|#"}}
+{"bucket": "path get.Num #count", "area": "path", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "#"}}
+{"bucket": "path get.Num lines", "area": "path", "op": "get", "field": "Num", "case": {"doc": "0", "path": "..#", "lines": true}}
+{"bucket": "path get.Num literal", "area": "path", "op": "get", "field": "Num", "case": {"doc": "0", "path": "!1"}}
+{"bucket": "path get.Num multipath", "area": "path", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "[()]#"}}
+{"bucket": "path get.Num pipe", "area": "path", "op": "get", "field": "Num", "case": {"doc": "[0,0,{\"age\":1}]", "path": "2|age"}}
+{"bucket": "path get.Num plain", "area": "path", "op": "get", "field": "Num", "case": {"doc": "{ \"\" : 1 }", "path": ""}}
+{"bucket": "path get.Num query", "area": "path", "op": "get", "field": "Num", "case": {"doc": "[{\"a*b\":1}]", "path": "#(*)|*"}}
+{"bucket": "path get.Num wildcard", "area": "path", "op": "get", "field": "Num", "case": {"doc": "{\"first\":1}", "path": "firs?"}}
+{"bucket": "path get.Raw #count", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "[]", "path": "#"}}
+{"bucket": "path get.Raw literal", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "!{", "raw": "7"}}
+{"bucket": "path get.Raw multipath", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "{}"}}
+{"bucket": "path get.Raw pipe", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "[0,0,[0]]", "path": "2|0"}}
+{"bucket": "path get.Raw query", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "[]", "path": "#()#"}}
+{"bucket": "path get.Str #.map", "area": "path", "op": "get", "field": "Str", "case": {"doc": "[{\"b\":\"1\"}]", "path": "#.b|0"}}
+{"bucket": "path get.Str lines", "area": "path", "op": "get", "field": "Str", "case": {"doc": "0\n\n\"ig\"", "path": "..1", "lines": true}}
+{"bucket": "path get.Str literal", "area": "path", "op": "get", "field": "Str", "case": {"doc": "0", "path": "!\"a"}}
+{"bucket": "path get.Str multipath", "area": "path", "op": "get", "field": "Str", "case": {"doc": "0", "path": "{}|@tostr"}}
+{"bucket": "path get.Str pipe", "area": "path", "op": "get", "field": "Str", "case": {"doc": "\n{ \r\n \"a b\":[\n0,\"true\"]\t}\n", "path": "a b|1"}}
+{"bucket": "path get.Str plain", "area": "path", "op": "get", "field": "Str", "case": {"doc": " { \"\" : \"null\" }", "path": "", "raw": "7"}}
+{"bucket": "path get.Str query", "area": "path", "op": "get", "field": "Str", "case": {"doc": "[\"fb\"]", "path": "#(", "sub": "#"}}
+{"bucket": "path get.Str wildcard", "area": "path", "op": "get", "field": "Str", "case": {"doc": "{\"a\":\"true\"}", "path": "*"}}
+{"bucket": "path get.Type plain", "area": "path", "op": "get", "field": "Type", "case": {"doc": "{ \"\" : 0 }", "path": ""}}
+{"bucket": "path set.set.out #.map", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[[]]", "path": "#.#"}}
+{"bucket": "path set.set.out @dig", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@dig"}}
+{"bucket": "path set.set.out @flatten", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@flatten"}}
+{"bucket": "path set.set.out @fromstr", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@fromstr"}}
+{"bucket": "path set.set.out @group", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[{}]", "path": "#.@group"}}
+{"bucket": "path set.set.out @join", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "\n0\t", "path": "@join"}}
+{"bucket": "path set.set.out @keys", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[{}]", "path": "#.@keys"}}
+{"bucket": "path set.set.out @pretty", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@pretty"}}
+{"bucket": "path set.set.out @tostr", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[{}]", "path": "#..@tostr", "raw": "7"}}
+{"bucket": "path set.set.out @ugly", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@ugly", "sub": "#"}}
+{"bucket": "path set.set.out lines", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[]", "path": "..#.#()#", "sub": "2", "raw": "7", "lines": true}}
+{"bucket": "path set.set.out multipath", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "{\"\":0}", "path": "[a", "raw": "7"}}
+{"bucket": "api get.Num @dig", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[{\"1\":{\"nets\":{\"a\":1}}}]", "path": "@dig:nets.?|0|@pretty"}}
+{"bucket": "api get.Num @flatten", "area": "api", "op": "get", "field": "Num", "case": {"doc": "1", "path": "@flatten", "raw": "7"}}
+{"bucket": "api get.Num @fromstr", "area": "api", "op": "get", "field": "Num", "case": {"doc": "1", "path": "@fromstr"}}
+{"bucket": "api get.Num @group", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[0,0,{\"nets\":[0]}]", "path": "2|@group|#"}}
+{"bucket": "api get.Num @join", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "#|@join"}}
+{"bucket": "api get.Num @keys", "area": "api", "op": "get", "field": "Num", "case": {"doc": "0", "path": "@keys.#"}}
+{"bucket": "api get.Num @pretty", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "@pretty:{\"\"}|#"}}
+{"bucket": "api get.Num @reverse", "area": "api", "op": "get", "field": "Num", "case": {"doc": "1", "path": "@reverse", "raw": "7"}}
+{"bucket": "api get.Num @this", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "@this|#"}}
+{"bucket": "api get.Num @tostr", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "@tostr.#"}}
+{"bucket": "api get.Num @ugly", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "@ugly.#"}}
+{"bucket": "api get.Num @valid", "area": "api", "op": "get", "field": "Num", "case": {"doc": "1", "path": "@valid"}}
+{"bucket": "api get.Num @values", "area": "api", "op": "get", "field": "Num", "case": {"doc": "0", "path": "@values.#"}}
+{"bucket": "api get.Raw @dig", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@dig"}}
+{"bucket": "api get.Raw @flatten", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@flatten", "raw": "7"}}
+{"bucket": "api get.Raw @fromstr", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@fromstr"}}
+{"bucket": "api get.Raw @group", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "[0,0,{}]", "path": "2|@group"}}
+{"bucket": "api get.Raw @join", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@join"}}
+{"bucket": "api get.Raw @keys", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@keys", "raw": "7"}}
+{"bucket": "api get.Raw @pretty", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@pretty", "raw": "7"}}
+{"bucket": "api get.Raw @reverse", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@reverse"}}
+{"bucket": "api get.Raw @this", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@this"}}
+{"bucket": "api get.Raw @tostr", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@tostr", "raw": "7"}}
+{"bucket": "api get.Raw @ugly", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@ugly"}}
+{"bucket": "api get.Raw @valid", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@valid"}}
+{"bucket": "api get.Raw @values", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@values"}}
+{"bucket": "api get.Str @flatten", "area": "api", "op": "get", "field": "Str", "case": {"doc": "\"Jane\"", "path": "@flatten"}}
+{"bucket": "api get.Str @fromstr", "area": "api", "op": "get", "field": "Str", "case": {"doc": "[ 0, { \"last\" : \"B\" } ]", "path": "@fromstr.1.last"}}
+{"bucket": "api get.Str @join", "area": "api", "op": "get", "field": "Str", "case": {"doc": "\"B\"", "path": "@join"}}
+{"bucket": "api get.Str @keys", "area": "api", "op": "get", "field": "Str", "case": {"doc": "{\"nets\":0}", "path": "@keys|0"}}
+{"bucket": "api get.Str @pretty", "area": "api", "op": "get", "field": "Str", "case": {"doc": "\"B\"", "path": "@pretty", "raw": "7"}}
+{"bucket": "api get.Str @reverse", "area": "api", "op": "get", "field": "Str", "case": {"doc": "\"ig\"", "path": "@reverse"}}
+{"bucket": "api get.Str @this", "area": "api", "op": "get", "field": "Str", "case": {"doc": "{\"a\\\\b\":\"Craig\"}", "path": "@this|*"}}
+{"bucket": "api get.Str @tostr", "area": "api", "op": "get", "field": "Str", "case": {"doc": "0", "path": "@tostr"}}
+{"bucket": "api get.Str @ugly", "area": "api", "op": "get", "field": "Str", "case": {"doc": "\"Roger\"", "path": "@ugly"}}
+{"bucket": "api get.Str @valid", "area": "api", "op": "get", "field": "Str", "case": {"doc": "\"a\"", "path": "@valid"}}
+{"bucket": "api get.Str @values", "area": "api", "op": "get", "field": "Str", "case": {"doc": "0", "path": "@values|@tostr", "raw": "7"}}
+{"bucket": "api get.m.ForEach #.map", "area": "api", "op": "get", "field": "m.ForEach", "case": {"doc": "{ \"#\" : { \"last\" : [ 0 ] } }", "path": "\\#.last"}}
+{"bucket": "api get.m.ForEach #count", "area": "api", "op": "get", "field": "m.ForEach", "case": {"doc": "{\"#\":[0]}", "path": "\\#"}}
+{"bucket": "api get.m.ForEach pipe", "area": "api", "op": "get", "field": "m.ForEach", "case": {"doc": "{\"a|b\":[0]}", "path": "a\\|b"}}
+{"bucket": "api get.m.ForEach plain", "area": "api", "op": "get", "field": "m.ForEach", "case": {"doc": "[[0]]", "path": "0", "raw": "7"}}
+{"bucket": "api get.m.Value plain+dup", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "[0,0,[{\"last\":{\"name\":0,\"name\":{}}}]]", "path": "2", "raw": "7"}}
+{"bucket": "path del.del.out #.map", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "{\"k:v\":{\"#\":\"[1,2]\"}}", "path": "k:v.\\#.0"}}
+{"bucket": "path del.del.out multipath", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "[0,0]", "path": "[]1", "raw": "7"}}
+{"bucket": "path del.del.out plain", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "[0,0]", "path": "\\1", "raw": "7"}}
+{"bucket": "path docset.docset.err1 lines", "area": "path", "op": "docset", "field": "docset.err1", "case": {"doc": "", "path": "..@", "raw": "7", "lines": true}}
+{"bucket": "path docset.docset.out1 multipath", "area": "path", "op": "docset", "field": "docset.out1", "case": {"doc": "{\"\":0}", "path": "{,"}}
+{"bucket": "path docset.docset.out2 literal", "area": "path", "op": "docset", "field": "docset.out2", "case": {"doc": "0", "path": "!1", "raw": "{\"\":[]}"}}
+{"bucket": "path docset.docset.out2 multipath", "area": "path", "op": "docset", "field": "docset.out2", "case": {"doc": "0", "path": "[\\", "raw": "[]"}}
+{"bucket": "path docset.docset.out2 plain", "area": "path", "op": "docset", "field": "docset.out2", "case": {"doc": "0", "path": "2\\", "raw": "null"}}
+{"bucket": "path docset.docset.out3 plain", "area": "path", "op": "docset", "field": "docset.out3", "case": {"doc": "0", "path": "\"", "raw": "true"}}
+{"bucket": "path get.Index lines", "area": "path", "op": "get", "field": "Index", "case": {"doc": "0\n{}\n", "path": "..#(b=~false)", "lines": true}}
+{"bucket": "path get.Index query", "area": "path", "op": "get", "field": "Index", "case": {"doc": "[0]", "path": "#(#<~true)"}}
+{"bucket": "path get.Indexes #.map", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[]", "path": "#..#||"}}
+{"bucket": "path get.Indexes lines", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "0", "path": "..#(b<~true)#", "lines": true}}
+{"bucket": "path get.Indexes query", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[0]", "path": "#(#=~false)#"}}
+{"bucket": "path get.Num lines", "area": "path", "op": "get", "field": "Num", "case": {"doc": " {\"nets\":0}", "path": "..#(nets)#|@tostr|#", "sub": "1", "lines": true}}
+{"bucket": "path get.Num query", "area": "path", "op": "get", "field": "Num", "case": {"doc": "[[]]", "path": "#.#()#.#||#", "sub": "0"}}
+{"bucket": "path get.Raw lines", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "..#(b<~true)", "lines": true}}
+{"bucket": "path get.Raw literal", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "!{\"a\"[{}]}.a"}}
+{"bucket": "path get.Raw multipath", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "{\"a\":[{\"age\":0}]}", "path": "{a|@tostr|#,()}"}}
+{"bucket": "path get.Raw query", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "[0]", "path": "#(#=~null)"}}
+{"bucket": "path get.Str lines", "area": "path", "op": "get", "field": "Str", "case": {"doc": "\" \"\n", "path": "..#(b=~false)", "lines": true}}
+{"bucket": "path get.Str query", "area": "path", "op": "get", "field": "Str", "case": {"doc": "[ \"fb\" ]", "path": "#(#<~true)"}}
+{"bucket": "path get.Type lines", "area": "path", "op": "get", "field": "Type", "case": {"doc": "0", "path": "..#(b=~false)", "lines": true}}
+{"bucket": "path get.Type multipath", "area": "path", "op": "get", "field": "Type", "case": {"doc": "[\n  {\n    \"last\": 0\n  }\n]", "path": "#(last!\"\")..#||{}"}}
+{"bucket": "path many.many0.Index plain", "area": "path", "op": "many", "field": "many0.Index", "case": {"doc": "[0]", "path": "", "sub": "#(e=~false)", "raw": "7"}}
+{"bucket": "path many.many0.Indexes plain", "area": "path", "op": "many", "field": "many0.Indexes", "case": {"doc": "[]", "path": "", "sub": "#..#||"}}
+{"bucket": "path many.many0.Num lines", "area": "path", "op": "many", "field": "many0.Num", "case": {"doc": "{}\n{\"a\":0}\n", "path": "..", "sub": "@keys|#", "lines": true}}
+{"bucket": "path many.many0.Num plain", "area": "path", "op": "many", "field": "many0.Num", "case": {"doc": "\n[\t\t]\n", "path": "", "sub": "@tostr:{}.#"}}
+{"bucket": "path many.many0.Raw #count", "area": "path", "op": "many", "field": "many0.Raw", "case": {"doc": "[ {  } ]", "path": "#", "sub": "@join:{\"preserve\"t"}}
+{"bucket": "path many.many0.Raw lines", "area": "path", "op": "many", "field": "many0.Raw", "case": {"doc": "[]\n0", "path": "..", "sub": "@ugly.@flatten", "lines": true}}
+{"bucket": "path many.many0.Raw plain", "area": "path", "op": "many", "field": "many0.Raw", "case": {"doc": "[]", "path": "", "sub": "#..#||", "raw": "7"}}
+{"bucket": "path many.many0.Str plain", "area": "path", "op": "many", "field": "many0.Str", "case": {"doc": "0", "path": "", "sub": "@keys.#(f=~false).@tostr"}}
+{"bucket": "path many.many0.Type lines", "area": "path", "op": "many", "field": "many0.Type", "case": {"doc": "[]\r\n{\"age\":0}\n0", "path": "..", "sub": "@reverse.1.age", "lines": true}}
+{"bucket": "path rget.chain.Index @tostr", "area": "path", "op": "rget", "field": "chain.Index", "case": {"doc": "[\n  \n]", "path": "@tostr", "sub": "1"}}
+{"bucket": "path rget.chain.Index literal", "area": "path", "op": "rget", "field": "chain.Index", "case": {"doc": "0", "path": "[!null,()]", "sub": "#(e=~false)", "raw": "7"}}
+{"bucket": "path rget.chain.Indexes #.map", "area": "path", "op": "rget", "field": "chain.Indexes", "case": {"doc": "[]", "path": "#.", "sub": "#..#||"}}
+{"bucket": "path rget.chain.Indexes @this", "area": "path", "op": "rget", "field": "chain.Indexes", "case": {"doc": "[0]", "path": "@this", "sub": "#(1<~true)#"}}
+{"bucket": "path rget.chain.Indexes multipath", "area": "path", "op": "rget", "field": "chain.Indexes", "case": {"doc": "0", "path": "[()]", "sub": "#..#||"}}
+{"bucket": "path rget.chain.Raw literal", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "0", "path": "[!\"\"]", "sub": "@tostr.0"}}
+{"bucket": "path rget.chain.Raw plain", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "0", "path": "", "sub": "!{\"a\"[{\"\"}]}.a"}}
+{"bucket": "path set.set.out #count", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[[]]", "path": "#[#]"}}
+{"bucket": "path set.set.out @case", "area": "path", "op": "set", "field": "set.out", "case": {"doc": " 0", "path": "@case"}}
+{"bucket": "path set.set.out @echo", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@echo:{"}}
+{"bucket": "path set.set.out @flatten", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "\t0\t", "path": "@flatten"}}
+{"bucket": "path set.set.out @len", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@len"}}
+{"bucket": "path set.set.out @tostr", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[{}]", "path": "#..@tostr"}}
+{"bucket": "path set.set.out @ugly", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": "#.@ugly"}}
+{"bucket": "path set.set.out @valid", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "\n0", "path": "@valid"}}
+{"bucket": "path set.set.out @values", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "\t[]", "path": "@values"}}
+{"bucket": "path set.set.out lines", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[]", "path": "..#(#)#", "lines": true}}
+{"bucket": "path set.set.out wildcard", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "{\"b\":0}", "path": "*"}}
+{"bucket": "api get.Num @fromstr", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[0]", "path": "@fromstr.#(#=~null)#|#"}}
+{"bucket": "api get.Num @pretty", "area": "api", "op": "get", "field": "Num", "case": {"doc": "\n{\t\"(p)\" \r\n :\t[ \r\n {\n\"b\"\t:\n0\t}]}", "path": "@pretty.(p).@tostr.#"}}
+{"bucket": "api get.Num @reverse", "area": "api", "op": "get", "field": "Num", "case": {"doc": "[\n  {\n    \"nets\": [\n      0\n    ]\n  }\n]", "path": "#.nets.#|@reverse|0"}}
+{"bucket": "api get.Num @this", "area": "api", "op": "get", "field": "Num", "case": {"doc": "{\"age\":[{\"name\":[0]}]}", "path": "age.#.name.#|@this|0"}}
+{"bucket": "api get.Num @tostr", "area": "api", "op": "get", "field": "Num", "case": {"doc": " [\t0 ]\n", "path": "@tostr.#", "raw": "7"}}
+{"bucket": "api get.Num @ugly", "area": "api", "op": "get", "field": "Num", "case": {"doc": "{\n  \"Last\": [\n    {\n      \"nets\": []\n    }\n  ]\n}", "path": "La?t.#.nets.#|@ugly|#"}}
+{"bucket": "api get.Raw @case", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{\n  \"a=b\": [\n    [\n      \"\"\n    ]\n  ]\n}", "path": "a=b.@case|@tostr.#"}}
+{"bucket": "api get.Raw @fromstr", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "[0]", "path": "@fromstr|#(b!=~true)"}}
+{"bucket": "api get.Raw @join", "area": "api", "op": "get", "field": "Raw", "case": {"doc": " [{  \r\n }\n]", "path": "@join:{\"preserve\"t", "sub": "#"}}
+{"bucket": "api get.Str @tostr", "area": "api", "op": "get", "field": "Str", "case": {"doc": "[{\"b\":\"\"}]", "path": "#.b|@tostr|0", "raw": "7"}}
+{"bucket": "api get.Type @tostr", "area": "api", "op": "get", "field": "Type", "case": {"doc": "\n[\t\n]", "path": "@tostr.1", "sub": "#"}}
+{"bucket": "api get.m.All #.map", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[[]]", "path": "#.#."}}
+{"bucket": "api get.m.All @case", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[false]", "path": "@case:upper"}}
+{"bucket": "api get.m.All @echo", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "0", "path": "@echo:{\"\"1"}}
+{"bucket": "api get.m.All @flatten", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@flatten", "raw": "7"}}
+{"bucket": "api get.m.All @group", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0,{}]", "path": "#.@group"}}
+{"bucket": "api get.m.All @join", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@join", "raw": "7"}}
+{"bucket": "api get.m.All @keys", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@keys"}}
+{"bucket": "api get.m.All @reverse", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@reverse", "raw": "7"}}
+{"bucket": "api get.m.All @this", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0,{\"age\":0}]", "path": "#.age.@this"}}
+{"bucket": "api get.m.All @tostr", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@tostr"}}
+{"bucket": "api get.m.All @valid", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@valid"}}
+{"bucket": "api get.m.All @values", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@values"}}
+{"bucket": "api get.m.All @wrap", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "{}", "path": "|@wrap"}}
+{"bucket": "api get.m.All lines", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[]", "path": "..#.#()#", "raw": "7"}}
+{"bucket": "api get.m.All literal", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "0", "path": "![."}}
+{"bucket": "api get.m.All multipath", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "{\n  \"friends\": [\n    0\n  ]\n}", "path": "friends.#.{}", "raw": "7"}}
+{"bucket": "api get.m.All nomod:lines", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "{\"@reverse\":0}\n", "path": "..#.@reverse", "lines": true}}
+{"bucket": "api get.m.All query", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[[0]]", "path": "#.#("}}
+{"bucket": "api get.m.Array multipath", "area": "api", "op": "get", "field": "m.Array", "case": {"doc": "[ { \"ne\\u0074s\" : [] } ]", "path": "#.nets.#|[]"}}
+{"bucket": "api get.m.Keys literal", "area": "api", "op": "get", "field": "m.Keys", "case": {"doc": "0", "path": "![|"}}
+{"bucket": "api get.m.Map @echo", "area": "api", "op": "get", "field": "m.Map", "case": {"doc": "0", "path": "@echo|@wrap"}}
+{"bucket": "api get.m.Map literal", "area": "api", "op": "get", "field": "m.Map", "case": {"doc": "0", "path": "!{\"\"1"}}
+{"bucket": "api get.m.Path lines", "area": "api", "op": "get", "field": "m.Path", "case": {"doc": "{} \n0\n", "path": "..1", "lines": true}}
+{"bucket": "api get.m.Path nomod:lines", "area": "api", "op": "get", "field": "m.Path", "case": {"doc": "", "path": "..", "lines": true}}
+{"bucket": "api get.m.Path nomod:plain", "area": "api", "op": "get", "field": "m.Path", "case": {"doc": "0", "path": ""}}
+{"bucket": "api get.m.Paths @echo", "area": "api", "op": "get", "field": "m.Paths", "case": {"doc": "[0]", "path": "#.@echo:\"", "raw": "7"}}
+{"bucket": "api get.m.Paths lines", "area": "api", "op": "get", "field": "m.Paths", "case": {"doc": "{} \n[]", "path": "..#.#()#", "lines": true}}
+{"bucket": "api get.m.String literal", "area": "api", "op": "get", "field": "m.String", "case": {"doc": "0", "path": "!1-", "raw": "7"}}
+{"bucket": "api get.m.Value @keys", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "[]", "path": "#|@keys|@case:upper"}}
+{"bucket": "api get.m.Value lines", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "{\"a b\":[44]}\n", "path": "..#(a b.#).a b.#(=44).@keys|@case:upper", "lines": true}}
+{"bucket": "api get.m.Value multipath", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "[]", "path": "|{@wrap}", "raw": "7"}}
+{"bucket": "api rget.chain.Num @tostr", "area": "api", "op": "rget", "field": "chain.Num", "case": {"doc": "[{\"b\":0}]", "path": "@tostr", "sub": "#"}}
+{"bucket": "api rget.chain.Raw @this", "area": "api", "op": "rget", "field": "chain.Raw", "case": {"doc": "[0]", "path": "@this", "sub": "#(1<~true)"}}
+{"bucket": "api rget.chain.Str @tostr", "area": "api", "op": "rget", "field": "chain.Str", "case": {"doc": "{\n  \"friends\": [\n    {\"first\": \"\"}\n  ]\n}", "path": "friends.#.first|@tostr", "sub": "0", "raw": "7"}}
+{"bucket": "path del.del.out plain", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "[0,0]", "path": "1\\", "sub": "#", "raw": "7"}}
+{"bucket": "path docset.docset.out1 plain", "area": "path", "op": "docset", "field": "docset.out1", "case": {"doc": "\"[1,2]\"", "path": "1"}}
+{"bucket": "path set.set.out #.map", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[{\"a\":0}]", "path": "#.a"}}
+{"bucket": "path set.set.out @fromstr", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[{}]", "path": "#.@fromstr"}}
+{"bucket": "path set.set.out @join", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "\t0", "path": "@join"}}
+{"bucket": "path set.set.out @pretty", "area": "path", "op": "set", "field": "set.out", "case": {"doc": " 0", "path": "@pretty:{\"prefix\"\" \""}}
+{"bucket": "deviation docset.deviation.docset.out1 plain", "area": "deviation", "op": "docset", "field": "deviation.docset.out1", "case": {"doc": "[0,\"[1,2]\" ]", "path": "1.1", "raw": "{\"\":[]}"}}
+{"bucket": "deviation set.deviation.set.out @case", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[\n  {\n    \"b\": 0\n  }\n]", "path": "#.b.@case"}}
+{"bucket": "deviation set.deviation.set.out @group", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[{\"a\":0}]", "path": "#.@group"}}
+{"bucket": "deviation set.deviation.set.out @join", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[0]", "path": "#.@join"}}
+{"bucket": "deviation set.deviation.set.out @keys", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[\n  0\n]", "path": "#.@keys"}}
+{"bucket": "deviation set.deviation.set.out @this", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[{\"age\":0}]", "path": "#.age.@this"}}
+{"bucket": "deviation set.deviation.set.out @tostr", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[ 0 ]", "path": "#.@tostr"}}
+{"bucket": "deviation set.deviation.set.out @ugly", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[0]", "path": "#.@ugly", "raw": "7"}}
+{"bucket": "deviation set.deviation.set.out @values", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[0]", "path": "#.@values.#"}}
+{"bucket": "deviation set.deviation.set.out @wrap", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[ { \"last\" : 0 } ]", "path": "#(last=\"\")#..@wrap"}}
+{"bucket": "deviation set.deviation.set.out lines", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[]", "path": "..#(#)#.#", "lines": true}}
+{"bucket": "deviation set.deviation.set.out plain", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "{\"c\":\"[1,2]\"}", "path": "c.1", "raw": "7", "val": 1}}
+{"bucket": "deviation set.deviation.set.out query", "area": "deviation", "op": "set", "field": "deviation.set.out", "case": {"doc": "[{\"id\":[]}]", "path": "#.id.#()#"}}
+{"bucket": "deviation setraw.deviation.setraw.out #.map", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[[]]", "path": "#.#", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @case", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[\n  {\n    \"b\": 0\n  }\n]", "path": "#.b.@case", "raw": "[]"}}
+{"bucket": "deviation setraw.deviation.setraw.out @dig", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[0]", "path": "#.@dig", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @echo", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[0]", "path": "#.@echo:{", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @fromstr", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[{\"a\":0}]", "path": "#.a.@fromstr", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @group", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[{\"a\":0}]", "path": "#.@group", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @join", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[0]", "path": "#.@join", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @keys", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[\n  0\n]", "path": "#.@keys", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @len", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[0]", "path": "#.@len", "raw": "{\"\":[]}"}}
+{"bucket": "deviation setraw.deviation.setraw.out @pretty", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[0]", "path": "#.@pretty", "raw": "{\"\":[]}"}}
+{"bucket": "deviation setraw.deviation.setraw.out @this", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[{\"age\":0}]", "path": "#.age.@this", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out @tostr", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[ 0 ]", "path": "#.@tostr", "raw": "{\"\":[]}"}}
+{"bucket": "deviation setraw.deviation.setraw.out @valid", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[{\"first\":0}]", "path": "#(*)#.*.@valid", "raw": "{}"}}
+{"bucket": "deviation setraw.deviation.setraw.out @values", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[0]", "path": "#.@values.#", "raw": "{\"\":[]}"}}
+{"bucket": "deviation setraw.deviation.setraw.out @wrap", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[ { \"last\" : 0 } ]", "path": "#(last=\"\")#..@wrap", "raw": "\"\""}}
+{"bucket": "deviation setraw.deviation.setraw.out lines", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[]", "path": "..#(#)#.#", "raw": "\"\"", "lines": true}}
+{"bucket": "deviation setraw.deviation.setraw.out multipath", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[ { \"ne\\u0074s\" : [] } ]", "path": "#.nets.#|[]", "raw": "null"}}
+{"bucket": "deviation setraw.deviation.setraw.out query", "area": "deviation", "op": "setraw", "field": "deviation.setraw.out", "case": {"doc": "[{\"id\":[]}]", "path": "#.id.#()#", "raw": "{}"}}
+{"bucket": "api parse.m.root.All nomod:lines", "area": "api", "op": "parse", "field": "m.root.All", "case": {"doc": "[]\n0", "path": "..#", "raw": "7", "lines": true}}
+{"bucket": "api parse.m.root.Path nomod:#.map", "area": "api", "op": "parse", "field": "m.root.Path", "case": {"doc": "[]", "path": "#.|#"}}
+{"bucket": "api parse.m.root.Path nomod:#count", "area": "api", "op": "parse", "field": "m.root.Path", "case": {"doc": "[]", "path": "#", "raw": "7"}}
+{"bucket": "api parse.m.root.Path nomod:@reverse", "area": "api", "op": "parse", "field": "m.root.Path", "case": {"doc": "{\"@reverse\":[{\"last\":0}]}", "path": "@reverse.0.last"}}
+{"bucket": "api parse.m.root.Path nomod:query", "area": "api", "op": "parse", "field": "m.root.Path", "case": {"doc": "[  ]", "path": "#(\"\")#"}}
+{"bucket": "api parse.m.root.Path nomod:wildcard", "area": "api", "op": "parse", "field": "m.root.Path", "case": {"doc": "{ \"@r\\u0065verse\" : 0 }", "path": "*"}}
+{"bucket": "path docset.docset1.out @case", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": " \"Roger\"", "path": "@case:upper"}}
+{"bucket": "path docset.docset2.out literal", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "0", "path": "!"}}
+{"bucket": "path docset.docset2.out multipath", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "0", "path": "["}}
+{"bucket": "path docset.docset2.out plain", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "0", "path": "�", "raw": "s"}}
+{"bucket": "path docset.docset3.out plain", "area": "path", "op": "docset", "field": "docset3.out", "case": {"doc": "{\"a\" \r\n :0\n}\t", "path": "\"", "raw": "null"}}
+{"bucket": "path setopt.setopt0.inplace lines", "area": "path", "op": "setopt", "field": "setopt0.inplace", "case": {"doc": "\n", "path": "..@", "raw": "7", "lines": true}}
+{"bucket": "path setopt.setopt1.out lines", "area": "path", "op": "setopt", "field": "setopt1.out", "case": {"doc": "\n0", "path": "..0", "lines": true}}
+{"bucket": "api get.Type @tostr", "area": "api", "op": "get", "field": "Type", "case": {"doc": "\t[\n \r\n ]\t", "path": "@tostr.#("}}
+{"bucket": "deviation docset.deviation.docset1 @values", "area": "deviation", "op": "docset", "field": "deviation.docset1", "case": {"doc": "[ 0 ]", "path": "#.@values", "raw": "{}"}}
+{"bucket": "deviation set.deviation.set @values", "area": "deviation", "op": "set", "field": "deviation.set", "case": {"doc": "[ 0 ]", "path": "#.@values"}}
+{"bucket": "path docset.deviation-failed.docset3 plain", "area": "path", "op": "docset", "field": "deviation-failed.docset3", "case": {"doc": "0", "path": ":\"", "raw": "7"}}
+{"bucket": "path docset.docset1.out #.map", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\"k:v\":{\"#\":\"[1,2]\"}}", "path": "k:v.\\#.0", "raw": "true"}}
+{"bucket": "path docset.docset1.out @case", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": " \"Roger\"", "path": "@case:upper", "raw": "true"}}
+{"bucket": "path docset.docset1.out lines", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{}", "path": "..#.@group", "raw": "7", "lines": true}}
+{"bucket": "path docset.docset1.out multipath", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\"\":0}", "path": "{,", "raw": "\"\""}}
+{"bucket": "path docset.docset1.out query", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\n  \"nets\": [\n    0\n  ]\n}", "path": "nets|#(!\"\")#", "raw": "null"}}
+{"bucket": "path docset.docset2.out @case", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": " 0\t", "path": "@case:upper", "raw": "\"b\""}}
+{"bucket": "path docset.docset2.out @join", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "[{}]", "path": "#.@join", "raw": "[]"}}
+{"bucket": "path docset.docset3.out plain", "area": "path", "op": "docset", "field": "docset3.out", "case": {"doc": "{\"#\":0}", "path": "\"", "raw": "[]"}}
+{"bucket": "path set.set.out query", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[1,0,[0]]", "path": "2|#()#", "sub": "2", "val": 4}}
+{"bucket": "path setopt.setopt1.err multipath", "area": "path", "op": "setopt", "field": "setopt1.err", "case": {"doc": "[0]", "path": "[]0", "raw": "\"\""}}
+{"bucket": "path setopt.setopt1.err plain+dup", "area": "path", "op": "setopt", "field": "setopt1.err", "case": {"doc": "[ 0, { \"nets\" : [], \"nets\" : { \"fav.movie\" : 0 } } ]", "path": "1.nets.fav\\.movie", "raw": "true"}}
+{"bucket": "path setopt.setopt1.out lines", "area": "path", "op": "setopt", "field": "setopt1.out", "case": {"doc": "\n0", "path": "..0", "raw": "\"\"", "lines": true}}
+{"bucket": "path setopt.setopt1.out plain+dup", "area": "path", "op": "setopt", "field": "setopt1.out", "case": {"doc": "{\"b\":0,\"b\":{\"nets\":0}}", "path": "b.nets", "raw": "[]"}}
+{"bucket": "deviation docset.deviation.docset2 @case", "area": "deviation", "op": "docset", "field": "deviation.docset2", "case": {"doc": "{ \"k:v\" : [ {} ] }", "path": "k:v.#.@case", "raw": "null"}}
+{"bucket": "deviation docset.deviation.docset2 @this", "area": "deviation", "op": "docset", "field": "deviation.docset2", "case": {"doc": "{\n  \"name\": [\n    {}\n  ]\n}", "path": "name.#.@this", "raw": "7"}}
+{"bucket": "deviation docset.deviation.docset2 @valid", "area": "deviation", "op": "docset", "field": "deviation.docset2", "case": {"doc": "[{}]", "path": "#.@valid", "raw": "7"}}
+{"bucket": "path del.deviation-failed.string.del plain", "area": "path", "op": "del", "field": "deviation-failed.string.del", "case": {"doc": "[0,\"[1,2]\" ]", "path": "1.1"}}
+{"bucket": "path docset.docset2.out multipath", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "0", "path": "[%", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.malformed.docset1 plain", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[0,\"[1,2]\" ]", "path": "1.1", "raw": "{\"r\":[]}"}}
+{"bucket": "deviation docset.deviation.string.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.string.docset2", "case": {"doc": "0", "path": "e.{}", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 #.map", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "{\n  \"b\": [\n    \"Jane\",\n    []\n  ]\n}", "path": "b|#.#", "raw": "null"}}
+{"bucket": "deviation docset.deviation-unverified.unmapped.docset1 multipath", "area": "deviation", "op": "docset", "field": "deviation-unverified.unmapped.docset1", "case": {"doc": "{\"\":0}", "path": "{,.}", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation-unverified.unmapped.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation-unverified.unmapped.docset2", "case": {"doc": "0", "path": "[]", "raw": "[]"}}
+{"bucket": "deviation set.deviation.string.set #.map", "area": "deviation", "op": "set", "field": "deviation.string.set", "case": {"doc": "{\"k:v\":{\"#\":\"[1,2]\"}}", "path": "k:v.\\#.0", "val": 4}}
+{"bucket": "deviation set.deviation.unmapped.set #.map", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "{\n  \"b\": [\n    \"Jane\",\n    []\n  ]\n}", "path": "b|#.#"}}
+{"bucket": "deviation set.deviation-unverified.unmapped.set multipath", "area": "deviation", "op": "set", "field": "deviation-unverified.unmapped.set", "case": {"doc": "{\"\":0}", "path": "{,.}"}}
+{"bucket": "path docset.deviation-failed.malformed.docset3 plain", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset3", "case": {"doc": "0", "path": "\"=", "raw": "{}"}}
+{"bucket": "path docset.deviation-failed.string.docset2 literal", "area": "path", "op": "docset", "field": "deviation-failed.string.docset2", "case": {"doc": "0", "path": "!1=", "raw": "\"\""}}
+{"bucket": "path docset.deviation-failed.string.docset2 multipath", "area": "path", "op": "docset", "field": "deviation-failed.string.docset2", "case": {"doc": "0", "path": "[=", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.string.docset2 literal", "area": "deviation", "op": "docset", "field": "deviation.string.docset2", "case": {"doc": "0", "path": "!\"", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.string.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.string.docset2", "case": {"doc": "0", "path": "{b", "raw": "\"\""}}
+{"bucket": "path del.del.out literal", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "{\"\":0}", "path": "[!"}}
+{"bucket": "path docset.deviation-failed.dupkey.docset2 multipath", "area": "path", "op": "docset", "field": "deviation-failed.dupkey.docset2", "case": {"doc": "0", "path": "[\u0000", "raw": "7"}}
+{"bucket": "path docset.deviation-failed.malformed.docset1 plain", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset1", "case": {"doc": "\"[1,2]\"", "path": "1", "raw": "{\"\":[]}"}}
+{"bucket": "path docset.deviation-failed.malformed.docset3 plain", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset3", "case": {"doc": "0", "path": "\"\\", "raw": "[]"}}
+{"bucket": "path docset.docset1.out #.map", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\"k:v\":{\"#\":\"[1,2]\"}}", "path": "k:v.\\#.0", "raw": "1"}}
+{"bucket": "path docset.docset1.out @pretty", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": " 0", "path": "@pretty:{\"prefix\"\" \"", "raw": "7"}}
+{"bucket": "path docset.docset2.out #.map", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "0", "path": "\\#.\\0", "raw": "true"}}
+{"bucket": "path docset.docset2.out literal", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "0", "path": "!1.", "raw": "\"\""}}
+{"bucket": "path docset.docset3.out plain", "area": "path", "op": "docset", "field": "docset3.out", "case": {"doc": "{\"b\":0}", "path": "\"", "raw": "true"}}
+{"bucket": "path get.Index @pretty", "area": "path", "op": "get", "field": "Index", "case": {"doc": "0", "path": "@pretty:{\"prefix\"\" \"", "raw": "7"}}
+{"bucket": "path get.Index plain", "area": "path", "op": "get", "field": "Index", "case": {"doc": "\"[1,I\"", "path": "1"}}
+{"bucket": "path get.Indexes #.map", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "\"[{\"", "path": "#.", "raw": "7"}}
+{"bucket": "path get.Num #count", "area": "path", "op": "get", "field": "Num", "case": {"doc": "\"[1,�]\"", "path": "#", "raw": "7"}}
+{"bucket": "path get.Num literal", "area": "path", "op": "get", "field": "Num", "case": {"doc": "0", "path": "!{\"a\"1}.a", "raw": "7"}}
+{"bucket": "path get.Num plain", "area": "path", "op": "get", "field": "Num", "case": {"doc": "\"[Q,2]\"", "path": "1", "raw": "7"}}
+{"bucket": "path get.Raw #count", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "\"[{\"", "path": "#", "raw": "7"}}
+{"bucket": "path get.Raw multipath", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "[\n[{} \r\n ]] ", "path": "[@tostr.#]"}}
+{"bucket": "path get.Raw query", "area": "path", "op": "get", "field": "Raw", "case": {"doc": " [ { \"last\" : \"a\" } ]", "path": "#(last=\"a\u0010\\g\")", "raw": "7"}}
+{"bucket": "path get.Str literal", "area": "path", "op": "get", "field": "Str", "case": {"doc": "0", "path": "!\"\u0007\\", "raw": "7"}}
+{"bucket": "path get.Type lines", "area": "path", "op": "get", "field": "Type", "case": {"doc": " {\"nets\":0}", "path": "..#(nets)#|@tostr|0", "sub": "1", "raw": "7"}}
+{"bucket": "path rget.chain.Index @echo", "area": "path", "op": "rget", "field": "chain.Index", "case": {"doc": "0", "path": "@echo:1{\"\"1", "raw": "7"}}
+{"bucket": "path rget.chain.Index literal", "area": "path", "op": "rget", "field": "chain.Index", "case": {"doc": "0", "path": "!1{\"\"1", "raw": "7"}}
+{"bucket": "path rget.chain.Num query", "area": "path", "op": "rget", "field": "chain.Num", "case": {"doc": "[\"[b\"]", "path": "#(", "sub": "#", "raw": "7"}}
+{"bucket": "path rget.chain.Raw plain", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "0", "path": "", "sub": "@wrap|@keys"}}
+{"bucket": "path rget.chain.Raw query", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "[\"f[\"]", "path": "#(", "sub": "#", "raw": "7"}}
+{"bucket": "path rget.chain.Str plain", "area": "path", "op": "rget", "field": "chain.Str", "case": {"doc": "0", "path": "", "sub": "@wrap|@keys|0"}}
+{"bucket": "path set.deviation-failed.malformed.set #.map", "area": "path", "op": "set", "field": "deviation-failed.malformed.set", "case": {"doc": "{\"k:v\":{\"#\":\"[1,2]\"}}", "path": "k:v.\\#.0.\u0000"}}
+{"bucket": "path set.deviation-failed.malformed.set plain", "area": "path", "op": "set", "field": "deviation-failed.malformed.set", "case": {"doc": "\"[1,2I\"", "path": "1"}}
+{"bucket": "path set.deviation-failed.string.set plain", "area": "path", "op": "set", "field": "deviation-failed.string.set", "case": {"doc": "[0,\"[1,2]\" ]", "path": "1.1."}}
+{"bucket": "path set.set.err multipath", "area": "path", "op": "set", "field": "set.err", "case": {"doc": "[0]", "path": "[]0"}}
+{"bucket": "api get.Num @fromstr", "area": "api", "op": "get", "field": "Num", "case": {"doc": "{\"s\":\"{\\\"k\\\"�[1,2]}\"}", "path": "s|@fromstr|k.1", "raw": "7"}}
+{"bucket": "api get.Raw @dig", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{}", "path": "|@dig:@dig", "raw": "7"}}
+{"bucket": "api get.Raw @flatten", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{\"a\":{\"b\":[[[]]]}}", "path": "a.b|@flatten:{\"deep\"t", "raw": "7"}}
+{"bucket": "api get.Raw @fromstr", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{\"s\":\"{\\\"k\\\":[1,2\"}", "path": "s.@fromstr.k", "raw": "7"}}
+{"bucket": "api get.Raw @ugly", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "[ [ \r\n { \"age\":\n0\t}]]\t", "path": "@ugly|@tostr|0"}}
+{"bucket": "api get.Type @pretty", "area": "api", "op": "get", "field": "Type", "case": {"doc": "\n{\t\"(p)\" \r\n :\t[ \r\n {}]}", "path": "@pretty.(p).@tostr.0", "raw": "7"}}
+{"bucket": "api get.m.All #count", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[ [] ]", "path": "#[#!3)#"}}
+{"bucket": "api get.m.All @case", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@case"}}
+{"bucket": "api get.m.All @echo", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "0", "path": "@echo:[b"}}
+{"bucket": "api get.m.All lines", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[]", "path": "..#(#)#"}}
+{"bucket": "api get.m.All literal", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "0", "path": "![i"}}
+{"bucket": "api get.m.Bool pipe", "area": "api", "op": "get", "field": "m.Bool", "case": {"doc": "\n{ \r\n \"a b\":[\n0,\"truE\"]\t}\n", "path": "a b|1", "raw": "7"}}
+{"bucket": "api get.m.Bool query", "area": "api", "op": "get", "field": "m.Bool", "case": {"doc": "[ \"truE\" ]", "path": "#(", "sub": " ", "raw": "7"}}
+{"bucket": "api get.m.Bool wildcard", "area": "api", "op": "get", "field": "m.Bool", "case": {"doc": "{\"a\":\"trUe\"}", "path": "*", "raw": "7"}}
+{"bucket": "api get.m.Keys @echo", "area": "api", "op": "get", "field": "m.Keys", "case": {"doc": "0", "path": "@echo:[{"}}
+{"bucket": "api get.m.Keys @fromstr", "area": "api", "op": "get", "field": "m.Keys", "case": {"doc": "{\"s\":\"{\\\"k\\\":[J,2]}\"}", "path": "s.@fromstr.k", "raw": "7"}}
+{"bucket": "api get.m.Keys @pretty", "area": "api", "op": "get", "field": "m.Keys", "case": {"doc": "{\n  \"nets\": [\n    {\n      \"a\\\\b\": false\n    }\n  ]\n}", "path": "nets.#.a\\\\b|@pretty|@case:upper"}}
+{"bucket": "api get.m.Map @echo", "area": "api", "op": "get", "field": "m.Map", "case": {"doc": "0", "path": "@echo:{\"\"[", "raw": "7"}}
+{"bucket": "api get.m.Map @fromstr", "area": "api", "op": "get", "field": "m.Map", "case": {"doc": "{\"s\":\"{\\\"k\\\":�T�*=>[1,2]}\"}", "path": "s|@fromstr", "raw": "7"}}
+{"bucket": "api get.m.Map literal", "area": "api", "op": "get", "field": "m.Map", "case": {"doc": "0", "path": "!{t3"}}
+{"bucket": "api get.m.Path lines", "area": "api", "op": "get", "field": "m.Path", "case": {"doc": "{}\n0\n", "path": "..1", "raw": "7"}}
+{"bucket": "api get.m.Path plain", "area": "api", "op": "get", "field": "m.Path", "case": {"doc": "\"����,[1,2]\"", "path": "1", "raw": "7"}}
+{"bucket": "api get.m.Value @echo", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "0", "path": "@echo:{\"\"1", "raw": "7"}}
+{"bucket": "api get.m.Value @fromstr", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "{\"s\":\"{\\\"k\\\":[�2]}\"}", "path": "s.@fromstr.k", "raw": "7"}}
+{"bucket": "api parse.m.root.Path nomod:multipath", "area": "api", "op": "parse", "field": "m.root.Path", "case": {"doc": "0", "path": "[}"}}
+{"bucket": "deviation del.deviation.malformed.del #.map", "area": "deviation", "op": "del", "field": "deviation.malformed.del", "case": {"doc": "{\"k:v\":{\"#\":\"[��2k\"}}", "path": "k:v.\\#.0"}}
+{"bucket": "deviation del.deviation.malformed.del plain", "area": "deviation", "op": "del", "field": "deviation.malformed.del", "case": {"doc": "{\"first\":\"[1,2s\"}", "path": "first.1"}}
+{"bucket": "deviation docset.deviation.dupkey.docset1 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset1", "case": {"doc": "\t{ \r\n \"{y\\u007d\": 0 \r\n } ", "path": "{y}", "raw": "7"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 literal", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": "!\"", "raw": "{\"\":[]}"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": "[,", "raw": "true"}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @fromstr", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[0]", "path": "#.@fromstr", "raw": "7"}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @valid", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[0]", "path": "#.@valid", "raw": "7"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 @fromstr", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "[{}]", "path": "#.@fromstr", "raw": "8"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 @join", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "[{}]", "path": "#.@join", "raw": "[3]"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 @ugly", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "[[]]", "path": "#.@ugly", "raw": "7"}}
+{"bucket": "deviation docset.deviation.malformed.docset3 #.map", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset3", "case": {"doc": "0", "path": "\\#.\"", "raw": "true"}}
+{"bucket": "deviation docset.deviation.malformed.docset3 #count", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset3", "case": {"doc": "0", "path": "\"\\#", "raw": "{\"\":[]}"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @echo", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[0]", "path": "#.@echo:22{", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @group", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[{}]", "path": "#.@group", "raw": "7"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @join", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[[]]", "path": "#.@join", "raw": "7"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @keys", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[\n  0]", "path": "#.@keys", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @tostr", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[0]", "path": "#.@tostr", "raw": "7"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @wrap", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[ { \"last\" : 0}  ]", "path": "#(last=\"\")#..@wrap", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.unmapped.docset2 @values", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset2", "case": {"doc": "[[]]", "path": "#.@values", "raw": "{}"}}
+{"bucket": "deviation docset.deviation.unmapped.docset2 query", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset2", "case": {"doc": "[0,0,[0]]", "path": "2|#()#", "raw": "1"}}
+{"bucket": "deviation set.deviation.unmapped.set @echo", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "[[]]", "path": "#.@echo:{"}}
+{"bucket": "deviation set.deviation.unmapped.set @pretty", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "  0", "path": "@pretty:{\"prefix\"\" \""}}
+{"bucket": "deviation set.deviation.unmapped.set @wrap", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "[ { \"last\" : 0}  ]", "path": "#(last=\"\")#..@wrap"}}
+{"bucket": "path doc.doc2.Raw @dig", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|@dig"}}
+{"bucket": "path doc.doc2.Raw @echo", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|@echo:{"}}
+{"bucket": "path doc.doc2.Raw @keys", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|@keys"}}
+{"bucket": "path doc.doc2.Raw @len", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|@len"}}
+{"bucket": "path doc.doc2.Raw @pretty", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "@pretty:{\"indent\"\"\"", "raw": "7"}}
+{"bucket": "path doc.doc2.Raw @tostr", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|@tostr"}}
+{"bucket": "path doc.doc2.Raw @values", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|@values"}}
+{"bucket": "path doc.doc2.Raw @wrap", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|@wrap", "sub": "c"}}
+{"bucket": "path doc.doc2.Raw lines", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0 \n0", "path": "..1.@dig", "lines": true}}
+{"bucket": "path doc.doc2.Raw multipath", "area": "path", "op": "doc", "field": "doc2.Raw", "case": {"doc": "0", "path": "|{@dig}"}}
+{"bucket": "path docset.deviation-failed.dupkey.docset2 literal", "area": "path", "op": "docset", "field": "deviation-failed.dupkey.docset2", "case": {"doc": "0", "path": "!0", "raw": "0"}}
+{"bucket": "path docset.deviation-failed.dupkey.docset2 multipath", "area": "path", "op": "docset", "field": "deviation-failed.dupkey.docset2", "case": {"doc": "0", "path": "[\b", "raw": "0"}}
+{"bucket": "path get.Indexes @dig", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "{\"last\":[[]]}", "path": "last.#..@dig"}}
+{"bucket": "path get.Indexes @echo", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[{}]", "path": "#..@echo:\"\""}}
+{"bucket": "path get.Indexes @keys", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[{\"nets\":0}]", "path": "#(nets)..@keys|#."}}
+{"bucket": "path get.Indexes @len", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[{}]", "path": "#..@len"}}
+{"bucket": "path get.Indexes @values", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[{}]", "path": "#..@values"}}
+{"bucket": "path get.Indexes lines", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "{}", "path": "..#..@keys", "lines": true}}
+{"bucket": "path get.Num multipath", "area": "path", "op": "get", "field": "Num", "case": {"doc": "[]", "path": "[.@dig]|#", "sub": "#"}}
+{"bucket": "path get.Raw lines", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "", "path": "..|@dig", "raw": "7", "lines": true}}
+{"bucket": "path rget.chain.Index lines", "area": "path", "op": "rget", "field": "chain.Index", "case": {"doc": "{\"&&\":0}", "path": "..#(*)#|@tostr", "sub": "0", "raw": "7"}}
+{"bucket": "path rget.chain.Raw lines", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "", "path": "..", "sub": "@keys", "lines": true}}
+{"bucket": "path rget.chain.Raw multipath", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "0", "path": "[]", "sub": "|@wrap"}}
+{"bucket": "path rget.chain.Raw plain", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "0", "path": "", "sub": "@len"}}
+{"bucket": "path rget.chain.Raw wildcard", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": " \r\n {\"name\" \r\n :{\"a=b\": \r\n {} }}", "path": "*.a=b", "sub": "[.@keys]"}}
+{"bucket": "api get.Raw @dig", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "[]", "path": "|@dig"}}
+{"bucket": "api get.Raw @echo", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{}", "path": "|@echo:{}"}}
+{"bucket": "api get.Raw @group", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@group.@keys"}}
+{"bucket": "api get.Raw @join+dup", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{\"age\":[{\"\":0,\"\":0}]}", "path": "age|@join:{\"preserve\"t", "raw": "7"}}
+{"bucket": "api get.Raw @keys", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "[]", "path": "|@keys"}}
+{"bucket": "api get.Raw @len", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{}", "path": "|@len"}}
+{"bucket": "api get.Raw @tostr", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{}", "path": "|@tostr", "raw": "7"}}
+{"bucket": "api get.Raw @values", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "[]", "path": "|@values"}}
+{"bucket": "api get.Raw @wrap", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "0", "path": "@wrap|.@keys"}}
+{"bucket": "api get.Type @tostr", "area": "api", "op": "get", "field": "Type", "case": {"doc": "{}", "path": "|@tostr"}}
+{"bucket": "api get.m.All @echo", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "{ \"nets\" : [ 0 ] }", "path": "nets.#.@echo:\"\""}}
+{"bucket": "api get.m.All @this", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "[0]", "path": "#.@this", "raw": "7"}}
+{"bucket": "api get.m.All literal", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "0", "path": "[!+]", "raw": "7"}}
+{"bucket": "api get.m.All multipath", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "{\"friends\":[0]}", "path": "*.#.[]", "raw": "7"}}
+{"bucket": "api get.m.Bool #count", "area": "api", "op": "get", "field": "m.Bool", "case": {"doc": "[\"truE\"]", "path": "#[", "sub": "0", "raw": "7"}}
+{"bucket": "api get.m.Bool plain", "area": "api", "op": "get", "field": "m.Bool", "case": {"doc": "{\"a\":\"trUe\"}", "path": "a", "raw": "7"}}
+{"bucket": "api get.m.Keys #.map", "area": "api", "op": "get", "field": "m.Keys", "case": {"doc": "{\"vals\":[0,0]}", "path": "*.#.!\"a", "raw": "7"}}
+{"bucket": "api get.m.Keys literal", "area": "api", "op": "get", "field": "m.Keys", "case": {"doc": "0", "path": "[[!\"]\"]]"}}
+{"bucket": "api get.m.Map literal", "area": "api", "op": "get", "field": "m.Map", "case": {"doc": "0", "path": "{{}:!\")\"}"}}
+{"bucket": "api get.m.Paths #.map", "area": "api", "op": "get", "field": "m.Paths", "case": {"doc": "{\"vals\":[0]}", "path": "*.#.!\"", "raw": "7"}}
+{"bucket": "api get.m.Value #.map", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "{\"vals\":[0,0,0]}", "path": "*.#.!\"", "raw": "7"}}
+{"bucket": "api get.m.Value @join", "area": "api", "op": "get", "field": "m.Value", "case": {"doc": "{\"age\":[{},{\"\":0}]}", "path": "age|@join:{\"preserve\":t", "raw": "7"}}
+{"bucket": "api parse.m.root.Bool plain", "area": "api", "op": "parse", "field": "m.root.Bool", "case": {"doc": "\"truE\"", "path": "", "raw": "7"}}
+{"bucket": "api parse.m.root.Path nomod:multipath", "area": "api", "op": "parse", "field": "m.root.Path", "case": {"doc": "0", "path": "[]"}}
+{"bucket": "api rget.chain.Raw @wrap", "area": "api", "op": "rget", "field": "chain.Raw", "case": {"doc": "0", "path": "@wrap", "sub": ".@dig", "raw": "7"}}
+{"bucket": "deviation docset.deviation.dupkey.docset1 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset1", "case": {"doc": "{\"{y\\u007d\":0}", "path": "{y}", "raw": "8"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": "[a", "raw": "[]"}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @echo", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[0]", "path": "#.@echo:\"\"", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @wrap", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[ { \"last\" : \"\", \"b\" : 0 } ]", "path": "#(last%\"\")#.b.@wrap", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.malformed.docset1 plain", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "\"[1,I\"", "path": "1", "raw": "7"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 @reverse", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "{\"friends\":[{}]}", "path": "friends.#.@reverse", "raw": "7"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 lines", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "0", "path": "..#.@reverse", "raw": "\n8"}}
+{"bucket": "deviation docset.deviation.string.docset1 plain", "area": "deviation", "op": "docset", "field": "deviation.string.docset1", "case": {"doc": "\"[1,2]\"", "path": "1", "raw": "null"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 #.map", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "{\"vals\":[{}]}", "path": "*.#.!+a", "raw": "7"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @pretty", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "  0", "path": "@pretty:{\"prefix\"\" \"", "raw": "7"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 multipath", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "{\"friends\":[{}]}", "path": "friends.#.[]", "raw": "7"}}
+{"bucket": "deviation set.deviation.malformed.set @echo", "area": "deviation", "op": "set", "field": "deviation.malformed.set", "case": {"doc": "[0]", "path": "#.@echo:\"\""}}
+{"bucket": "deviation set.deviation.malformed.set @wrap", "area": "deviation", "op": "set", "field": "deviation.malformed.set", "case": {"doc": "[ { \"last\" : \"\", \"b\" : 0 } ]", "path": "#(last%\"\")#.b.@wrap"}}
+{"bucket": "deviation setopt.deviation.string.setopt1 plain", "area": "deviation", "op": "setopt", "field": "deviation.string.setopt1", "case": {"doc": "\"[1,�����2]\"", "path": "1", "raw": "7"}}
+{"bucket": "api get.m.All lines", "area": "api", "op": "get", "field": "m.All", "case": {"doc": "0", "path": "..#.@keys", "raw": "7", "lines": true}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @fromstr", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[0]", "path": "#.@fromstr.@case", "raw": "{\"\":[]}"}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @values", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[ 0 ]", "path": "#.@values", "raw": "{\"\":[]}"}}
+{"bucket": "path docset.panic multipath", "area": "path", "op": "docset", "field": "panic", "case": {"doc": "0", "path": "{\\.", "raw": "\"\""}}
+{"bucket": "path docset.panic plain", "area": "path", "op": "docset", "field": "panic", "case": {"doc": "0", "path": "\"\\.", "raw": "{}"}}
+{"bucket": "path del.del.out multipath", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "{\"\":{\"#\":\"[1,2]\"}}", "path": "[v.\\#.0", "raw": "1"}}
+{"bucket": "path docset.deviation-failed.dupkey.docset2 literal", "area": "path", "op": "docset", "field": "deviation-failed.dupkey.docset2", "case": {"doc": "0", "path": "!0.00", "raw": "0"}}
+{"bucket": "path docset.deviation-failed.malformed.docset1 plain", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset1", "case": {"doc": "\"[0 0\"", "path": "00", "raw": "1\r"}}
+{"bucket": "path docset.deviation-failed.malformed.docset3 multipath", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset3", "case": {"doc": "{\"\":0}", "path": "{0.\"", "raw": "\"\""}}
+{"bucket": "path docset.deviation-failed.malformed.docset3 plain", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset3", "case": {"doc": "0", "path": "00.\"", "raw": "true"}}
+{"bucket": "path docset.docset2.out multipath", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "{\"\":0}", "path": "{,.{}", "raw": "\"\""}}
+{"bucket": "path docset.docset3.out plain", "area": "path", "op": "docset", "field": "docset3.out", "case": {"doc": "0", "path": "0.-1.\"", "raw": "0"}}
+{"bucket": "path get.Index lines", "area": "path", "op": "get", "field": "Index", "case": {"doc": "{\"\":0     }", "path": "..0.", "raw": "0"}}
+{"bucket": "path get.Raw multipath", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "[]", "path": "\\|[]"}}
+{"bucket": "path rget.chain.Raw multipath", "area": "path", "op": "rget", "field": "chain.Raw", "case": {"doc": "0", "path": "[]", "sub": "\\.{}"}}
+{"bucket": "path set.deviation-failed.malformed.set #.map", "area": "path", "op": "set", "field": "deviation-failed.malformed.set", "case": {"doc": "{\"k:v\":{\"#\":\"[0\"}}", "path": "k:v.\\#.00"}}
+{"bucket": "path set.deviation-failed.malformed.set plain", "area": "path", "op": "set", "field": "deviation-failed.malformed.set", "case": {"doc": "\"[1,2I\"", "path": "01"}}
+{"bucket": "path set.deviation-failed.string.set plain", "area": "path", "op": "set", "field": "deviation-failed.string.set", "case": {"doc": "\"[0 0\"", "path": "00"}}
+{"bucket": "api get.Raw @fromstr", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{\"children\":{\"a.b\":[],\"a\":{\"a|b\":0}}}", "path": "@fromstr:[].children.*.a\\|b"}}
+{"bucket": "api get.Raw @keys", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "[]", "path": "\\||@keys"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 @flatten", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "{\"\":[{}]}", "path": ".#.@flatten", "raw": "0"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 @values", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "[[]]", "path": "#.@values", "raw": " 0"}}
+{"bucket": "deviation docset.deviation.malformed.docset2 query", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "[{\"\":0}]", "path": "#...#(", "raw": "0"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @echo", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[{}]", "path": "#.@echo:\"\"", "raw": "0"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @reverse+dup", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[{\"\":0,\"\":[]}]", "path": "#.@reverse", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @values", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[{}]", "path": "#.@values", "raw": "3"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 multipath+dup", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "{\"friends\":[{\"\":0,\"\":0,\"\":[\"\",\"\",\"\"]},{\"\": \"Roger\", \"last\": \"Craig\", \"nets\": [\"fb\", \"tw\"]},\n    {\"last\": \"Murphy\", \"age\": 0, \"nets\": [\"ig\", \"tw\"]}\n  ]\n}", "path": "friends.#.{t,,,,,,,,,age}", "raw": "7"}}
+{"bucket": "deviation set.deviation.unmapped.set @echo", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "[{}]", "path": "#.@echo:\"\""}}
+{"bucket": "deviation set.deviation.unmapped.set @reverse+dup", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "[{\"\":0,\"\":[]}]", "path": "#.@reverse"}}
+{"bucket": "deviation set.deviation.unmapped.set @values", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "[{}]", "path": "#.@values"}}
+{"bucket": "deviation setopt.deviation.string.setopt1 lines", "area": "deviation", "op": "setopt", "field": "deviation.string.setopt1", "case": {"doc": " \"\"\n", "path": "..0", "sub": "#", "raw": "true", "lines": true}}
+{"bucket": "path docset.deviation-failed.malformed.docset3 plain", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset3", "case": {"doc": "0", "path": "1.-1.\".\"", "raw": "1"}}
+{"bucket": "path docset.docset1.err #.map", "area": "path", "op": "docset", "field": "docset1.err", "case": {"doc": "{\"k:v\":{\"#\":\"[[\"}}", "path": "k:v.\\#.0.A", "raw": "0"}}
+{"bucket": "path docset.docset1.err multipath", "area": "path", "op": "docset", "field": "docset1.err", "case": {"doc": "[0,\"[[\"]", "path": "1.0.[", "raw": "0"}}
+{"bucket": "path docset.docset1.err plain", "area": "path", "op": "docset", "field": "docset1.err", "case": {"doc": "[0,\"[[\"]", "path": "1.0.A", "raw": "2"}}
+{"bucket": "path docset.docset2.out multipath", "area": "path", "op": "docset", "field": "docset2.out", "case": {"doc": "0", "path": ":.:.:.[:", "raw": "0"}}
+{"bucket": "path get.Index @pretty", "area": "path", "op": "get", "field": "Index", "case": {"doc": "0", "path": "@pretty:\u0012{\"prefix\"\" \""}}
+{"bucket": "path set.set.err #.map", "area": "path", "op": "set", "field": "set.err", "case": {"doc": "{\"k:v\":{\"#\":\"[[0\"}}", "path": "k:v.\\#.0.A"}}
+{"bucket": "path set.set.err plain", "area": "path", "op": "set", "field": "set.err", "case": {"doc": "[0,\"[[ 0\"]", "path": "1.0.�", "b64": {"path": "MS4wLr0="}}}
+{"bucket": "api get.Raw @join+dup", "area": "api", "op": "get", "field": "Raw", "case": {"doc": "{\"a\":[{\"\":0,\"\":0}]}", "path": "a.@join:\u0011{\"preserve\"t", "sub": "\u0010", "raw": "7"}}
+{"bucket": "api get.m.Path plain", "area": "api", "op": "get", "field": "m.Path", "case": {"doc": "\"�����:,[1,2]\"", "path": "1", "raw": "7"}}
+{"bucket": "deviation del.deviation.malformed.del multipath", "area": "deviation", "op": "del", "field": "deviation.malformed.del", "case": {"doc": "{\"\":{\"#\":\"[2\"}}", "path": "[v.\\#.0", "raw": "1"}}
+{"bucket": "deviation docset.deviation.dupkey.docset1 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset1", "case": {"doc": "{\"{y\\u007d\":0}", "path": "{y}", "raw": "0"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 plain", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": "v.!-", "raw": "0"}}
+{"bucket": "deviation docset.deviation.malformed.docset1 #count", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "\"[0\"", "path": "#[", "raw": "7"}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @group", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[{\n}]", "path": "#.@group", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @this", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[{\n}]", "path": "#.@this.@group", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.malformed.docset2 #.map", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "[{}]", "path": "#...0", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.malformed.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset2", "case": {"doc": "{\"a\":[{}]}", "path": "a.#.{)", "raw": "0"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 #count", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "\"[truE\"", "path": "#[", "raw": "7"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @fromstr", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "\" {\"", "path": "@fromstr", "raw": "0"}}
+{"bucket": "deviation docset.deviation.unmapped.docset1 @reverse", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset1", "case": {"doc": "[{\"\":0,\"]}]\":0}]", "path": "#.@reverse", "raw": "\"\""}}
+{"bucket": "deviation docset.deviation.unmapped.docset2 lines", "area": "deviation", "op": "docset", "field": "deviation.unmapped.docset2", "case": {"doc": "[]", "path": "..#...#.", "raw": "0 "}}
+{"bucket": "deviation set.deviation.malformed.set @group", "area": "deviation", "op": "set", "field": "deviation.malformed.set", "case": {"doc": "[{\n}]", "path": "#.@group"}}
+{"bucket": "deviation set.deviation.malformed.set @this", "area": "deviation", "op": "set", "field": "deviation.malformed.set", "case": {"doc": "[{\n}]", "path": "#.@this.@group"}}
+{"bucket": "deviation set.deviation.unmapped.set @pretty", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": " 0", "path": "@pretty:\u0012{\"prefix\"\" \""}}
+{"bucket": "deviation set.deviation.unmapped.set @reverse", "area": "deviation", "op": "set", "field": "deviation.unmapped.set", "case": {"doc": "[{\"\":0,\"]}]\":0}]", "path": "#.@reverse"}}
+{"bucket": "path get.Raw multipath", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "[\n[{ \r\n \"a\": \r\n 0\n} \r\n ]] ", "path": "[#.@tostr.#]"}}
+{"bucket": "path docset.deviation-failed.dupkey.docset2 literal", "area": "path", "op": "docset", "field": "deviation-failed.dupkey.docset2", "case": {"doc": "0", "path": "!0.\\0", "raw": "[]"}}
+{"bucket": "path docset.deviation-failed.dupkey.docset2 multipath", "area": "path", "op": "docset", "field": "deviation-failed.dupkey.docset2", "case": {"doc": "0", "path": "[0.�", "raw": "[]", "b64": {"path": "WzAu/A=="}}}
+{"bucket": "path docset.deviation-failed.dupkey.docset2 plain", "area": "path", "op": "docset", "field": "deviation-failed.dupkey.docset2", "case": {"doc": "0", "path": "0.!0.�", "raw": "0", "b64": {"path": "MC4hMC7D"}}}
+{"bucket": "path docset.deviation-failed.malformed.docset1 plain", "area": "path", "op": "docset", "field": "deviation-failed.malformed.docset1", "case": {"doc": "[0,\"[0\"]", "path": "1.0.�.00", "raw": "9", "b64": {"path": "MS4wLtIuMDA="}}}
+{"bucket": "path docset.docset1.out #.map", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "[{\"�\":0}]", "path": "#.�*", "sub": "0", "raw": "7", "b64": {"doc": "W3siriI6MH1d", "path": "Iy6RKg=="}}}
+{"bucket": "path docset.docset1.out query", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\"\":[{\"�\":0}]}", "path": ".#(�*)", "raw": "0", "b64": {"doc": "eyIiOlt7IrciOjB9XX0=", "path": "LiMo0iop"}}}
+{"bucket": "path docset.docset1.out wildcard", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\"�\":0}", "path": "*�", "raw": "7", "b64": {"doc": "eyLeIjowfQ==", "path": "Kv8="}}}
+{"bucket": "path get.Index #.map", "area": "path", "op": "get", "field": "Index", "case": {"doc": "{\"#\":{\"�[x]\":0}}", "path": "#.�[?]", "b64": {"doc": "eyIjIjp7IspbeF0iOjB9fQ==", "path": "Iy7XWz9d"}}}
+{"bucket": "path get.Index query", "area": "path", "op": "get", "field": "Index", "case": {"doc": "{\"friends\":[{\"fi�s\":0}]}", "path": "*.#(*�*)", "raw": "A", "b64": {"doc": "eyJmcmllbmRzIjpbeyJmabdzIjowfV19", "path": "Ki4jKCrSKik="}}}
+{"bucket": "path get.Indexes @valid", "area": "path", "op": "get", "field": "Indexes", "case": {"doc": "[{\"����\":0}]", "path": "#.�*.@valid", "sub": "0", "raw": "7", "b64": {"doc": "W3si1NTU1CI6MH1d", "path": "Iy64Ki5AdmFsaWQ="}}}
+{"bucket": "path get.Num #count", "area": "path", "op": "get", "field": "Num", "case": {"doc": "{\"�\":[0]}", "path": "�*.#", "sub": "0", "raw": "7", "b64": {"doc": "eyL/IjpbMF19", "path": "qiouIw=="}}}
+{"bucket": "path get.Num wildcard", "area": "path", "op": "get", "field": "Num", "case": {"doc": "{\"��\":1}", "path": "�*", "sub": "0", "raw": "7", "b64": {"doc": "eyLMwiI6MX0=", "path": "ryo="}}}
+{"bucket": "path get.Raw multipath", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "{\"fr�ends\":[]}", "path": "*�*..[)", "raw": "7", "b64": {"doc": "eyJmctFlbmRzIjpbXX0=", "path": "KooqLi5bKQ=="}}}
+{"bucket": "path get.Str wildcard", "area": "path", "op": "get", "field": "Str", "case": {"doc": "{\"�\":\"0\"}", "path": "*�", "sub": "|", "raw": "7", "b64": {"doc": "eyKWIjoiMCJ9", "path": "Ks8="}}}
+{"bucket": "path get.Type #count", "area": "path", "op": "get", "field": "Type", "case": {"doc": "{\"fr�ends\":[]}", "path": "*�*.#", "raw": "7", "b64": {"doc": "eyJmcvdlbmRzIjpbXX0=", "path": "Ks4qLiM="}}}
+{"bucket": "path set.deviation-failed.malformed.set plain", "area": "path", "op": "set", "field": "deviation-failed.malformed.set", "case": {"doc": "[0,\"[0\"]", "path": "1.0.�.00", "b64": {"path": "MS4wLtIuMDA="}}}
+{"bucket": "deviation docset.deviation.malformed.docset1 @valid", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "[{\"����\":0}]", "path": "#.*.@valid", "sub": "0", "raw": "7", "b64": {"doc": "W3si1NTU1CI6MH1d"}}}
+{"bucket": "deviation docset.deviation.malformed.docset1 multipath", "area": "deviation", "op": "docset", "field": "deviation.malformed.docset1", "case": {"doc": "{\"\":[0]}", "path": ".#.{)", "sub": "0", "raw": "7"}}
+{"bucket": "path docset.docset1.out wildcard", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\"children\":{\".b\":[],\"a\":{\"a|b\":0}}}", "path": "children.*.a\\|*", "raw": "7"}}
+{"bucket": "path docset.docset1.out wildcard+dup", "area": "path", "op": "docset", "field": "docset1.out", "case": {"doc": "{\"children\":{\"\":[],\"\":{\"a|\":0}}}", "path": "children..a\\|*", "raw": "7"}}
+{"bucket": "path get.Num @fromstr", "area": "path", "op": "get", "field": "Num", "case": {"doc": "{\"children\":{\".b\":[],\"a\":{\"a|b\":1}}}", "path": "@fromstr:[].children.*.a\\|*", "raw": "7"}}
+{"bucket": "path get.Raw @fromstr", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "{\"children\":{\"a.b\":[],\"a\":{\"a|b\":0}}}", "path": "@fromstr:[].children.*.a\\|*", "raw": "7"}}
+{"bucket": "path get.Raw @fromstr+dup", "area": "path", "op": "get", "field": "Raw", "case": {"doc": "{\"children\":{\"\":[],\"\":{\"a|b\":0}}}", "path": "@fromstr:[].children..a\\|*", "raw": "7"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 literal", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": "!0", "raw": "[]"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": "[0", "raw": "0"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 plain", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": "\\\\.!0", "raw": "0"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "{\"\":[{},{},{}]}", "path": "\\\\.[)0", "raw": "0"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "{}", "path": "\\\\.[)0", "raw": "0"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 multipath", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "{}", "path": "\\\\.[0", "raw": "0"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 plain+dup", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "[{\"\":{},\"\":\"\"}]", "path": "0.!\\\\.!0", "raw": "0"}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 plain", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": ":[0.�", "raw": "[]", "b64": {"path": "OlswLvw="}}}
+{"bucket": "deviation docset.deviation.dupkey.docset2 literal", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": ":!0.�", "raw": "[]", "b64": {"path": "OiEwLvw="}}}

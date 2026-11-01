@@ -40,8 +40,9 @@ jobs:
         run: test "$(go list -m all)" = "$(go list -m)"
       - name: Check formatting and assembly declarations
         run: |
-          test -z "$(gofmt -l base64)"
+          test -z "$(gofmt -l base64 ojson)"
           go vet ./...
+          go vet -tags=purego ./...
       - name: Native correctness and protected-page boundaries
         run: go test -count=1 -v ./...
       - name: Race detector
@@ -50,6 +51,52 @@ jobs:
         run: go test -gcflags=all=-d=checkptr=2 -count=1 ./...
       - name: Portable fallback
         run: go test -tags=purego -count=1 ./...
+
+  json:
+    name: ojson differential tests / linux-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      MOEGO_REQUIRE_AVX2: ${{ matrix.arch == 'amd64' && '1' || '0' }}
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        working-directory: bench/json
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: bench/json/go.mod
+          cache-dependency-path: bench/json/go.sum
+      - name: Download pinned gjson, sjson and sonic
+        run: |
+          go mod download
+          go mod verify
+      - name: Check formatting
+        run: |
+          test -z "$(gofmt -l .)"
+          go vet ./...
+      # Compares ojson with gjson and sjson on every exported identifier,
+      # the retained regression cases and generated documents, and checks
+      # that the benchmarked engines produce the same output.
+      - name: API surface, differential, regression and output tests
+        run: go test -count=1 ./...
+      - name: Race detector
+        run: go test -race -count=1 ./diff
+      - name: Pointer checks
+        run: go test -gcflags=all=-d=checkptr=2 -count=1 ./diff
+      - name: Portable fallback
+        run: go test -tags=purego -count=1 ./diff
 
   benchmark:
     name: Benchmark / linux-${{ matrix.arch }}

@@ -1,0 +1,319 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1406" viewBox="0 0 1200 1406" role="img" aria-labelledby="t">
+<title id="t">读取请求体：每次分配的字节，越短越少</title>
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; }
+  .ink2 { fill: #52514e; }
+  .muted { fill: #6f6d68; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .own { fill: #2a78d6; }
+  .peer { fill: #898781; }
+  .floor { fill: #d4d2ca; }
+  .num { font-variant-numeric: tabular-nums; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #ffffff; }
+    .ink2 { fill: #c3c2b7; }
+    .muted { fill: #9a9891; }
+    .axis { stroke: #383835; }
+    .own { fill: #3987e5; }
+    .floor { fill: #4a4945; }
+  }
+</style>
+<rect class="surface" width="1200" height="1406" rx="8"/>
+<text x="24.0" y="36.0" class="ink" font-size="18" text-anchor="start" font-weight="600">读取请求体：每次分配的字节，越短越少</text>
+<text x="24.0" y="58.0" class="ink2" font-size="13" text-anchor="start">带图聊天请求 1 KiB–8 MiB，以及一个 SSE 小帧；右上角倍数为最好的保序竞品 ÷ ojson；每个面板横轴比例各自不同</text>
+<text x="24.0" y="78.0" class="muted" font-size="12" text-anchor="start">Intel Xeon E5-2667 v4 @ 3.20GHz · linux/amd64 · Go 1.26.6 · 固定一个 CPU，GOMAXPROCS=1 · 每项 5 或 15 个样本的中位数</text>
+<text x="24.0" y="98.0" class="muted" font-size="12" text-anchor="start">多人共用的 KVM 虚拟机，测量时有其他用户的负载，结果只代表这台机器</text>
+<text x="24.0" y="132.0" class="ink2" font-size="12" text-anchor="start">读取 model 和 group</text>
+<text x="24.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 KiB</text>
+<text x="584.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.48×</text>
+<line class="axis" x1="220" y1="170" x2="220" y2="278"/>
+<text x="212.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,173.0H223.2A3.205574912891986,3.205574912891986 0 0 1 226.4,176.2V181.8A3.205574912891986,3.205574912891986 0 0 1 223.2,185.0H220.0Z"><title>ojson 184 B</title></path>
+<text x="232.4" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">184 B</text>
+<text x="212.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="212.0" y="219.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,209.0H223.2A3.205574912891986,3.205574912891986 0 0 1 226.4,212.2V217.8A3.205574912891986,3.205574912891986 0 0 1 223.2,221.0H220.0Z"><title>gjson 184 B</title></path>
+<text x="232.4" y="219.0" class="ink2 num" font-size="12" text-anchor="start">184 B</text>
+<text x="212.0" y="237.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,227.0H221.5A1.5331010452961673,1.5331010452961673 0 0 1 223.1,228.5V237.5A1.5331010452961673,1.5331010452961673 0 0 1 221.5,239.0H220.0Z"><title>sonic.Get 88 B</title></path>
+<text x="229.1" y="237.0" class="ink2 num" font-size="12" text-anchor="start">88 B</text>
+<text x="212.0" y="255.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M220.0,245.0H432.3A4,4 0 0 1 436.3,249.0V253.0A4,4 0 0 1 432.3,257.0H220.0Z"><title>encoding/json map（无序） 6.21 KB</title></path>
+<text x="442.3" y="255.0" class="ink2 num" font-size="12" text-anchor="start">6.21 KB</text>
+<text x="212.0" y="273.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M220.0,263.0H456.0A4,4 0 0 1 460.0,267.0V271.0A4,4 0 0 1 456.0,275.0H220.0Z"><title>sonic map（无序） 6.89 KB</title></path>
+<text x="466.0" y="273.0" class="ink2 num" font-size="12" text-anchor="start">6.89 KB</text>
+<text x="616.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">64 KiB</text>
+<text x="1176.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.48×</text>
+<line class="axis" x1="812" y1="170" x2="812" y2="278"/>
+<text x="804.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,173.0H812.5A0.5,0.5 0 0 1 813.0,173.5V184.5A0.5,0.5 0 0 1 812.5,185.0H812.0Z"><title>ojson 184 B</title></path>
+<text x="819.0" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">184 B</text>
+<text x="804.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="804.0" y="219.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,209.0H812.5A0.5,0.5 0 0 1 813.0,209.5V220.5A0.5,0.5 0 0 1 812.5,221.0H812.0Z"><title>gjson 184 B</title></path>
+<text x="819.0" y="219.0" class="ink2 num" font-size="12" text-anchor="start">184 B</text>
+<text x="804.0" y="237.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,227.0H812.5A0.5,0.5 0 0 1 813.0,227.5V238.5A0.5,0.5 0 0 1 812.5,239.0H812.0Z"><title>sonic.Get 88 B</title></path>
+<text x="819.0" y="237.0" class="ink2 num" font-size="12" text-anchor="start">88 B</text>
+<text x="804.0" y="255.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M812.0,245.0H1047.6A4,4 0 0 1 1051.6,249.0V253.0A4,4 0 0 1 1047.6,257.0H812.0Z"><title>encoding/json map（无序） 71.3 KB</title></path>
+<text x="1057.6" y="255.0" class="ink2 num" font-size="12" text-anchor="start">71.3 KB</text>
+<text x="804.0" y="273.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M812.0,263.0H1048.0A4,4 0 0 1 1052.0,267.0V271.0A4,4 0 0 1 1048.0,275.0H812.0Z"><title>sonic map（无序） 71.4 KB</title></path>
+<text x="1058.0" y="273.0" class="ink2 num" font-size="12" text-anchor="start">71.4 KB</text>
+<text x="24.0" y="310.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 MiB</text>
+<text x="584.0" y="310.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.48×</text>
+<line class="axis" x1="220" y1="320" x2="220" y2="428"/>
+<text x="212.0" y="333.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,323.0H220.5A0.5,0.5 0 0 1 221.0,323.5V334.5A0.5,0.5 0 0 1 220.5,335.0H220.0Z"><title>ojson 184 B</title></path>
+<text x="227.0" y="333.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">184 B</text>
+<text x="212.0" y="351.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="351.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="212.0" y="369.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,359.0H220.5A0.5,0.5 0 0 1 221.0,359.5V370.5A0.5,0.5 0 0 1 220.5,371.0H220.0Z"><title>gjson 184 B</title></path>
+<text x="227.0" y="369.0" class="ink2 num" font-size="12" text-anchor="start">184 B</text>
+<text x="212.0" y="387.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,377.0H220.5A0.5,0.5 0 0 1 221.0,377.5V388.5A0.5,0.5 0 0 1 220.5,389.0H220.0Z"><title>sonic.Get 88 B</title></path>
+<text x="227.0" y="387.0" class="ink2 num" font-size="12" text-anchor="start">88 B</text>
+<text x="212.0" y="405.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M220.0,395.0H456.0A4,4 0 0 1 460.0,399.0V403.0A4,4 0 0 1 456.0,407.0H220.0Z"><title>encoding/json map（无序） 1.05 MB</title></path>
+<text x="466.0" y="405.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="212.0" y="423.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M220.0,413.0H456.0A4,4 0 0 1 460.0,417.0V421.0A4,4 0 0 1 456.0,425.0H220.0Z"><title>sonic map（无序） 1.05 MB</title></path>
+<text x="466.0" y="423.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="616.0" y="310.0" class="ink" font-size="13" text-anchor="start" font-weight="600">8 MiB</text>
+<text x="1176.0" y="310.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.48×</text>
+<line class="axis" x1="812" y1="320" x2="812" y2="428"/>
+<text x="804.0" y="333.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,323.0H812.5A0.5,0.5 0 0 1 813.0,323.5V334.5A0.5,0.5 0 0 1 812.5,335.0H812.0Z"><title>ojson 184 B</title></path>
+<text x="819.0" y="333.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">184 B</text>
+<text x="804.0" y="351.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="351.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="804.0" y="369.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,359.0H812.5A0.5,0.5 0 0 1 813.0,359.5V370.5A0.5,0.5 0 0 1 812.5,371.0H812.0Z"><title>gjson 184 B</title></path>
+<text x="819.0" y="369.0" class="ink2 num" font-size="12" text-anchor="start">184 B</text>
+<text x="804.0" y="387.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,377.0H812.5A0.5,0.5 0 0 1 813.0,377.5V388.5A0.5,0.5 0 0 1 812.5,389.0H812.0Z"><title>sonic.Get 88 B</title></path>
+<text x="819.0" y="387.0" class="ink2 num" font-size="12" text-anchor="start">88 B</text>
+<text x="804.0" y="405.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M812.0,395.0H1048.0A4,4 0 0 1 1052.0,399.0V403.0A4,4 0 0 1 1048.0,407.0H812.0Z"><title>encoding/json map（无序） 8.39 MB</title></path>
+<text x="1058.0" y="405.0" class="ink2 num" font-size="12" text-anchor="start">8.39 MB</text>
+<text x="804.0" y="423.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M812.0,413.0H1048.0A4,4 0 0 1 1052.0,417.0V421.0A4,4 0 0 1 1048.0,425.0H812.0Z"><title>sonic map（无序） 8.39 MB</title></path>
+<text x="1058.0" y="423.0" class="ink2 num" font-size="12" text-anchor="start">8.39 MB</text>
+<text x="24.0" y="462.0" class="ink2" font-size="12" text-anchor="start">读取六个字段，大多不存在</text>
+<text x="24.0" y="490.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 KiB</text>
+<text x="584.0" y="490.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.40×</text>
+<line class="axis" x1="220" y1="500" x2="220" y2="608"/>
+<text x="212.0" y="513.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,503.0H232.5A4,4 0 0 1 236.5,507.0V511.0A4,4 0 0 1 232.5,515.0H220.0Z"><title>ojson 480 B</title></path>
+<text x="242.5" y="513.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">480 B</text>
+<text x="212.0" y="531.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="531.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="212.0" y="549.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,539.0H232.5A4,4 0 0 1 236.5,543.0V547.0A4,4 0 0 1 232.5,551.0H220.0Z"><title>gjson 480 B</title></path>
+<text x="242.5" y="549.0" class="ink2 num" font-size="12" text-anchor="start">480 B</text>
+<text x="212.0" y="567.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,557.0H223.3A3.30654420206659,3.30654420206659 0 0 1 226.6,560.3V565.7A3.30654420206659,3.30654420206659 0 0 1 223.3,569.0H220.0Z"><title>sonic.Get 192 B</title></path>
+<text x="232.6" y="567.0" class="ink2 num" font-size="12" text-anchor="start">192 B</text>
+<text x="212.0" y="585.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M220.0,575.0H432.6A4,4 0 0 1 436.6,579.0V583.0A4,4 0 0 1 432.6,587.0H220.0Z"><title>encoding/json map（无序） 6.29 KB</title></path>
+<text x="442.6" y="585.0" class="ink2 num" font-size="12" text-anchor="start">6.29 KB</text>
+<text x="212.0" y="603.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M220.0,593.0H456.0A4,4 0 0 1 460.0,597.0V601.0A4,4 0 0 1 456.0,605.0H220.0Z"><title>sonic map（无序） 6.97 KB</title></path>
+<text x="466.0" y="603.0" class="ink2 num" font-size="12" text-anchor="start">6.97 KB</text>
+<text x="616.0" y="490.0" class="ink" font-size="13" text-anchor="start" font-weight="600">64 KiB</text>
+<text x="1176.0" y="490.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.40×</text>
+<line class="axis" x1="812" y1="500" x2="812" y2="608"/>
+<text x="804.0" y="513.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,503.0H812.8A0.805785991074801,0.805785991074801 0 0 1 813.6,503.8V514.2A0.805785991074801,0.805785991074801 0 0 1 812.8,515.0H812.0Z"><title>ojson 480 B</title></path>
+<text x="819.6" y="513.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">480 B</text>
+<text x="804.0" y="531.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="531.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="804.0" y="549.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,539.0H812.8A0.805785991074801,0.805785991074801 0 0 1 813.6,539.8V550.2A0.805785991074801,0.805785991074801 0 0 1 812.8,551.0H812.0Z"><title>gjson 480 B</title></path>
+<text x="819.6" y="549.0" class="ink2 num" font-size="12" text-anchor="start">480 B</text>
+<text x="804.0" y="567.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,557.0H812.5A0.5,0.5 0 0 1 813.0,557.5V568.5A0.5,0.5 0 0 1 812.5,569.0H812.0Z"><title>sonic.Get 192 B</title></path>
+<text x="819.0" y="567.0" class="ink2 num" font-size="12" text-anchor="start">192 B</text>
+<text x="804.0" y="585.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M812.0,575.0H1047.6A4,4 0 0 1 1051.6,579.0V583.0A4,4 0 0 1 1047.6,587.0H812.0Z"><title>encoding/json map（无序） 71.4 KB</title></path>
+<text x="1057.6" y="585.0" class="ink2 num" font-size="12" text-anchor="start">71.4 KB</text>
+<text x="804.0" y="603.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M812.0,593.0H1048.0A4,4 0 0 1 1052.0,597.0V601.0A4,4 0 0 1 1048.0,605.0H812.0Z"><title>sonic map（无序） 71.5 KB</title></path>
+<text x="1058.0" y="603.0" class="ink2 num" font-size="12" text-anchor="start">71.5 KB</text>
+<text x="24.0" y="640.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 MiB</text>
+<text x="584.0" y="640.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.40×</text>
+<line class="axis" x1="220" y1="650" x2="220" y2="758"/>
+<text x="212.0" y="663.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,653.0H220.5A0.5,0.5 0 0 1 221.0,653.5V664.5A0.5,0.5 0 0 1 220.5,665.0H220.0Z"><title>ojson 480 B</title></path>
+<text x="227.0" y="663.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">480 B</text>
+<text x="212.0" y="681.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="681.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="212.0" y="699.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,689.0H220.5A0.5,0.5 0 0 1 221.0,689.5V700.5A0.5,0.5 0 0 1 220.5,701.0H220.0Z"><title>gjson 480 B</title></path>
+<text x="227.0" y="699.0" class="ink2 num" font-size="12" text-anchor="start">480 B</text>
+<text x="212.0" y="717.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,707.0H220.5A0.5,0.5 0 0 1 221.0,707.5V718.5A0.5,0.5 0 0 1 220.5,719.0H220.0Z"><title>sonic.Get 192 B</title></path>
+<text x="227.0" y="717.0" class="ink2 num" font-size="12" text-anchor="start">192 B</text>
+<text x="212.0" y="735.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M220.0,725.0H456.0A4,4 0 0 1 460.0,729.0V733.0A4,4 0 0 1 456.0,737.0H220.0Z"><title>encoding/json map（无序） 1.05 MB</title></path>
+<text x="466.0" y="735.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="212.0" y="753.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M220.0,743.0H456.0A4,4 0 0 1 460.0,747.0V751.0A4,4 0 0 1 456.0,755.0H220.0Z"><title>sonic map（无序） 1.05 MB</title></path>
+<text x="466.0" y="753.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="616.0" y="640.0" class="ink" font-size="13" text-anchor="start" font-weight="600">8 MiB</text>
+<text x="1176.0" y="640.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.40×</text>
+<line class="axis" x1="812" y1="650" x2="812" y2="758"/>
+<text x="804.0" y="663.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,653.0H812.5A0.5,0.5 0 0 1 813.0,653.5V664.5A0.5,0.5 0 0 1 812.5,665.0H812.0Z"><title>ojson 480 B</title></path>
+<text x="819.0" y="663.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">480 B</text>
+<text x="804.0" y="681.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="681.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="804.0" y="699.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,689.0H812.5A0.5,0.5 0 0 1 813.0,689.5V700.5A0.5,0.5 0 0 1 812.5,701.0H812.0Z"><title>gjson 480 B</title></path>
+<text x="819.0" y="699.0" class="ink2 num" font-size="12" text-anchor="start">480 B</text>
+<text x="804.0" y="717.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,707.0H812.5A0.5,0.5 0 0 1 813.0,707.5V718.5A0.5,0.5 0 0 1 812.5,719.0H812.0Z"><title>sonic.Get 193 B</title></path>
+<text x="819.0" y="717.0" class="ink2 num" font-size="12" text-anchor="start">193 B</text>
+<text x="804.0" y="735.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M812.0,725.0H1048.0A4,4 0 0 1 1052.0,729.0V733.0A4,4 0 0 1 1048.0,737.0H812.0Z"><title>encoding/json map（无序） 8.39 MB</title></path>
+<text x="1058.0" y="735.0" class="ink2 num" font-size="12" text-anchor="start">8.39 MB</text>
+<text x="804.0" y="753.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M812.0,743.0H1048.0A4,4 0 0 1 1052.0,747.0V751.0A4,4 0 0 1 1048.0,755.0H812.0Z"><title>sonic map（无序） 8.39 MB</title></path>
+<text x="1058.0" y="753.0" class="ink2 num" font-size="12" text-anchor="start">8.39 MB</text>
+<text x="24.0" y="792.0" class="ink2" font-size="12" text-anchor="start">读取一个深层路径</text>
+<text x="24.0" y="820.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 KiB</text>
+<text x="584.0" y="820.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="220" y1="830" x2="220" y2="938"/>
+<text x="212.0" y="843.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,833.0H220.5A0.5,0.5 0 0 1 221.0,833.5V844.5A0.5,0.5 0 0 1 220.5,845.0H220.0Z"><title>ojson 8 B</title></path>
+<text x="227.0" y="843.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">8 B</text>
+<text x="212.0" y="861.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="861.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="212.0" y="879.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,869.0H220.5A0.5,0.5 0 0 1 221.0,869.5V880.5A0.5,0.5 0 0 1 220.5,881.0H220.0Z"><title>gjson 8 B</title></path>
+<text x="227.0" y="879.0" class="ink2 num" font-size="12" text-anchor="start">8 B</text>
+<text x="212.0" y="897.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,887.0H220.7A0.6904487917146145,0.6904487917146145 0 0 1 221.4,887.7V898.3A0.6904487917146145,0.6904487917146145 0 0 1 220.7,899.0H220.0Z"><title>sonic.Get 40 B</title></path>
+<text x="227.4" y="897.0" class="ink2 num" font-size="12" text-anchor="start">40 B</text>
+<text x="212.0" y="915.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M220.0,905.0H432.5A4,4 0 0 1 436.5,909.0V913.0A4,4 0 0 1 432.5,917.0H220.0Z"><title>encoding/json map（无序） 6.27 KB</title></path>
+<text x="442.5" y="915.0" class="ink2 num" font-size="12" text-anchor="start">6.27 KB</text>
+<text x="212.0" y="933.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M220.0,923.0H456.0A4,4 0 0 1 460.0,927.0V931.0A4,4 0 0 1 456.0,935.0H220.0Z"><title>sonic map（无序） 6.95 KB</title></path>
+<text x="466.0" y="933.0" class="ink2 num" font-size="12" text-anchor="start">6.95 KB</text>
+<text x="616.0" y="820.0" class="ink" font-size="13" text-anchor="start" font-weight="600">64 KiB</text>
+<text x="1176.0" y="820.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="812" y1="830" x2="812" y2="938"/>
+<text x="804.0" y="843.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,833.0H812.5A0.5,0.5 0 0 1 813.0,833.5V844.5A0.5,0.5 0 0 1 812.5,845.0H812.0Z"><title>ojson 8 B</title></path>
+<text x="819.0" y="843.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">8 B</text>
+<text x="804.0" y="861.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="861.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="804.0" y="879.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,869.0H812.5A0.5,0.5 0 0 1 813.0,869.5V880.5A0.5,0.5 0 0 1 812.5,881.0H812.0Z"><title>gjson 8 B</title></path>
+<text x="819.0" y="879.0" class="ink2 num" font-size="12" text-anchor="start">8 B</text>
+<text x="804.0" y="897.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,887.0H812.5A0.5,0.5 0 0 1 813.0,887.5V898.5A0.5,0.5 0 0 1 812.5,899.0H812.0Z"><title>sonic.Get 40 B</title></path>
+<text x="819.0" y="897.0" class="ink2 num" font-size="12" text-anchor="start">40 B</text>
+<text x="804.0" y="915.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M812.0,905.0H1047.6A4,4 0 0 1 1051.6,909.0V913.0A4,4 0 0 1 1047.6,917.0H812.0Z"><title>encoding/json map（无序） 71.4 KB</title></path>
+<text x="1057.6" y="915.0" class="ink2 num" font-size="12" text-anchor="start">71.4 KB</text>
+<text x="804.0" y="933.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M812.0,923.0H1048.0A4,4 0 0 1 1052.0,927.0V931.0A4,4 0 0 1 1048.0,935.0H812.0Z"><title>sonic map（无序） 71.5 KB</title></path>
+<text x="1058.0" y="933.0" class="ink2 num" font-size="12" text-anchor="start">71.5 KB</text>
+<text x="24.0" y="970.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 MiB</text>
+<text x="584.0" y="970.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="220" y1="980" x2="220" y2="1088"/>
+<text x="212.0" y="993.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,983.0H220.5A0.5,0.5 0 0 1 221.0,983.5V994.5A0.5,0.5 0 0 1 220.5,995.0H220.0Z"><title>ojson 8 B</title></path>
+<text x="227.0" y="993.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">8 B</text>
+<text x="212.0" y="1011.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="1011.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="212.0" y="1029.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,1019.0H220.5A0.5,0.5 0 0 1 221.0,1019.5V1030.5A0.5,0.5 0 0 1 220.5,1031.0H220.0Z"><title>gjson 8 B</title></path>
+<text x="227.0" y="1029.0" class="ink2 num" font-size="12" text-anchor="start">8 B</text>
+<text x="212.0" y="1047.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,1037.0H220.5A0.5,0.5 0 0 1 221.0,1037.5V1048.5A0.5,0.5 0 0 1 220.5,1049.0H220.0Z"><title>sonic.Get 40 B</title></path>
+<text x="227.0" y="1047.0" class="ink2 num" font-size="12" text-anchor="start">40 B</text>
+<text x="212.0" y="1065.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M220.0,1055.0H456.0A4,4 0 0 1 460.0,1059.0V1063.0A4,4 0 0 1 456.0,1067.0H220.0Z"><title>encoding/json map（无序） 1.05 MB</title></path>
+<text x="466.0" y="1065.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="212.0" y="1083.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M220.0,1073.0H456.0A4,4 0 0 1 460.0,1077.0V1081.0A4,4 0 0 1 456.0,1085.0H220.0Z"><title>sonic map（无序） 1.05 MB</title></path>
+<text x="466.0" y="1083.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="616.0" y="970.0" class="ink" font-size="13" text-anchor="start" font-weight="600">8 MiB</text>
+<text x="1176.0" y="970.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="812" y1="980" x2="812" y2="1088"/>
+<text x="804.0" y="993.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,983.0H812.5A0.5,0.5 0 0 1 813.0,983.5V994.5A0.5,0.5 0 0 1 812.5,995.0H812.0Z"><title>ojson 8 B</title></path>
+<text x="819.0" y="993.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">8 B</text>
+<text x="804.0" y="1011.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="1011.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="804.0" y="1029.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,1019.0H812.5A0.5,0.5 0 0 1 813.0,1019.5V1030.5A0.5,0.5 0 0 1 812.5,1031.0H812.0Z"><title>gjson 8 B</title></path>
+<text x="819.0" y="1029.0" class="ink2 num" font-size="12" text-anchor="start">8 B</text>
+<text x="804.0" y="1047.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,1037.0H812.5A0.5,0.5 0 0 1 813.0,1037.5V1048.5A0.5,0.5 0 0 1 812.5,1049.0H812.0Z"><title>sonic.Get 40 B</title></path>
+<text x="819.0" y="1047.0" class="ink2 num" font-size="12" text-anchor="start">40 B</text>
+<text x="804.0" y="1065.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M812.0,1055.0H1048.0A4,4 0 0 1 1052.0,1059.0V1063.0A4,4 0 0 1 1048.0,1067.0H812.0Z"><title>encoding/json map（无序） 8.39 MB</title></path>
+<text x="1058.0" y="1065.0" class="ink2 num" font-size="12" text-anchor="start">8.39 MB</text>
+<text x="804.0" y="1083.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M812.0,1073.0H1048.0A4,4 0 0 1 1052.0,1077.0V1081.0A4,4 0 0 1 1048.0,1085.0H812.0Z"><title>sonic map（无序） 8.39 MB</title></path>
+<text x="1058.0" y="1083.0" class="ink2 num" font-size="12" text-anchor="start">8.39 MB</text>
+<text x="24.0" y="1122.0" class="ink2" font-size="12" text-anchor="start">SSE 帧</text>
+<text x="24.0" y="1150.0" class="ink" font-size="13" text-anchor="start" font-weight="600">三个字段</text>
+<text x="584.0" y="1150.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.48×</text>
+<line class="axis" x1="220" y1="1160" x2="220" y2="1268"/>
+<text x="212.0" y="1173.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,1163.0H250.6A4,4 0 0 1 254.6,1167.0V1171.0A4,4 0 0 1 250.6,1175.0H220.0Z"><title>ojson 248 B</title></path>
+<text x="260.6" y="1173.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">248 B</text>
+<text x="212.0" y="1191.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="1191.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="212.0" y="1209.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,1199.0H251.7A4,4 0 0 1 255.7,1203.0V1207.0A4,4 0 0 1 251.7,1211.0H220.0Z"><title>gjson 256 B</title></path>
+<text x="261.7" y="1209.0" class="ink2 num" font-size="12" text-anchor="start">256 B</text>
+<text x="212.0" y="1227.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,1217.0H232.7A4,4 0 0 1 236.7,1221.0V1225.0A4,4 0 0 1 232.7,1229.0H220.0Z"><title>sonic.Get 120 B</title></path>
+<text x="242.7" y="1227.0" class="ink2 num" font-size="12" text-anchor="start">120 B</text>
+<text x="212.0" y="1245.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M220.0,1235.0H453.8A4,4 0 0 1 457.8,1239.0V1243.0A4,4 0 0 1 453.8,1247.0H220.0Z"><title>encoding/json map（无序） 1.7 KB</title></path>
+<text x="463.8" y="1245.0" class="ink2 num" font-size="12" text-anchor="start">1.7 KB</text>
+<text x="212.0" y="1263.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M220.0,1253.0H456.0A4,4 0 0 1 460.0,1257.0V1261.0A4,4 0 0 1 456.0,1265.0H220.0Z"><title>sonic map（无序） 1.72 KB</title></path>
+<text x="466.0" y="1263.0" class="ink2 num" font-size="12" text-anchor="start">1.72 KB</text>
+<text x="616.0" y="1150.0" class="ink" font-size="13" text-anchor="start" font-weight="600">一个字段</text>
+<text x="1176.0" y="1150.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="812" y1="1160" x2="812" y2="1268"/>
+<text x="804.0" y="1173.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,1163.0H812.6A0.5797101449275363,0.5797101449275363 0 0 1 813.2,1163.6V1174.4A0.5797101449275363,0.5797101449275363 0 0 1 812.6,1175.0H812.0Z"><title>ojson 8 B</title></path>
+<text x="819.2" y="1173.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">8 B</text>
+<text x="804.0" y="1191.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="1191.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · 不分配</text>
+<text x="804.0" y="1209.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,1199.0H812.6A0.5797101449275363,0.5797101449275363 0 0 1 813.2,1199.6V1210.4A0.5797101449275363,0.5797101449275363 0 0 1 812.6,1211.0H812.0Z"><title>gjson 8 B</title></path>
+<text x="819.2" y="1209.0" class="ink2 num" font-size="12" text-anchor="start">8 B</text>
+<text x="804.0" y="1227.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,1217.0H814.9A2.898550724637681,2.898550724637681 0 0 1 817.8,1219.9V1226.1A2.898550724637681,2.898550724637681 0 0 1 814.9,1229.0H812.0Z"><title>sonic.Get 40 B</title></path>
+<text x="823.8" y="1227.0" class="ink2 num" font-size="12" text-anchor="start">40 B</text>
+<text x="804.0" y="1245.0" class="ink2" font-size="12" text-anchor="end">encoding/json map（无序）</text>
+<path class="peer" d="M812.0,1235.0H1045.7A4,4 0 0 1 1049.7,1239.0V1243.0A4,4 0 0 1 1045.7,1247.0H812.0Z"><title>encoding/json map（无序） 1.64 KB</title></path>
+<text x="1055.7" y="1245.0" class="ink2 num" font-size="12" text-anchor="start">1.64 KB</text>
+<text x="804.0" y="1263.0" class="ink2" font-size="12" text-anchor="end">sonic map（无序）</text>
+<path class="peer" d="M812.0,1253.0H1048.0A4,4 0 0 1 1052.0,1257.0V1261.0A4,4 0 0 1 1048.0,1265.0H812.0Z"><title>sonic map（无序） 1.66 KB</title></path>
+<text x="1058.0" y="1263.0" class="ink2 num" font-size="12" text-anchor="start">1.66 KB</text>
+<text x="24.0" y="1306.0" class="muted" font-size="12" text-anchor="start">其他 ojson 行的倍数写在数值后面；SetBytes 只对比 sjson。</text>
+<text x="24.0" y="1322.0" class="muted" font-size="12" text-anchor="start">分轮测量的行每轮每项一个进程，耗时倍数是逐轮倍数的中位数；条形是全部样本的中位数。</text>
+<text x="24.0" y="1338.0" class="muted" font-size="12" text-anchor="start">计时前已核对输出：ojson 与 gjson、sjson 逐字节相同，sonic/ast 紧凑后相同。</text>
+<text x="24.0" y="1354.0" class="muted" font-size="12" text-anchor="start">ojson 和 gjson 取多个路径用 GetManyBytes，取一个用 GetBytes；NoCopy 用 GetManyBytesNoCopy 和 GetBytesNoCopy；sonic.Get 每个路径调用一次。</text>
+<text x="24.0" y="1370.0" class="muted" font-size="12" text-anchor="start">数据由 bench/json/race 和 bench/json/complex 测得，图由 bench/json/race/plot.py 生成</text>
+<text x="24.0" y="1386.0" class="muted" font-size="12" text-anchor="start">竞品版本：tidwall/gjson v1.19.0 · tidwall/sjson v1.2.5 · bytedance/sonic v1.15.5</text>
+</svg>

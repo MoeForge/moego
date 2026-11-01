@@ -30,12 +30,12 @@ TEXT = {
         "names": ("预分配编码", "预分配解码", "EncodeToString", "DecodeString", "data URL 拼接", "data URL 解码",
                   "单次分配 data URL", "复用缓冲区 data URL", "校验计长 vs 分配后解码", "校验计长 vs 复用输出"),
         "sections": ("编码与解码：这 8 个场景横轴比例相同",
-                     "校验计长，横轴比例与上方不同：moego 调用 ValidateString，不写出解码结果；其他实现完整解码后返回长度"),
+                     "校验计长，横轴比例与上方不同：base64 调用 ValidateString，不写出解码结果；其他实现完整解码后返回长度"),
         "samples": "每项 {} 个样本的中位数",
-        "stdlib": ("moego 与 encoding/base64 吞吐量对比",
-                   "{} 原始数据，单位 GB/s，越长越快；右上角倍数为 moego 吞吐量 ÷ encoding/base64 吞吐量"),
-        "competitors": ("moego 与 Go base64 实现吞吐量横向对比",
-                        "{} 原始数据，单位 GB/s，越长越快；右上角倍数为 moego 吞吐量 ÷ 最快的其他实现"),
+        "stdlib": ("base64 与 encoding/base64 吞吐量对比",
+                   "{} 原始数据，单位 GB/s，越长越快；右上角倍数为 base64 吞吐量 ÷ encoding/base64 吞吐量"),
+        "competitors": ("base64 与其他 Go Base64 实现吞吐量对比",
+                        "{} 原始数据，单位 GB/s，越长越快；右上角倍数为 base64 吞吐量 ÷ 最快的其他实现"),
         "source": "数据由 bench/rounds.py 测得，图由 bench/plot.py 生成",
         "versions": "竞品版本：",
     },
@@ -45,21 +45,24 @@ TEXT = {
                   "data URL into a reused buffer", "ValidateString vs DecodeString",
                   "ValidateString vs Decode, reused buffer"),
         "sections": ("Encoding and decoding: these 8 scenarios share one scale",
-                     "Validation, on a different scale: moego's ValidateString writes no decoded bytes; "
+                     "Validation, on a different scale: base64's ValidateString writes no decoded bytes; "
                      "the others decode in full and return the length"),
         "samples": "median of {} samples each",
-        "stdlib": ("Throughput of moego and encoding/base64",
+        "stdlib": ("Throughput of base64 and encoding/base64",
                    "{} of raw data in GB/s, longer is faster; "
-                   "top-right multiplier: moego throughput ÷ encoding/base64 throughput"),
-        "competitors": ("Throughput of moego and other Go Base64 implementations",
+                   "top-right multiplier: base64 throughput ÷ encoding/base64 throughput"),
+        "competitors": ("Throughput of base64 and other Go Base64 implementations",
                         "{} of raw data in GB/s, longer is faster; "
-                        "top-right multiplier: moego throughput ÷ the fastest other implementation"),
+                        "top-right multiplier: base64 throughput ÷ the fastest other implementation"),
         "source": "Measured with bench/rounds.py, drawn by bench/plot.py",
         "versions": "Versions: ",
     },
 }
 COMPETITORS = ("Emmansun", "Segmentio", "Cloudwego", "CloudwegoFallback", "Cristalhq")
-LABELS = {"Moego": "moego", "Stdlib": "encoding/base64"}
+# Chart labels: the package name for moego, module paths for the others, as in the README.
+LABELS = {"Moego": "base64", "Stdlib": "encoding/base64", "Emmansun": "emmansun/base64",
+          "Segmentio": "segmentio/asm", "Cloudwego": "cloudwego/base64x",
+          "CloudwegoFallback": "cloudwego/base64x", "Cristalhq": "cristalhq/base64"}
 FONT = 'system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", sans-serif'
 STYLE = f"""<style>
   svg {{ font-family: {FONT}; }}
@@ -128,7 +131,7 @@ MODULES = ("emmansun/base64", "segmentio/asm", "cloudwego/base64x", "cristalhq/b
 PANEL = 450
 GUTTER = 32
 MARGIN = 24
-NAME_COLUMN = 118
+NAME_COLUMN = 128
 VALUE_ROOM = 44
 ROW = 18
 BAR = 12
@@ -142,13 +145,13 @@ def describe_host(run, samples, words):
         for line in combined.read_text().splitlines():
             field, _, value = line.partition(": ")
             if field in ("goos", "goarch", "cpu") and value:
-                info.setdefault(field, value.strip())
+                info.setdefault(field, re.sub(r"\(R\)|\(TM\)| CPU", "", value).strip())
     environment = run / "environment.json"
     if environment.exists():
         meta = json.loads(environment.read_text())
         version = re.search(r"\bgo1\.[\d.]+", meta.get("build_info", {}).get("output", ""))
         if version:
-            info["go"] = version.group(0)
+            info["go"] = "Go " + version.group(0).removeprefix("go")
         procs = meta.get("effective_environment", {}).get("GOMAXPROCS")
         if procs:
             info["procs"] = f"GOMAXPROCS={procs}"

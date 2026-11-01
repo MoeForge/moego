@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="928" viewBox="0 0 1200 928" role="img" aria-labelledby="t">
+<title id="t">ojson, gjson, sjson and sonic on a 1 MiB chat request</title>
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; }
+  .ink2 { fill: #52514e; }
+  .muted { fill: #6f6d68; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .own { fill: #2a78d6; }
+  .peer { fill: #898781; }
+  .floor { fill: #d4d2ca; }
+  .num { font-variant-numeric: tabular-nums; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #ffffff; }
+    .ink2 { fill: #c3c2b7; }
+    .muted { fill: #9a9891; }
+    .axis { stroke: #383835; }
+    .own { fill: #3987e5; }
+    .floor { fill: #4a4945; }
+  }
+</style>
+<rect class="surface" width="1200" height="928" rx="8"/>
+<text x="24.0" y="36.0" class="ink" font-size="18" text-anchor="start" font-weight="600">ojson, gjson, sjson and sonic on a 1 MiB chat request</text>
+<text x="24.0" y="58.0" class="ink2" font-size="13" text-anchor="start">Chat request with an embedded image; reads take several paths, overrides return a new body; top-right: the best order-preserving competitor ÷ ojson</text>
+<text x="24.0" y="78.0" class="muted" font-size="12" text-anchor="start">Intel Xeon E5-2667 v4 @ 3.20GHz · linux/amd64 · Go 1.26.6 · GOMAXPROCS=1 on one pinned CPU · median of 5 or 15 samples each</text>
+<text x="24.0" y="98.0" class="muted" font-size="12" text-anchor="start">Shared KVM virtual machine with other users&#x27; load; results apply to this machine only</text>
+<text x="24.0" y="132.0" class="ink2" font-size="12" text-anchor="start">Time per call, shorter is faster; each panel has its own scale</text>
+<text x="24.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Read model and group</text>
+<text x="584.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.13×</text>
+<line class="axis" x1="220" y1="170" x2="220" y2="242"/>
+<text x="212.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,173.0H354.2A4,4 0 0 1 358.2,177.0V181.0A4,4 0 0 1 354.2,185.0H220.0Z"><title>ojson 465 ns</title></path>
+<text x="364.2" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">465 ns</text>
+<text x="212.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<path class="own" d="M220.0,191.0H263.8A4,4 0 0 1 267.8,195.0V199.0A4,4 0 0 1 263.8,203.0H220.0Z"><title>ojson NoCopy 161 ns</title></path>
+<text x="273.8" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">161 ns · 3.28×</text>
+<text x="212.0" y="219.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,209.0H456.0A4,4 0 0 1 460.0,213.0V217.0A4,4 0 0 1 456.0,221.0H220.0Z"><title>gjson 807 ns</title></path>
+<text x="466.0" y="219.0" class="ink2 num" font-size="12" text-anchor="start">807 ns</text>
+<text x="212.0" y="237.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,227.0H372.8A4,4 0 0 1 376.8,231.0V235.0A4,4 0 0 1 372.8,239.0H220.0Z"><title>sonic.Get 527 ns</title></path>
+<text x="382.8" y="237.0" class="ink2 num" font-size="12" text-anchor="start">527 ns</text>
+<text x="616.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Read six fields, most absent</text>
+<text x="1176.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">16.5×</text>
+<line class="axis" x1="812" y1="170" x2="812" y2="242"/>
+<text x="804.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,173.0H815.1A3.135516890695566,3.135516890695566 0 0 1 818.3,176.1V181.9A3.135516890695566,3.135516890695566 0 0 1 815.1,185.0H812.0Z"><title>ojson 44.9 µs</title></path>
+<text x="824.3" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">44.9 µs</text>
+<text x="804.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<path class="own" d="M812.0,191.0H815.1A3.12163149867455,3.12163149867455 0 0 1 818.2,194.1V199.9A3.12163149867455,3.12163149867455 0 0 1 815.1,203.0H812.0Z"><title>ojson NoCopy 44.7 µs</title></path>
+<text x="824.2" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">44.7 µs · 16.6×</text>
+<text x="804.0" y="219.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,209.0H1048.0A4,4 0 0 1 1052.0,213.0V217.0A4,4 0 0 1 1048.0,221.0H812.0Z"><title>gjson 1.72 ms</title></path>
+<text x="1058.0" y="219.0" class="ink2 num" font-size="12" text-anchor="start">1.72 ms</text>
+<text x="804.0" y="237.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,227.0H911.7A4,4 0 0 1 915.7,231.0V235.0A4,4 0 0 1 911.7,239.0H812.0Z"><title>sonic.Get 743 µs</title></path>
+<text x="921.7" y="237.0" class="ink2 num" font-size="12" text-anchor="start">743 µs</text>
+<text x="24.0" y="274.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 override</text>
+<text x="584.0" y="274.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.18×</text>
+<line class="axis" x1="220" y1="284" x2="220" y2="374"/>
+<text x="212.0" y="297.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson Doc</text>
+<path class="own" d="M220.0,287.0H320.8A4,4 0 0 1 324.8,291.0V295.0A4,4 0 0 1 320.8,299.0H220.0Z"><title>ojson Doc 239 µs</title></path>
+<text x="330.8" y="297.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">239 µs</text>
+<text x="212.0" y="315.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson SetBytes</text>
+<path class="own" d="M220.0,305.0H312.8A4,4 0 0 1 316.8,309.0V313.0A4,4 0 0 1 312.8,317.0H220.0Z"><title>ojson SetBytes 220 µs</title></path>
+<text x="322.8" y="315.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">220 µs · 1.02×</text>
+<text x="212.0" y="333.0" class="ink2" font-size="12" text-anchor="end">sjson</text>
+<path class="peer" d="M220.0,323.0H339.3A4,4 0 0 1 343.3,327.0V331.0A4,4 0 0 1 339.3,335.0H220.0Z"><title>sjson 281 µs</title></path>
+<text x="349.3" y="333.0" class="ink2 num" font-size="12" text-anchor="start">281 µs</text>
+<text x="212.0" y="351.0" class="ink2" font-size="12" text-anchor="end">sonic/ast</text>
+<path class="peer" d="M220.0,341.0H456.0A4,4 0 0 1 460.0,345.0V349.0A4,4 0 0 1 456.0,353.0H220.0Z"><title>sonic/ast 547 µs</title></path>
+<text x="466.0" y="351.0" class="ink2 num" font-size="12" text-anchor="start">547 µs</text>
+<text x="212.0" y="369.0" class="ink2" font-size="12" text-anchor="end">floor: copy to a new slice</text>
+<path class="floor" d="M220.0,359.0H312.0A4,4 0 0 1 316.0,363.0V367.0A4,4 0 0 1 312.0,371.0H220.0Z"><title>floor: copy to a new slice 219 µs</title></path>
+<text x="322.0" y="369.0" class="ink2 num" font-size="12" text-anchor="start">219 µs</text>
+<text x="616.0" y="274.0" class="ink" font-size="13" text-anchor="start" font-weight="600">20 overrides</text>
+<text x="1176.0" y="274.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">2.78×</text>
+<line class="axis" x1="812" y1="284" x2="812" y2="374"/>
+<text x="804.0" y="297.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson Doc</text>
+<path class="own" d="M812.0,287.0H815.3A3.297586469119092,3.297586469119092 0 0 1 818.6,290.3V295.7A3.297586469119092,3.297586469119092 0 0 1 815.3,299.0H812.0Z"><title>ojson Doc 310 µs</title></path>
+<text x="824.6" y="297.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">310 µs</text>
+<text x="804.0" y="315.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson Doc.AppendTo</text>
+<path class="own" d="M812.0,305.0H813.4A1.4019924571681737,1.4019924571681737 0 0 1 814.8,306.4V315.6A1.4019924571681737,1.4019924571681737 0 0 1 813.4,317.0H812.0Z"><title>ojson Doc.AppendTo 132 µs</title></path>
+<text x="820.8" y="315.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">132 µs · 8.26×</text>
+<text x="804.0" y="333.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson SetBytes</text>
+<path class="own" d="M812.0,323.0H929.9A4,4 0 0 1 933.9,327.0V331.0A4,4 0 0 1 929.9,335.0H812.0Z"><title>ojson SetBytes 5.73 ms</title></path>
+<text x="939.9" y="333.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">5.73 ms · 1.56×</text>
+<text x="804.0" y="351.0" class="ink2" font-size="12" text-anchor="end">sjson</text>
+<path class="peer" d="M812.0,341.0H1048.0A4,4 0 0 1 1052.0,345.0V349.0A4,4 0 0 1 1048.0,353.0H812.0Z"><title>sjson 11.3 ms</title></path>
+<text x="1058.0" y="351.0" class="ink2 num" font-size="12" text-anchor="start">11.3 ms</text>
+<text x="804.0" y="369.0" class="ink2" font-size="12" text-anchor="end">sonic/ast</text>
+<path class="peer" d="M812.0,359.0H828.5A4,4 0 0 1 832.5,363.0V367.0A4,4 0 0 1 828.5,371.0H812.0Z"><title>sonic/ast 966 µs</title></path>
+<text x="838.5" y="369.0" class="ink2 num" font-size="12" text-anchor="start">966 µs</text>
+<text x="24.0" y="406.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Query: messages.#(role==&quot;user&quot;)…detail</text>
+<text x="584.0" y="406.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">48.1×</text>
+<line class="axis" x1="220" y1="416" x2="220" y2="452"/>
+<text x="212.0" y="429.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,419.0H222.5A2.493107896650426,2.493107896650426 0 0 1 225.0,421.5V428.5A2.493107896650426,2.493107896650426 0 0 1 222.5,431.0H220.0Z"><title>ojson 96.5 µs</title></path>
+<text x="231.0" y="429.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">96.5 µs</text>
+<text x="212.0" y="447.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,437.0H456.0A4,4 0 0 1 460.0,441.0V445.0A4,4 0 0 1 456.0,449.0H220.0Z"><title>gjson 4.64 ms</title></path>
+<text x="466.0" y="447.0" class="ink2 num" font-size="12" text-anchor="start">4.64 ms</text>
+<text x="616.0" y="406.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Set through a query</text>
+<text x="1176.0" y="406.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">3.00×</text>
+<line class="axis" x1="812" y1="416" x2="812" y2="452"/>
+<text x="804.0" y="429.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,419.0H887.8A4,4 0 0 1 891.8,423.0V427.0A4,4 0 0 1 887.8,431.0H812.0Z"><title>ojson 118 µs</title></path>
+<text x="897.8" y="429.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">118 µs</text>
+<text x="804.0" y="447.0" class="ink2" font-size="12" text-anchor="end">sjson</text>
+<path class="peer" d="M812.0,437.0H1048.0A4,4 0 0 1 1052.0,441.0V445.0A4,4 0 0 1 1048.0,449.0H812.0Z"><title>sjson 355 µs</title></path>
+<text x="1058.0" y="447.0" class="ink2 num" font-size="12" text-anchor="start">355 µs</text>
+<text x="24.0" y="486.0" class="ink2" font-size="12" text-anchor="start">Bytes allocated per call, shorter is less; each panel has its own scale</text>
+<text x="24.0" y="514.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Read model and group</text>
+<text x="584.0" y="514.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.48×</text>
+<line class="axis" x1="220" y1="524" x2="220" y2="596"/>
+<text x="212.0" y="537.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M220.0,527.0H456.0A4,4 0 0 1 460.0,531.0V535.0A4,4 0 0 1 456.0,539.0H220.0Z"><title>ojson 184 B</title></path>
+<text x="466.0" y="537.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">184 B</text>
+<text x="212.0" y="555.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="226.0" y="555.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · no allocation</text>
+<text x="212.0" y="573.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M220.0,563.0H456.0A4,4 0 0 1 460.0,567.0V571.0A4,4 0 0 1 456.0,575.0H220.0Z"><title>gjson 184 B</title></path>
+<text x="466.0" y="573.0" class="ink2 num" font-size="12" text-anchor="start">184 B</text>
+<text x="212.0" y="591.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M220.0,581.0H330.8A4,4 0 0 1 334.8,585.0V589.0A4,4 0 0 1 330.8,593.0H220.0Z"><title>sonic.Get 88 B</title></path>
+<text x="340.8" y="591.0" class="ink2 num" font-size="12" text-anchor="start">88 B</text>
+<text x="616.0" y="514.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Read six fields, most absent</text>
+<text x="1176.0" y="514.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">0.40×</text>
+<line class="axis" x1="812" y1="524" x2="812" y2="596"/>
+<text x="804.0" y="537.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,527.0H1048.0A4,4 0 0 1 1052.0,531.0V535.0A4,4 0 0 1 1048.0,539.0H812.0Z"><title>ojson 480 B</title></path>
+<text x="1058.0" y="537.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">480 B</text>
+<text x="804.0" y="555.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson NoCopy</text>
+<text x="818.0" y="555.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B · no allocation</text>
+<text x="804.0" y="573.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<path class="peer" d="M812.0,563.0H1048.0A4,4 0 0 1 1052.0,567.0V571.0A4,4 0 0 1 1048.0,575.0H812.0Z"><title>gjson 480 B</title></path>
+<text x="1058.0" y="573.0" class="ink2 num" font-size="12" text-anchor="start">480 B</text>
+<text x="804.0" y="591.0" class="ink2" font-size="12" text-anchor="end">sonic.Get</text>
+<path class="peer" d="M812.0,581.0H904.0A4,4 0 0 1 908.0,585.0V589.0A4,4 0 0 1 904.0,593.0H812.0Z"><title>sonic.Get 192 B</title></path>
+<text x="914.0" y="591.0" class="ink2 num" font-size="12" text-anchor="start">192 B</text>
+<text x="24.0" y="628.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 override</text>
+<text x="584.0" y="628.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="220" y1="638" x2="220" y2="728"/>
+<text x="212.0" y="651.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson Doc</text>
+<path class="own" d="M220.0,641.0H455.8A4,4 0 0 1 459.8,645.0V649.0A4,4 0 0 1 455.8,653.0H220.0Z"><title>ojson Doc 1.05 MB</title></path>
+<text x="465.8" y="651.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.05 MB</text>
+<text x="212.0" y="669.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson SetBytes</text>
+<path class="own" d="M220.0,659.0H455.7A4,4 0 0 1 459.7,663.0V667.0A4,4 0 0 1 455.7,671.0H220.0Z"><title>ojson SetBytes 1.05 MB</title></path>
+<text x="465.7" y="669.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.05 MB · 1.00×</text>
+<text x="212.0" y="687.0" class="ink2" font-size="12" text-anchor="end">sjson</text>
+<path class="peer" d="M220.0,677.0H455.8A4,4 0 0 1 459.8,681.0V685.0A4,4 0 0 1 455.8,689.0H220.0Z"><title>sjson 1.05 MB</title></path>
+<text x="465.8" y="687.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="212.0" y="705.0" class="ink2" font-size="12" text-anchor="end">sonic/ast</text>
+<path class="peer" d="M220.0,695.0H456.0A4,4 0 0 1 460.0,699.0V703.0A4,4 0 0 1 456.0,707.0H220.0Z"><title>sonic/ast 1.05 MB</title></path>
+<text x="466.0" y="705.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="212.0" y="723.0" class="ink2" font-size="12" text-anchor="end">floor: copy to a new slice</text>
+<path class="floor" d="M220.0,713.0H455.7A4,4 0 0 1 459.7,717.0V721.0A4,4 0 0 1 455.7,725.0H220.0Z"><title>floor: copy to a new slice 1.05 MB</title></path>
+<text x="465.7" y="723.0" class="ink2 num" font-size="12" text-anchor="start">1.05 MB</text>
+<text x="616.0" y="628.0" class="ink" font-size="13" text-anchor="start" font-weight="600">20 overrides</text>
+<text x="1176.0" y="628.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">2.49×</text>
+<line class="axis" x1="812" y1="638" x2="812" y2="728"/>
+<text x="804.0" y="651.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson Doc</text>
+<path class="own" d="M812.0,641.0H818.2A4,4 0 0 1 822.2,645.0V649.0A4,4 0 0 1 818.2,653.0H812.0Z"><title>ojson Doc 1.06 MB</title></path>
+<text x="828.2" y="651.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.06 MB</text>
+<text x="804.0" y="669.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson Doc.AppendTo</text>
+<path class="own" d="M812.0,659.0H812.5A0.5,0.5 0 0 1 813.0,659.5V670.5A0.5,0.5 0 0 1 812.5,671.0H812.0Z"><title>ojson Doc.AppendTo 3.7 KB</title></path>
+<text x="819.0" y="669.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">3.7 KB · 715.0×</text>
+<text x="804.0" y="687.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson SetBytes</text>
+<path class="own" d="M812.0,677.0H1010.3A4,4 0 0 1 1014.3,681.0V685.0A4,4 0 0 1 1010.3,689.0H812.0Z"><title>ojson SetBytes 21.1 MB</title></path>
+<text x="1020.3" y="687.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">21.1 MB · 1.19×</text>
+<text x="804.0" y="705.0" class="ink2" font-size="12" text-anchor="end">sjson</text>
+<path class="peer" d="M812.0,695.0H1048.0A4,4 0 0 1 1052.0,699.0V703.0A4,4 0 0 1 1048.0,707.0H812.0Z"><title>sjson 25 MB</title></path>
+<text x="1058.0" y="705.0" class="ink2 num" font-size="12" text-anchor="start">25 MB</text>
+<text x="804.0" y="723.0" class="ink2" font-size="12" text-anchor="end">sonic/ast</text>
+<path class="peer" d="M812.0,713.0H833.3A4,4 0 0 1 837.3,717.0V721.0A4,4 0 0 1 833.3,725.0H812.0Z"><title>sonic/ast 2.64 MB</title></path>
+<text x="843.3" y="723.0" class="ink2 num" font-size="12" text-anchor="start">2.64 MB</text>
+<text x="24.0" y="760.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Query: messages.#(role==&quot;user&quot;)…detail</text>
+<text x="584.0" y="760.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">same</text>
+<line class="axis" x1="220" y1="770" x2="220" y2="806"/>
+<text x="212.0" y="783.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<text x="226.0" y="783.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B</text>
+<text x="212.0" y="801.0" class="ink2" font-size="12" text-anchor="end">gjson</text>
+<text x="226.0" y="801.0" class="ink2 num" font-size="12" text-anchor="start">0 B</text>
+<text x="616.0" y="760.0" class="ink" font-size="13" text-anchor="start" font-weight="600">Set through a query</text>
+<text x="1176.0" y="760.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">3.00×</text>
+<line class="axis" x1="812" y1="770" x2="812" y2="806"/>
+<text x="804.0" y="783.0" class="ink" font-size="12" text-anchor="end" font-weight="600">ojson</text>
+<path class="own" d="M812.0,773.0H888.0A4,4 0 0 1 892.0,777.0V781.0A4,4 0 0 1 888.0,785.0H812.0Z"><title>ojson 1.05 MB</title></path>
+<text x="898.0" y="783.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.05 MB</text>
+<text x="804.0" y="801.0" class="ink2" font-size="12" text-anchor="end">sjson</text>
+<path class="peer" d="M812.0,791.0H1048.0A4,4 0 0 1 1052.0,795.0V799.0A4,4 0 0 1 1048.0,803.0H812.0Z"><title>sjson 3.15 MB</title></path>
+<text x="1058.0" y="801.0" class="ink2 num" font-size="12" text-anchor="start">3.15 MB</text>
+<text x="24.0" y="844.0" class="muted" font-size="12" text-anchor="start">Other ojson rows carry their own multiplier after the value; SetBytes is compared with sjson only.</text>
+<text x="24.0" y="860.0" class="muted" font-size="12" text-anchor="start">Rows that ran in rounds, one process per row and round, use the median of the per-round time ratios; bars are the medians of all samples.</text>
+<text x="24.0" y="876.0" class="muted" font-size="12" text-anchor="start">Outputs were checked before timing: ojson matches gjson and sjson byte for byte, sonic/ast after compacting.</text>
+<text x="24.0" y="892.0" class="muted" font-size="12" text-anchor="start">Measured with bench/json/race and bench/json/complex, drawn by bench/json/race/plot.py</text>
+<text x="24.0" y="908.0" class="muted" font-size="12" text-anchor="start">Versions: tidwall/gjson v1.19.0 · tidwall/sjson v1.2.5 · bytedance/sonic v1.15.5</text>
+</svg>

@@ -38,7 +38,7 @@ class ChartTests(unittest.TestCase):
             self.assertEqual(charts[f"bench-1MiB-vs-stdlib.{lang}.svg"].count("2.00×"), len(SCENARIOS))
             competitors = charts[f"bench-1MiB-vs-competitors.{lang}.svg"]
             self.assertEqual(competitors.count("1.25×"), len(SCENARIOS))
-            self.assertEqual(competitors.count("CloudwegoFallback"), len(SCENARIOS))
+            self.assertEqual(competitors.count("cloudwego/base64x"), len(SCENARIOS))
 
     def test_missing_scenario_cannot_render(self):
         with self.assertRaisesRegex(SystemExit, "missing BenchmarkValidation/Reuse/1MiB"):
