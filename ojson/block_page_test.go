@@ -1,4 +1,4 @@
-//go:build amd64 && !purego && linux
+//go:build (amd64 || arm64) && !purego && (linux || darwin)
 
 package ojson
 
@@ -13,17 +13,21 @@ import (
 // the reads past the end of the input that skipAVX2 and pathMasksAVX2 make
 // must stay in mapped memory.
 func TestContainerEndPages(t *testing.T) {
-	const page = 4096
+	page := syscall.Getpagesize()
 	mem, err := syscall.Mmap(-1, 0, 3*page, syscall.PROT_READ|syscall.PROT_WRITE, syscall.MAP_ANON|syscall.MAP_PRIVATE)
 	if err != nil {
 		t.Skip(err)
 	}
-	defer syscall.Munmap(mem)
-	if err := syscall.Mprotect(mem[:page], syscall.PROT_NONE); err != nil {
-		t.Skip(err)
+	defer func() {
+		if errUnmap := syscall.Munmap(mem); errUnmap != nil {
+			t.Errorf("munmap error: %v", errUnmap)
+		}
+	}()
+	if errProtect := syscall.Mprotect(mem[:page], syscall.PROT_NONE); errProtect != nil {
+		t.Skip(errProtect)
 	}
-	if err := syscall.Mprotect(mem[2*page:], syscall.PROT_NONE); err != nil {
-		t.Skip(err)
+	if errProtect := syscall.Mprotect(mem[2*page:], syscall.PROT_NONE); errProtect != nil {
+		t.Skip(errProtect)
 	}
 	data := mem[page : 2*page]
 	bodies := []string{

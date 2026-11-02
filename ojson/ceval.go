@@ -804,10 +804,30 @@ func multipath(json, path string) (Result, string, bool) {
 	obj := path[0] == '{'
 	var vbuf, nbuf [8]string
 	var qbuf [8]bool
+	var pbuf [8]string
+	var spbuf [8]span
 	vals, names, quoted := vbuf[:0], nbuf[:0], qbuf[:0]
+	hasSpans := false
+	if len(sels) > 1 && len(sels) <= len(pbuf) && !scalarRoot(json) {
+		paths := pbuf[:0]
+		for _, s := range sels {
+			paths = append(paths, s.path)
+		}
+		hasSpans = rootSpans(json, paths, spbuf[:len(sels)])
+	}
 	size := 2
-	for _, s := range sels {
-		r := Get(json, s.path)
+	for idx, s := range sels {
+		var r Result
+		if hasSpans {
+			sp := spbuf[idx]
+			if sp.vs >= 0 && sp.ve >= 0 {
+				r = resultAt(json, sp.vs, sp.ve, sp.esc)
+			} else if sp.vs != -1 || !plainComps(s.path) {
+				r = Get(json, s.path)
+			}
+		} else {
+			r = Get(json, s.path)
+		}
 		if !r.Exists() {
 			continue
 		}

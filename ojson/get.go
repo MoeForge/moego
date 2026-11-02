@@ -1127,7 +1127,7 @@ func directSpans(json string, paths []string, spans *[3]span) {
 			shared = shared || n > 0
 		}
 	}
-	if len(paths) > 1 && !shared && rootSpans(json, paths, spans) {
+	if len(paths) > 1 && !shared && rootSpans(json, paths, spans[:len(paths)]) {
 		return
 	}
 	for k, p := range paths {
@@ -1222,7 +1222,7 @@ func parseNum(raw string) float64 {
 // then searches on from the values found; a path that does not resolve
 // there gets a full search, as in directSpans. It reports false, setting
 // nothing, when the paths or the document do not have that shape.
-func rootSpans(json string, paths []string, spans *[3]span) bool {
+func rootSpans(json string, paths []string, spans []span) bool {
 	var r rootKeys
 	for k, p := range paths {
 		if p == "" || queryStart(p) || p[0] == '.' {
@@ -1264,16 +1264,16 @@ func rootSpans(json string, paths []string, spans *[3]span) bool {
 // loop of memberValue does faster over many members.
 const rootScan = 8
 
-// rootKeys holds the first keys of up to three paths and the index of the
+// rootKeys holds the first keys of up to eight paths and the index of the
 // rest of each path, -1 when there is none. scan sets at to the start of the
 // value of the first member with each key, or -1, and for a path with no
 // rest end and esc to what valueSpan returns for that value.
 type rootKeys struct {
-	key  [3]string
-	next [3]int
-	at   [3]int
-	end  [3]int
-	esc  [3]bool
+	key  [8]string
+	next [8]int
+	at   [8]int
+	end  [8]int
+	esc  [8]bool
 	n    int
 }
 
