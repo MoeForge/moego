@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unsafe"
 )
 
 // Type is the type of a JSON value.
@@ -220,19 +221,128 @@ func (t Result) Array() []Result {
 	if !t.IsArray() {
 		return []Result{t}
 	}
-	out := make([]Result, 0, t.count())
-	t.ForEach(func(_, v Result) bool {
-		out = append(out, v)
-		return true
-	})
+	s := t.Raw
+	var sbuf [128]int
+	spans := sbuf[:0]
+	var bp *[]byte
+	for i := 1; ; {
+		if i < len(s) && s[i] == ',' {
+			i++
+		}
+		if i < len(s) && (s[i] <= ' ' || s[i] == ',') {
+			for i < len(s) && (isSpace(s[i]) || s[i] == ',') {
+				i++
+			}
+		}
+		if i >= len(s) || s[i] == '}' || s[i] == ']' {
+			break
+		}
+		end, esc := valueSpan(s, i)
+		if end < 0 {
+			break
+		}
+		if esc {
+			end = -end
+		}
+		if len(spans) == cap(spans) {
+			spans, bp = growSpans(spans, bp)
+		}
+		spans = append(spans, i, end)
+		if end < 0 {
+			end = -end
+		}
+		i = end
+	}
+	n := len(spans) >> 1
+	if n == 0 {
+		if bp != nil {
+			scratchPool.Put(bp)
+		}
+		return []Result{}
+	}
+	out := make([]Result, n)
+	base := t.Index
 	// The elements take their offsets from Indexes only when there is
 	// one for each; otherwise they are unknown.
-	if t.Indexes != nil && len(t.Indexes) != len(out) {
-		for k := range out {
-			out[k].Index = 0
+	hasIdx := t.Indexes != nil && len(t.Indexes) == n
+	noIdx := t.Indexes != nil && len(t.Indexes) != n
+	for k := 0; k < n; k++ {
+		i, end := spans[2*k], spans[2*k+1]
+		esc := end < 0
+		if esc {
+			end = -end
+		}
+		r := &out[k]
+		idx := i + base
+		if hasIdx {
+			idx = t.Indexes[k]
+		} else if noIdx {
+			idx = 0
+		}
+		if raw := s[i:end]; raw != "" {
+			switch c := raw[0]; {
+			case c == '"':
+				if esc || len(raw) < 2 {
+					*r = stringResult(s, i, end, true)
+					if hasIdx || noIdx {
+						r.Index = idx
+					} else {
+						r.Index += base
+					}
+					continue
+				}
+				r.Type, r.Raw, r.Str, r.Index = String, raw, raw[1:len(raw)-1], idx
+			case c == '{' || c == '[':
+				r.Type, r.Raw, r.Index = JSON, raw, idx
+			case c == 't':
+				r.Type, r.Raw, r.Index = True, raw, idx
+			case c == 'f':
+				r.Type, r.Raw, r.Index = False, raw, idx
+			case c == 'n':
+				r.Type, r.Raw, r.Index = Null, raw, idx
+			case c == '-' || (c >= '0' && c <= '9'):
+				r.Type, r.Raw, r.Num, r.Index = Number, raw, parseNum(raw), idx
+			default:
+				if !hasIdx && !noIdx {
+					r.Index = base
+				} else {
+					r.Index = idx
+				}
+			}
+		} else if !hasIdx && !noIdx {
+			r.Index = base
+		} else {
+			r.Index = idx
 		}
 	}
+	if bp != nil {
+		scratchPool.Put(bp)
+	}
 	return out
+}
+
+// growSpans doubles the capacity of spans using scratchPool up to 1 MiB.
+func growSpans(spans []int, bp *[]byte) ([]int, *[]byte) {
+	const intSize = int(unsafe.Sizeof(int(0)))
+	need := max(2*cap(spans), 512)
+	if need*intSize > 1<<20 {
+		dst := make([]int, len(spans), need)
+		copy(dst, spans)
+		if bp != nil {
+			scratchPool.Put(bp)
+		}
+		return dst, nil
+	}
+	if bp == nil {
+		bp = scratchPool.Get().(*[]byte)
+	}
+	if cap(*bp) < need*intSize || uintptr(unsafe.Pointer(unsafe.SliceData(*bp)))%uintptr(intSize) != 0 {
+		buf := make([]int, need)
+		*bp = unsafe.Slice((*byte)(unsafe.Pointer(unsafe.SliceData(buf))), need*intSize)
+	}
+	dst := unsafe.Slice((*int)(unsafe.Pointer(unsafe.SliceData(*bp))), cap(*bp)/intSize)
+	copy(dst, spans)
+	return dst[:len(spans)], bp
 }
 
 // ForEach calls iterator for each member of an object or element of an
@@ -257,14 +367,16 @@ func (t Result) ForEach(iterator func(key, value Result) bool) {
 	// With Indexes, as from a query, value k is at Indexes[k], or unknown
 	// past them.
 	for n, k := 0, 0; ; n++ {
-		i = skipSpace(s, i)
+		if i < len(s) && s[i] == ',' {
+			i++
+		}
+		if i < len(s) && (s[i] <= ' ' || s[i] == ',') {
+			for i < len(s) && (isSpace(s[i]) || s[i] == ',') {
+				i++
+			}
+		}
 		if i >= len(s) || s[i] == '}' || s[i] == ']' {
 			return
-		}
-		if s[i] == ',' {
-			i++
-			n--
-			continue
 		}
 		// The results are built here rather than returned by resultAt,
 		// which would copy them, with the same fields.
@@ -346,13 +458,16 @@ func (t Result) count() int {
 	obj := s[i] == '{'
 	n := 0
 	for i++; ; {
-		i = skipSpace(s, i)
+		if i < len(s) && s[i] == ',' {
+			i++
+		}
+		if i < len(s) && (s[i] <= ' ' || s[i] == ',') {
+			for i < len(s) && (isSpace(s[i]) || s[i] == ',') {
+				i++
+			}
+		}
 		if i >= len(s) || s[i] == '}' || s[i] == ']' {
 			return n
-		}
-		if s[i] == ',' {
-			i++
-			continue
 		}
 		if obj {
 			_, _, vs, _, ok := nextMember(s, i)
