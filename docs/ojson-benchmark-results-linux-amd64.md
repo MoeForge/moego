@@ -427,9 +427,9 @@ its competitors in every row except the reads that return `gjson`'s
   timing. The paired rounds reduce, but do not remove, its effect.
 - Other CPUs, with other cache sizes and memory bandwidth, may give
   different results.
-- Only linux/amd64 was measured. On arm64 and with `-tags purego`, `ojson`
-  uses portable Go code instead of the AVX2 kernels; their speed has not
-  been measured.
+- Only linux/amd64 was measured. On arm64 `ojson` uses NEON kernels, and
+  with `-tags purego` it uses portable Go code instead of the AVX2 kernels;
+  their speed has not been measured.
 - The bodies are synthetic chat requests and responses. Real requests
   differ in layout and size.
 

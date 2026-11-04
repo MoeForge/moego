@@ -1221,9 +1221,13 @@ func parseNum(raw string) float64 {
 // of a root object. It reads the root members once for all of those keys,
 // then searches on from the values found; a path that does not resolve
 // there gets a full search, as in directSpans. It reports false, setting
-// nothing, when the paths or the document do not have that shape.
+// nothing, when there are more paths than rootKeys holds or than spans has
+// room for, or when the paths or the document do not have that shape.
 func rootSpans(json string, paths []string, spans []span) bool {
 	var r rootKeys
+	if len(paths) > len(r.key) || len(paths) > len(spans) {
+		return false
+	}
 	for k, p := range paths {
 		if p == "" || queryStart(p) || p[0] == '.' {
 			return false

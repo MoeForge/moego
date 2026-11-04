@@ -254,6 +254,28 @@ func TestGetManyRoot(t *testing.T) {
 	}
 }
 
+// TestRootSpansLimits checks that rootSpans declines more paths than rootKeys
+// holds, or than there are spans for, instead of indexing past them.
+func TestRootSpansLimits(t *testing.T) {
+	json := `{"a":1,"b":2,"c":3,"d":4,"e":5,"f":6,"g":7,"h":8,"i":9}`
+	paths := []string{"a", "b", "c", "d", "e", "f", "g", "h", "i"}
+	var spans [9]span
+	if rootSpans(json, paths, spans[:]) {
+		t.Fatal("rootSpans took 9 paths")
+	}
+	if rootSpans(json, paths[:3], spans[:2]) {
+		t.Fatal("rootSpans took 3 paths with 2 spans")
+	}
+	if !rootSpans(json, paths[:8], spans[:8]) {
+		t.Fatal("rootSpans declined 8 paths")
+	}
+	for k, p := range paths[:8] {
+		if vs, ve, esc := getSpan(json, p); spans[k] != (span{vs, ve, esc}) {
+			t.Fatalf("rootSpans span of %q = %+v, want %+v", p, spans[k], span{vs, ve, esc})
+		}
+	}
+}
+
 // clobber overwrites b, as a caller reusing its buffer would, so the tests
 // catch a GetBytes or GetManyBytes result that still points into it.
 func clobber(b []byte) {
