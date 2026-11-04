@@ -362,3 +362,39 @@ func TestMembersAVX2(t *testing.T) {
 		}
 	}
 }
+
+// TestMembersAVX2NearKeys looks up keys of every length up to 40 in objects
+// whose first key differs from them in one byte, at each position, so that
+// every word and tail comparison of membersAVX2 meets a mismatch.
+func TestMembersAVX2NearKeys(t *testing.T) {
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNO"
+	for n := 0; n <= 40; n++ {
+		key := letters[:n]
+		kw, km := keyWord(key, 0, len(key))
+		for j := -1; j < n; j++ {
+			near := []byte(key)
+			if j >= 0 {
+				near[j] = '_'
+			}
+			for pad := 0; pad < 16; pad++ {
+				head := "{" + strings.Repeat(" ", pad) + `"` + string(near) + `":1`
+				for _, doc := range []string{head + "}", head + `,"` + key + `":2}`} {
+					want := strings.IndexByte(doc, '1')
+					if j >= 0 {
+						want = strings.IndexByte(doc, '2')
+					}
+					if got, _ := memberScalar(doc, 1, key, kw, km, -1); got != want {
+						t.Fatalf("memberScalar(%q, 1, %q) = %d, want %d", doc, key, got, want)
+					}
+					v, at := membersFast(doc, 1, key)
+					if v == membersSlow {
+						v, _ = memberScalar(doc, at, key, kw, km, -1)
+					}
+					if v != want {
+						t.Fatalf("membersAVX2(%q, 1, %q) = %d, want %d", doc, key, v, want)
+					}
+				}
+			}
+		}
+	}
+}

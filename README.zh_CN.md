@@ -161,9 +161,9 @@ func main() {
 
 `gjson` v1.19.0 和 `sjson` v1.2.5 导出的每个函数、类型、方法和变量都有，签名相同：`Get`、`GetBytes`、`GetMany`、`GetManyBytes`、`Parse`、`Valid`、`ForEachLine`、`AddModifier`、`Result` 及其方法、`Set`、`SetBytes`、`SetRaw`、`Delete`、`Options` 等。路径语法是 `gjson` 的：通配符、`#` 计数和数组映射、`#(...)` 与 `#(...)#` 查询、`|` 管道、`{...}` 和 `[...]` 多路径、字面量，以及全部内置 modifier。
 
-#### amd64 上的 SIMD
+#### amd64 和 arm64 上的 SIMD
 
-在 amd64 上，CPU 和操作系统都支持 AVX2 时，`ojson` 用 AVX2 扫描和校验 JSON。其余情况用可移植的 Go 代码：不支持 AVX2 的 amd64 CPU、arm64 和其他架构，以及用 `-tags purego` 编译的程序。
+在 amd64 上，CPU 和操作系统都支持 AVX2 时，`ojson` 用 AVX2 扫描和校验 JSON；在 arm64 上用 NEON。其余情况用可移植的 Go 代码：不支持 AVX2 的 amd64 CPU、其他架构，以及用 `-tags purego` 编译的程序。
 
 #### 保留顺序和未改动的字节
 
@@ -253,7 +253,7 @@ func main() {
 ### 限制
 
 - `Doc` 把整个文档放在内存里，还不支持从 `io.ReaderAt` 或文件直接读取。
-- arm64 和 `-tags purego` 构建用可移植的 Go 代码，速度还没有测过。
+- arm64 NEON 路径，以及用可移植的 Go 代码的 `-tags purego` 构建，速度还没有测过。
 - 结果通过 `gjson` 的 `Result` 类型返回，所以读取多个路径时要分配 `[]Result`（amd64 上每个路径 80 B），除非用 `GetManyBytesNoCopy` 并复用切片。
 - 在 amd64 和 arm64 上，`GetBytes`、`GetManyBytes` 拷出的字节，以及 `SetBytes`、`Doc.Bytes` 等返回新切片的修改的输出，结果缓冲区不预先清零，见[结果缓冲区不预先清零](#结果缓冲区不预先清零)。
 

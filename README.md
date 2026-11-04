@@ -244,12 +244,12 @@ and the rest. The path syntax is that of `gjson`: wildcards, `#` for counts
 and array mapping, `#(...)` and `#(...)#` queries, `|` pipes, `{...}` and
 `[...]` multi-paths, literals, and all the built-in modifiers.
 
-#### SIMD on amd64
+#### SIMD on amd64 and arm64
 
 On amd64, `ojson` scans and validates JSON with AVX2 when the CPU and the
-operating system support it. Everything else uses portable Go code: amd64
-CPUs without AVX2, arm64 and other architectures, and builds with
-`-tags purego`.
+operating system support it. On arm64 it uses NEON. Everything else uses
+portable Go code: amd64 CPUs without AVX2, other architectures, and builds
+with `-tags purego`.
 
 #### Order and untouched bytes
 
@@ -376,8 +376,8 @@ on a corpus of retained cases.
 
 - A `Doc` holds the whole document in memory. Reading from an `io.ReaderAt`
   or a file without loading it is not supported.
-- The speed of arm64 and of builds with `-tags purego`, which use portable
-  Go code, has not been measured.
+- The speed of the arm64 NEON path and of builds with `-tags purego`, which
+  use portable Go code, has not been measured.
 - Values come back through the `Result` type of `gjson`, so a read of
   several paths allocates the `[]Result` (80 B per path on amd64) unless you
   use `GetManyBytesNoCopy` with a reused slice.
