@@ -73,7 +73,13 @@ func TestCustomModifier(t *testing.T) {
 // recursive implementation's stack allows, and checks that output stays
 // bounded.
 func TestModifiersDeep(t *testing.T) {
-	const n = 1 << 18
+	// @dig runs a Get on every value, so it is quadratic in depth, as in
+	// gjson; it gets a smaller depth m. The race detector run uses
+	// smaller depths.
+	n, m := 1<<18, 1<<12
+	if raceEnabled {
+		n, m = 1<<14, 1<<10
+	}
 	docs := []string{
 		strings.Repeat("[", n) + strings.Repeat("]", n),
 		strings.Repeat(`{"a":`, n) + "1" + strings.Repeat("}", n),
@@ -100,9 +106,6 @@ func TestModifiersDeep(t *testing.T) {
 		_ = r.Path(d)
 		r.ForEach(func(k, v Result) bool { return true })
 	}
-	// @dig runs a Get on every value, so it is quadratic in depth, as in
-	// gjson; check a smaller depth.
-	const m = 1 << 12
 	for _, d := range []string{strings.Repeat("[", m) + strings.Repeat("]", m), strings.Repeat(`{"a":`, m) + "1" + strings.Repeat("}", m)} {
 		for _, arg := range []string{"a", "@this", "0", "zz"} {
 			out, _ := applyModifier("dig", d, arg)

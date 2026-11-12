@@ -117,6 +117,15 @@ func escapeComp(k string) string {
 	return b.String()
 }
 
+// randomIterations limits repeated random cases under the race detector.
+// Table cases, boundary checks and concurrent tests keep their full coverage.
+func randomIterations(n int) int {
+	if raceEnabled {
+		return max(1, n/10)
+	}
+	return n
+}
+
 func randomDoc(r *rand.Rand) (string, []string) {
 	g := &genDoc{r: r}
 	g.ws()
@@ -172,7 +181,7 @@ func checkContainerEnd(t *testing.T, doc string) {
 
 func TestContainerEndFast(t *testing.T) {
 	r := rand.New(rand.NewSource(3))
-	for n := 0; n < 20000; n++ {
+	for n := 0; n < randomIterations(20000); n++ {
 		doc, _ := randomDoc(r)
 		checkContainerEnd(t, doc)
 		for k := 0; k < 3; k++ {

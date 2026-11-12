@@ -95,7 +95,7 @@ func checkDoc(t *testing.T, doc string, ops []docOp) {
 
 func TestDocMatchesFlat(t *testing.T) {
 	r := rand.New(rand.NewSource(7))
-	for n := 0; n < 30000; n++ {
+	for n := 0; n < randomIterations(30000); n++ {
 		doc, paths := randomDoc(r)
 		checkDoc(t, doc, randomOps(r, paths))
 	}
@@ -105,7 +105,7 @@ func TestDocMatchesFlat(t *testing.T) {
 // byte changed, where the Doc must still match the flat functions.
 func TestDocMalformed(t *testing.T) {
 	r := rand.New(rand.NewSource(8))
-	for n := 0; n < 20000; n++ {
+	for n := 0; n < randomIterations(20000); n++ {
 		doc, paths := randomDoc(r)
 		if doc == "" {
 			continue

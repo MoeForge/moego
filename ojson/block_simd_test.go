@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"unsafe"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
 )
 
 // The reference model of skipAVX2: the same block algorithm in Go.
@@ -38,7 +40,7 @@ func classifyGo(s string, i int, m *blockMasks) {
 	n := len(s) - i
 	if n >= 64 {
 		for k := range w {
-			w[k] = load64(s, i+8*k)
+			w[k] = jsonsimd.Load64(s, i+8*k)
 		}
 	} else {
 		var buf [64]byte
@@ -229,7 +231,7 @@ func refStates(s string, o int) []skipState {
 // depth, string and escape state skipAVX2 reports with refStates.
 func TestSkipAVX2States(t *testing.T) {
 	r := rand.New(rand.NewSource(3))
-	for n := 0; n < 20000; n++ {
+	for n := 0; n < randomIterations(20000); n++ {
 		doc, _ := randomDoc(r)
 		if doc == "" || (doc[0] != '{' && doc[0] != '[') {
 			continue
@@ -320,7 +322,7 @@ func TestPathDots(t *testing.T) {
 func TestMembersAVX2(t *testing.T) {
 	r := rand.New(rand.NewSource(12))
 	keys := []string{"", "a", "b", "x", "model", "k\"q", "a\\b", `a`, "messages", "a.b", "long key past thirty-two bytes!!", "é"}
-	for n := 0; n < 30000; n++ {
+	for n := 0; n < randomIterations(30000); n++ {
 		doc, _ := randomDoc(r)
 		if doc == "" {
 			continue

@@ -1,47 +1,13 @@
 package ojson
 
 import (
+	"encoding/json"
 	"slices"
 	"strings"
 	"testing"
-)
 
-// TestEscapes compares escapes with a loop over the backslashes.
-func TestEscapes(t *testing.T) {
-	ref := func(b, first uint64) (e, next uint64) {
-		e = first
-		b &^= first
-		for b != 0 {
-			p := uint(0)
-			for b>>p&1 == 0 {
-				p++
-			}
-			if p == 63 {
-				return e, 1
-			}
-			e |= 1 << (p + 1)
-			b &^= 1<<(p+2) - 1
-		}
-		return e, 0
-	}
-	seed := uint64(5)
-	for n := 0; n < 1000000; n++ {
-		seed = seed*6364136223846793005 + 1442695040888963407
-		b := seed
-		// Sparser masks give longer and shorter runs.
-		for k := n % 4; k > 0; k-- {
-			seed = seed*6364136223846793005 + 1442695040888963407
-			b &= seed | seed<<1
-		}
-		first := uint64(n>>2) & 1
-		if e, next := escapes(b, first); true {
-			we, wn := ref(b, first)
-			if e != we || next != wn {
-				t.Fatalf("escapes(%#x, %d) = %#x, %d, want %#x, %d", b, first, e, next, we, wn)
-			}
-		}
-	}
-}
+	"github.com/MoeForge/moego/internal/jsonsimd"
+)
 
 // validGen writes random JSON with runs that cross 64-byte blocks.
 type validGen struct {
@@ -123,17 +89,17 @@ func (g *validGen) value(depth int) {
 	g.space()
 }
 
-// TestValidBlocks compares validateBlocks with validateScalar on random
+// TestValidBlocks compares Valid with encoding/json on random
 // documents and on mutations of them.
 func TestValidBlocks(t *testing.T) {
-	if !haveAVX2 {
-		t.Skip("no AVX2")
+	if !blockKernels() {
+		t.Skip("no block kernels")
 	}
 	const nasty = "\"\\{}[]:,0123456789-+.eEtrufalsn \t\n\r\x00\x01\x1f\x7f\x80\xff/bu"
 	g := &validGen{seed: 11}
 	check := func(s string) {
-		if got, want := validateBlocks(s), validateScalar(s); got != want {
-			t.Fatalf("validateBlocks(%q) = %v, want %v", s, got, want)
+		if got, want := Valid(s), json.Valid([]byte(s)); got != want {
+			t.Fatalf("Valid(%q) = %v, want %v", s, got, want)
 		}
 	}
 	valid := 0
@@ -141,7 +107,7 @@ func TestValidBlocks(t *testing.T) {
 		g.b.Reset()
 		g.value(0)
 		s := g.b.String()
-		if validateScalar(s) {
+		if json.Valid([]byte(s)) {
 			valid++
 		}
 		check(s)
@@ -170,14 +136,14 @@ func TestValidBlocks(t *testing.T) {
 	}
 }
 
-// TestValidBlocksDeep compares validateBlocks with validateScalar on mixed
+// TestValidBlocksDeep compares Valid with encoding/json on mixed
 // nesting around the words of its stack and its depth limit.
 func TestValidBlocksDeep(t *testing.T) {
-	if !haveAVX2 {
-		t.Skip("no AVX2")
+	if !blockKernels() {
+		t.Skip("no block kernels")
 	}
 	g := &validGen{seed: 3}
-	for _, depth := range []int{1, 2, 63, 64, 65, 127, 128, 129, 300, validMaxDepth - 1, validMaxDepth, validMaxDepth + 1} {
+	for _, depth := range []int{1, 2, 63, 64, 65, 127, 128, 129, 300, 4096 - 1, 4096, 4096 + 1} {
 		for n := 0; n < 20; n++ {
 			var open, close []string
 			for k := 0; k < depth; k++ {
@@ -205,28 +171,28 @@ func TestValidBlocksDeep(t *testing.T) {
 				}
 			}
 			s := strings.Join(open, "") + "true" + strings.Join(close, "")
-			want := validateScalar(s)
+			want := json.Valid([]byte(s))
 			if n == 0 && !want {
 				t.Fatalf("depth %d: %.40q... is not valid", depth, s)
 			}
-			if got := validateBlocks(s); got != want {
-				t.Fatalf("validateBlocks(%d-deep, %d bytes, case %d) = %v, want %v", depth, len(s), n, got, want)
+			if got := Valid(s); got != want {
+				t.Fatalf("Valid(%d-deep, %d bytes, case %d) = %v, want %v", depth, len(s), n, got, want)
 			}
 		}
 	}
 }
 
-// FuzzValid compares validateBlocks with validateScalar.
+// FuzzValid compares Valid with encoding/json.
 func FuzzValid(f *testing.F) {
 	f.Add(`{"a":[1,2.5e3,"x\"y\\zé"],"b":{"c":null,"d":true}}`)
 	f.Add(strings.Repeat(" ", 61) + `"\\\"" ` + strings.Repeat("[", 70) + strings.Repeat("]", 70))
 	f.Fuzz(func(t *testing.T, s string) {
-		if got, want := validate(s), validateScalar(s); got != want {
-			t.Fatalf("validate(%q) = %v, want %v", s, got, want)
+		if got, want := Valid(s), json.Valid([]byte(s)); got != want {
+			t.Fatalf("Valid(%q) = %v, want %v", s, got, want)
 		}
-		if haveAVX2 {
-			if got, want := validateBlocks(s), validateScalar(s); got != want {
-				t.Fatalf("validateBlocks(%q) = %v, want %v", s, got, want)
+		if jsonsimd.HaveAVX2 {
+			if got, want := Valid(s), json.Valid([]byte(s)); got != want {
+				t.Fatalf("Valid(%q) = %v, want %v", s, got, want)
 			}
 		}
 	})

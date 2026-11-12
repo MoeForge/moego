@@ -11,7 +11,7 @@ import (
 func TestValidateStringDifferential(t *testing.T) {
 	rng := rand.New(rand.NewSource(5381))
 	lengths := []int{0, 1, 2, 3, 46, 47, 48, 49, 63, 64, 65, 95, 96, 97, 191, 192, 193, 255, 256, 257, 767, 768, 769, 1023, 1024, 1025, 1535, 1536, 1537, 4095, 4096, 4097}
-	for range 32 {
+	for range randomIterations(32) {
 		lengths = append(lengths, rng.Intn(8192))
 	}
 	for _, pair := range encodingPairs() {

@@ -15,7 +15,7 @@ func TestARM64BlockCodec(t *testing.T) {
 		e *Encoding
 		s *std.Encoding
 	}{{StdEncoding, std.StdEncoding}, {URLEncoding, std.URLEncoding}} {
-		for n := 0; n < 20000; n++ {
+		for n := 0; n < randomIterations(20000); n++ {
 			src := make([]byte, n)
 			rng.Read(src)
 			want := pair.s.EncodeToString(src)

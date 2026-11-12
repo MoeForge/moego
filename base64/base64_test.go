@@ -81,6 +81,15 @@ func abbreviated(data []byte) []byte {
 	return data
 }
 
+// randomIterations limits repeated random cases under the race detector.
+// Table cases, boundary checks and concurrent tests keep their full coverage.
+func randomIterations(n int) int {
+	if raceEnabled {
+		return max(1, n/10)
+	}
+	return n
+}
+
 func TestEncodingDifferential(t *testing.T) {
 	rng := rand.New(rand.NewSource(197901))
 	lengths := make([]int, 257)
@@ -88,7 +97,7 @@ func TestEncodingDifferential(t *testing.T) {
 		lengths[i] = i
 	}
 	lengths = append(lengths, 511, 512, 513, 1023, 1024, 1025, 4095, 4096, 4097, 65535, 65536, 65537)
-	for range 96 {
+	for range randomIterations(96) {
 		lengths = append(lengths, rng.Intn(64<<10))
 	}
 	for _, pair := range encodingPairs() {

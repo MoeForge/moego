@@ -203,7 +203,7 @@ const hexDigits = "0123456789abcdef"
 
 // appendString appends s as a quoted JSON string, escaping like
 // encoding/json with HTML escaping: '<', '>' and '&' become \u003c, \u003e
-// and \u0026, invalid UTF-8 bytes become \ufffd, and U+2028 and U+2029 are
+// and \u0026, invalid UTF-8 bytes become invalidUTF8, and U+2028 and U+2029 are
 // escaped.
 func appendString(dst []byte, s string) []byte {
 	dst = append(dst, '"')
@@ -239,7 +239,7 @@ func appendString(dst []byte, s string) []byte {
 		r, n := utf8.DecodeRuneInString(s[i:])
 		switch {
 		case r == utf8.RuneError && n == 1:
-			dst = append(append(dst, s[start:i]...), `\ufffd`...)
+			dst = append(append(dst, s[start:i]...), invalidUTF8...)
 		case r == '\u2028' || r == '\u2029':
 			dst = append(append(dst, s[start:i]...), '\\', 'u', '2', '0', '2', hexDigits[r&15])
 		default:

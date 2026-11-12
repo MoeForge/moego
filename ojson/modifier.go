@@ -6,6 +6,8 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
 )
 
 // DisableModifiers turns off modifiers: an '@name' path component is then
@@ -318,7 +320,7 @@ func uglyCheck(json string, i, end int, st *uglyState) int {
 		in = lsb
 	}
 	for ; i+8 <= end; i += 8 {
-		v := load64(json, i)
+		v := jsonsimd.Load64(json, i)
 		if st.esc || exactZero(v^lsb*'\\') != 0 {
 			st.in = in != 0
 			if st.drops(json, i, i+8) {
@@ -354,7 +356,7 @@ func uglyWords(out []byte, json string, i, end, w int, st *uglyState) (int, int)
 		in = lsb
 	}
 	for ; i+8 <= end; i += 8 {
-		v := load64(json, i)
+		v := jsonsimd.Load64(json, i)
 		if st.esc || exactZero(v^lsb*'\\') != 0 {
 			st.in = in != 0
 			w = st.write(out, json, i, i+8, w)

@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
 )
 
 // The first Get walk, kept as the reference the faster walk is tested
@@ -148,7 +150,7 @@ var getPaths = []string{"", "a*", "a.b*", "x.#", "@this", "a|b", "..a", "[a]", "
 
 func TestGetMatchesRef(t *testing.T) {
 	r := rand.New(rand.NewSource(4))
-	for n := 0; n < 30000; n++ {
+	for n := 0; n < randomIterations(30000); n++ {
 		doc, paths := randomDoc(r)
 		paths = append(paths, getPaths...)
 		for _, d := range []string{doc, mutate(r, doc), " " + doc[:r.Intn(len(doc)+1)]} {
@@ -287,13 +289,20 @@ func clobber(b []byte) {
 func FuzzGet(f *testing.F) {
 	f.Add(`{"a":{"b":[1,"x\"y",{"c":true}]},"a":{"c":2},"model":"m"}`, "a.c")
 	f.Add(`[1,"]",{"a":"\\"},[2]]`, "2.a")
+	// Malformed input, whose results are unspecified: it must not crash.
+	f.Add(`[[[ `, "0.#")
 	f.Fuzz(func(t *testing.T, doc, path string) {
+		got := Get(doc, path)
+		many := GetMany(doc, path, "a", path)
+		if !Valid(doc) {
+			return
+		}
 		want := getRef(doc, path)
-		if got := Get(doc, path); !sameResult(got, want) {
+		if !sameResult(got, want) {
 			t.Fatalf("Get(%q, %q) = %+v, want %+v", doc, path, got, want)
 		}
-		if got := GetMany(doc, path, "a", path)[2]; !sameResult(got, want) {
-			t.Fatalf("GetMany(%q, %q) = %+v, want %+v", doc, path, got, want)
+		if !sameResult(many[2], want) {
+			t.Fatalf("GetMany(%q, %q) = %+v, want %+v", doc, path, many[2], want)
 		}
 	})
 }
@@ -371,7 +380,7 @@ func TestPathClasses(t *testing.T) {
 			}
 			// From past the plain words, as walker.pend reads.
 			j := i
-			for j+8 <= len(p) && plainWord(load64(p, j)) {
+			for j+8 <= len(p) && plainWord(jsonsimd.Load64(p, j)) {
 				j += 8
 			}
 			raw, next, esc = getComp(p, i, j)
@@ -395,7 +404,7 @@ func TestPlainWord(t *testing.T) {
 			b := []byte("abcxyz_]")
 			b[at] = byte(c)
 			want := c >= ']' && c <= 'z'
-			if got := plainWord(load64(string(b), 0)); got != want {
+			if got := plainWord(jsonsimd.Load64(string(b), 0)); got != want {
 				t.Fatalf("plainWord(%q) = %v, want %v", b, got, want)
 			}
 		}

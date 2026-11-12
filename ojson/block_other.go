@@ -2,7 +2,8 @@
 
 package ojson
 
-const haveAVX2 = false
+// blockKernels is false: the portable code runs.
+func blockKernels() bool { return false }
 
 func containerEndFast(s string, o int) int { return containerEndScalar(s, o) }
 

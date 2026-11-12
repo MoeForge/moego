@@ -5,6 +5,7 @@ go 1.26.0
 require (
 	github.com/MoeForge/moego v0.0.0
 	github.com/bytedance/sonic v1.15.5
+	github.com/goccy/go-json v0.12.0
 	github.com/tidwall/gjson v1.19.0
 	github.com/tidwall/sjson v1.2.5
 )

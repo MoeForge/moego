@@ -85,7 +85,7 @@ python3 compare.py --suite all results/linux-amd64/combined.txt
 
 ## plot.py
 
-`plot.py` 读取 rounds.py 输出目录中的 `summary.csv`，并从同一目录的 `combined.txt` 和 `environment.json` 取 CPU、平台、Go 版本和 `GOMAXPROCS`，生成两张 SVG 横条图：moego 对 `encoding/base64`，以及 moego 对全部实现。吞吐量按原始数据量计算，默认取 1 MiB；`--size` 选择其他大小，`--lang` 选择图中文字的语言（`en` 或 `zh`，默认 `en`），`--note` 在标题下加一行说明，用与 `--lang` 相同的语言书写。文件名取自平台、大小和语言，例如 `linux-amd64-1MiB-vs-stdlib.zh.svg`。README 中的图由完整轮换测量的输出生成，中文和英文各运行一次：
+`plot.py` 读取 rounds.py 输出目录中的 `summary.csv`，并从同一目录的 `combined.txt` 和 `environment.json` 取 CPU、平台、Go 版本和 `GOMAXPROCS`，生成两张 SVG 横条图：moego 对 `encoding/base64`，以及 moego 对全部实现。吞吐量按原始数据量计算，默认取 1 MiB；`--size` 选择其他大小，`--lang` 选择图中文字的语言（`en` 或 `zh`，默认 `en`），`--note` 在标题下加一行说明，用与 `--lang` 相同的语言书写。文件名取自平台、大小和语言，例如 `linux-amd64-1MiB-vs-stdlib.zh.svg`。README 和 base64 性能测试结果页里的图由完整轮换测量的输出生成，中文和英文各运行一次：
 
 ```sh
 python3 plot.py results/linux-amd64 --output ../docs/images --lang zh --note "多人共用的 KVM 虚拟机，结果只代表这台机器"

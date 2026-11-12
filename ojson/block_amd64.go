@@ -2,20 +2,19 @@
 
 package ojson
 
-import "unsafe"
+import (
+	"unsafe"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
+)
 
 // containerEnd reads 64-byte blocks with AVX2 when the CPU has it. Each
 // block becomes bit masks of quotes, backslashes and brackets, so skipping a
 // container takes a few bit operations per block instead of a branch per
 // byte.
 
-var haveAVX2 = cpuHasAVX2()
-
-// cpuHasAVX2 reports AVX2 with OS support for YMM state, and the BMI1, BMI2,
-// POPCNT and PCLMULQDQ instructions that skipAVX2 also uses.
-//
-//go:noescape
-func cpuHasAVX2() bool
+// blockKernels reports whether the block kernels run: with AVX2.
+func blockKernels() bool { return jsonsimd.HaveAVX2 }
 
 // skipState is the state of a container skip at a block boundary.
 type skipState struct {
@@ -47,7 +46,7 @@ func membersFast(json string, i int, key string) (v, at int) {
 // containerEndFast is containerEnd on 64-byte blocks. Malformed text that
 // the block view could read differently goes to containerEndScalar.
 func containerEndFast(s string, o int) int {
-	if !haveAVX2 {
+	if !jsonsimd.HaveAVX2 {
 		return containerEndScalar(s, o)
 	}
 	st := skipState{pos: o}
@@ -67,7 +66,7 @@ func pathMasksAVX2(p *byte, n int) (dots, special uint64)
 // with escapes, query bytes, quotes, or the brackets that start multipaths.
 func pathDots(path string) uint64 {
 	n := len(path)
-	if !haveAVX2 || n < 16 || n >= 64 {
+	if !jsonsimd.HaveAVX2 || n < 16 || n >= 64 {
 		return 0
 	}
 	dots, special := pathMasksAVX2(unsafe.StringData(path), n)

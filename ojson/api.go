@@ -5,6 +5,8 @@ import (
 	"math/bits"
 	"slices"
 	"unicode/utf8"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
 )
 
 // DisableEscapeHTML stops AppendJSONString and @tostr from escaping '<',
@@ -81,7 +83,7 @@ func writeQuoted(out []byte, s string, html bool) int {
 	out[0] = '"'
 	w := 1
 	for i := 0; i < len(s); {
-		i, w = quoteBlocks(out, s, i, w, html)
+		i, w = jsonsimd.QuoteBlocks(out, s, i, w, html)
 		i, w = writeWords(out, s, i, min(i+64, len(s)), w, html)
 	}
 	out[w] = '"'
@@ -94,7 +96,7 @@ func writeWords(out []byte, s string, i, stop, w int, html bool) (int, int) {
 	for i < stop {
 		end := stop
 		if i+8 <= stop {
-			v := load64(s, i)
+			v := jsonsimd.Load64(s, i)
 			m := escWord(v, html)
 			if m == 0 {
 				binary.LittleEndian.PutUint64(out[w:], v)
@@ -185,7 +187,7 @@ func quotedLen(s string, html bool) int {
 	n := len(s) + 2
 	for i := 0; i < len(s); {
 		var k int
-		i, k = quoteCountBlocks(s, i, html)
+		i, k = jsonsimd.QuoteCountBlocks(s, i, html)
 		n += k
 		i, k = quotedWords(s, i, min(i+64, len(s)), html)
 		n += k
@@ -200,7 +202,7 @@ func quotedWords(s string, i, stop int, html bool) (int, int) {
 	for i < stop {
 		end := stop
 		if i+8 <= stop {
-			v := load64(s, i)
+			v := jsonsimd.Load64(s, i)
 			other := (v-lsb*0x20)&^v | v
 			if html {
 				other |= zeroBytes(v^lsb*'<') | zeroBytes(v^lsb*'>') | zeroBytes(v^lsb*'&')

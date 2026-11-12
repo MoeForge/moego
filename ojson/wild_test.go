@@ -190,7 +190,7 @@ func wildDoc(r *rand.Rand, depth int) string {
 func TestFindPrefix(t *testing.T) {
 	r := rand.New(rand.NewSource(1))
 	paths := wildPaths()
-	for n := 0; n < 3000; n++ {
+	for n := 0; n < randomIterations(3000); n++ {
 		doc := wildDoc(r, 0)
 		// The document ends at the closing brace, and also with room
 		// after it, so that member keys are read near the end of the

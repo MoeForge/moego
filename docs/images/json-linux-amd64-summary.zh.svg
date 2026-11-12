@@ -1,0 +1,282 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200" role="img" aria-labelledby="t">
+<title id="t">moego/json 与 encoding/json、sonic、goccy/go-json 对比：new-api 请求类型</title>
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; }
+  .ink2 { fill: #52514e; }
+  .muted { fill: #6f6d68; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .own { fill: #2a78d6; }
+  .peer { fill: #898781; }
+  .num { font-variant-numeric: tabular-nums; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #ffffff; }
+    .ink2 { fill: #c3c2b7; }
+    .muted { fill: #9a9891; }
+    .axis { stroke: #383835; }
+    .own { fill: #3987e5; }
+  }
+</style>
+<rect class="surface" width="1200" height="1200" rx="8"/>
+<text x="24.0" y="36.0" class="ink" font-size="18" text-anchor="start" font-weight="600">moego/json 与 encoding/json、sonic、goccy/go-json 对比：new-api 请求类型</text>
+<text x="24.0" y="58.0" class="ink2" font-size="13" text-anchor="start">用 encoding/json 的 API 解析和序列化；右上角倍数为最接近的竞品 ÷ moego/json</text>
+<text x="24.0" y="78.0" class="muted" font-size="12" text-anchor="start">Intel Xeon E5-2699A v4 @ 2.40GHz · linux/amd64 · Go 1.27.3 · 固定一个 CPU，GOMAXPROCS=1 · 每行每个实现一个进程，轮换顺序测 6 轮</text>
+<text x="24.0" y="98.0" class="muted" font-size="12" text-anchor="start">KVM 虚拟机，结果只代表这台机器</text>
+<text x="24.0" y="132.0" class="ink2" font-size="12" text-anchor="start">每次耗时，越短越快；每个面板横轴比例各自不同</text>
+<text x="24.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">解析 1 MiB 带图聊天请求</text>
+<text x="584.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.10×</text>
+<line class="axis" x1="220" y1="170" x2="220" y2="296"/>
+<text x="212.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,173.0H248.0A4,4 0 0 1 252.0,177.0V181.0A4,4 0 0 1 248.0,185.0H220.0Z"><title>moego/json 195 µs</title></path>
+<text x="258.0" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">195 µs</text>
+<text x="212.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,191.0H223.7A3.695856862551289,3.695856862551289 0 0 1 227.4,194.7V199.3A3.695856862551289,3.695856862551289 0 0 1 223.7,203.0H220.0Z"><title>moego/json NoCopy 45 µs</title></path>
+<text x="233.4" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">45 µs · 4.82×</text>
+<text x="212.0" y="219.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,209.0H456.0A4,4 0 0 1 460.0,213.0V217.0A4,4 0 0 1 456.0,221.0H220.0Z"><title>encoding/json 1.46 ms</title></path>
+<text x="466.0" y="219.0" class="ink2 num" font-size="12" text-anchor="start">1.46 ms</text>
+<text x="212.0" y="237.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,227.0H351.4A4,4 0 0 1 355.4,231.0V235.0A4,4 0 0 1 351.4,239.0H220.0Z"><title>encoding/json/v2 825 µs</title></path>
+<text x="361.4" y="237.0" class="ink2 num" font-size="12" text-anchor="start">825 µs</text>
+<text x="212.0" y="255.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,245.0H297.2A4,4 0 0 1 301.2,249.0V253.0A4,4 0 0 1 297.2,257.0H220.0Z"><title>sonic Std 495 µs</title></path>
+<text x="307.2" y="255.0" class="ink2 num" font-size="12" text-anchor="start">495 µs</text>
+<text x="212.0" y="273.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,263.0H251.4A4,4 0 0 1 255.4,267.0V271.0A4,4 0 0 1 251.4,275.0H220.0Z"><title>sonic Default 216 µs</title></path>
+<text x="261.4" y="273.0" class="ink2 num" font-size="12" text-anchor="start">216 µs</text>
+<text x="212.0" y="291.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,281.0H315.7A4,4 0 0 1 319.7,285.0V289.0A4,4 0 0 1 315.7,293.0H220.0Z"><title>goccy/go-json 607 µs</title></path>
+<text x="325.7" y="291.0" class="ink2 num" font-size="12" text-anchor="start">607 µs</text>
+<text x="616.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">解析 100K token 的对话</text>
+<text x="1176.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.18×</text>
+<line class="axis" x1="812" y1="170" x2="812" y2="296"/>
+<text x="804.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,173.0H845.5A4,4 0 0 1 849.5,177.0V181.0A4,4 0 0 1 845.5,185.0H812.0Z"><title>moego/json 399 µs</title></path>
+<text x="855.5" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">399 µs</text>
+<text x="804.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M812.0,191.0H844.4A4,4 0 0 1 848.4,195.0V199.0A4,4 0 0 1 844.4,203.0H812.0Z"><title>moego/json NoCopy 387 µs</title></path>
+<text x="854.4" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">387 µs · 1.22×</text>
+<text x="804.0" y="219.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,209.0H1048.0A4,4 0 0 1 1052.0,213.0V217.0A4,4 0 0 1 1048.0,221.0H812.0Z"><title>encoding/json 2.55 ms</title></path>
+<text x="1058.0" y="219.0" class="ink2 num" font-size="12" text-anchor="start">2.55 ms</text>
+<text x="804.0" y="237.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,227.0H984.4A4,4 0 0 1 988.4,231.0V235.0A4,4 0 0 1 984.4,239.0H812.0Z"><title>encoding/json/v2 1.87 ms</title></path>
+<text x="994.4" y="237.0" class="ink2 num" font-size="12" text-anchor="start">1.87 ms</text>
+<text x="804.0" y="255.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,245.0H855.7A4,4 0 0 1 859.7,249.0V253.0A4,4 0 0 1 855.7,257.0H812.0Z"><title>sonic Std 506 µs</title></path>
+<text x="865.7" y="255.0" class="ink2 num" font-size="12" text-anchor="start">506 µs</text>
+<text x="804.0" y="273.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,263.0H852.4A4,4 0 0 1 856.4,267.0V271.0A4,4 0 0 1 852.4,275.0H812.0Z"><title>sonic Default 472 µs</title></path>
+<text x="862.4" y="273.0" class="ink2 num" font-size="12" text-anchor="start">472 µs</text>
+<text x="804.0" y="291.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,281.0H903.4A4,4 0 0 1 907.4,285.0V289.0A4,4 0 0 1 903.4,293.0H812.0Z"><title>goccy/go-json 1.01 ms</title></path>
+<text x="913.4" y="291.0" class="ink2 num" font-size="12" text-anchor="start">1.01 ms</text>
+<text x="24.0" y="328.0" class="ink" font-size="13" text-anchor="start" font-weight="600">序列化 100K token 的对话</text>
+<text x="584.0" y="328.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.31×</text>
+<line class="axis" x1="220" y1="338" x2="220" y2="446"/>
+<text x="212.0" y="351.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,341.0H250.0A4,4 0 0 1 254.0,345.0V349.0A4,4 0 0 1 250.0,353.0H220.0Z"><title>moego/json 331 µs</title></path>
+<text x="260.0" y="351.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">331 µs</text>
+<text x="212.0" y="369.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,359.0H456.0A4,4 0 0 1 460.0,363.0V367.0A4,4 0 0 1 456.0,371.0H220.0Z"><title>encoding/json 2.34 ms</title></path>
+<text x="466.0" y="369.0" class="ink2 num" font-size="12" text-anchor="start">2.34 ms</text>
+<text x="212.0" y="387.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,377.0H395.7A4,4 0 0 1 399.7,381.0V385.0A4,4 0 0 1 395.7,389.0H220.0Z"><title>encoding/json/v2 1.75 ms</title></path>
+<text x="405.7" y="387.0" class="ink2 num" font-size="12" text-anchor="start">1.75 ms</text>
+<text x="212.0" y="405.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,395.0H379.7A4,4 0 0 1 383.7,399.0V403.0A4,4 0 0 1 379.7,407.0H220.0Z"><title>sonic Std 1.59 ms</title></path>
+<text x="389.7" y="405.0" class="ink2 num" font-size="12" text-anchor="start">1.59 ms</text>
+<text x="212.0" y="423.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,413.0H261.1A4,4 0 0 1 265.1,417.0V421.0A4,4 0 0 1 261.1,425.0H220.0Z"><title>sonic Default 439 µs</title></path>
+<text x="271.1" y="423.0" class="ink2 num" font-size="12" text-anchor="start">439 µs</text>
+<text x="212.0" y="441.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,431.0H295.5A4,4 0 0 1 299.5,435.0V439.0A4,4 0 0 1 295.5,443.0H220.0Z"><title>goccy/go-json 774 µs</title></path>
+<text x="305.5" y="441.0" class="ink2 num" font-size="12" text-anchor="start">774 µs</text>
+<text x="616.0" y="328.0" class="ink" font-size="13" text-anchor="start" font-weight="600">用 RawMessage 转发 64 KiB 请求</text>
+<text x="1176.0" y="328.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.50×</text>
+<line class="axis" x1="812" y1="338" x2="812" y2="446"/>
+<text x="804.0" y="351.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,341.0H842.2A4,4 0 0 1 846.2,345.0V349.0A4,4 0 0 1 842.2,353.0H812.0Z"><title>moego/json 77.1 µs</title></path>
+<text x="852.2" y="351.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">77.1 µs</text>
+<text x="804.0" y="369.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,359.0H1048.0A4,4 0 0 1 1052.0,363.0V367.0A4,4 0 0 1 1048.0,371.0H812.0Z"><title>encoding/json 541 µs</title></path>
+<text x="1058.0" y="369.0" class="ink2 num" font-size="12" text-anchor="start">541 µs</text>
+<text x="804.0" y="387.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,377.0H1030.6A4,4 0 0 1 1034.6,381.0V385.0A4,4 0 0 1 1030.6,389.0H812.0Z"><title>encoding/json/v2 502 µs</title></path>
+<text x="1040.6" y="387.0" class="ink2 num" font-size="12" text-anchor="start">502 µs</text>
+<text x="804.0" y="405.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,395.0H940.4A4,4 0 0 1 944.4,399.0V403.0A4,4 0 0 1 940.4,407.0H812.0Z"><title>sonic Std 299 µs</title></path>
+<text x="950.4" y="405.0" class="ink2 num" font-size="12" text-anchor="start">299 µs</text>
+<text x="804.0" y="423.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,413.0H878.0A4,4 0 0 1 882.0,417.0V421.0A4,4 0 0 1 878.0,425.0H812.0Z"><title>sonic Default 158 µs</title></path>
+<text x="888.0" y="423.0" class="ink2 num" font-size="12" text-anchor="start">158 µs</text>
+<text x="804.0" y="441.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,431.0H859.3A4,4 0 0 1 863.3,435.0V439.0A4,4 0 0 1 859.3,443.0H812.0Z"><title>goccy/go-json 116 µs</title></path>
+<text x="869.3" y="441.0" class="ink2 num" font-size="12" text-anchor="start">116 µs</text>
+<text x="24.0" y="478.0" class="ink" font-size="13" text-anchor="start" font-weight="600">解析 16 个 1536 维向量</text>
+<text x="584.0" y="478.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.07×</text>
+<line class="axis" x1="220" y1="488" x2="220" y2="596"/>
+<text x="212.0" y="501.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,491.0H263.6A4,4 0 0 1 267.6,495.0V499.0A4,4 0 0 1 263.6,503.0H220.0Z"><title>moego/json 943 µs</title></path>
+<text x="273.6" y="501.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">943 µs</text>
+<text x="212.0" y="519.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,509.0H456.0A4,4 0 0 1 460.0,513.0V517.0A4,4 0 0 1 456.0,521.0H220.0Z"><title>encoding/json 4.75 ms</title></path>
+<text x="466.0" y="519.0" class="ink2 num" font-size="12" text-anchor="start">4.75 ms</text>
+<text x="212.0" y="537.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,527.0H410.7A4,4 0 0 1 414.7,531.0V535.0A4,4 0 0 1 410.7,539.0H220.0Z"><title>encoding/json/v2 3.85 ms</title></path>
+<text x="420.7" y="537.0" class="ink2 num" font-size="12" text-anchor="start">3.85 ms</text>
+<text x="212.0" y="555.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,545.0H286.7A4,4 0 0 1 290.7,549.0V553.0A4,4 0 0 1 286.7,557.0H220.0Z"><title>sonic Std 1.4 ms</title></path>
+<text x="296.7" y="555.0" class="ink2 num" font-size="12" text-anchor="start">1.4 ms</text>
+<text x="212.0" y="573.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,563.0H285.1A4,4 0 0 1 289.1,567.0V571.0A4,4 0 0 1 285.1,575.0H220.0Z"><title>sonic Default 1.37 ms</title></path>
+<text x="295.1" y="573.0" class="ink2 num" font-size="12" text-anchor="start">1.37 ms</text>
+<text x="212.0" y="591.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,581.0H266.8A4,4 0 0 1 270.8,585.0V589.0A4,4 0 0 1 266.8,593.0H220.0Z"><title>goccy/go-json 1.01 ms</title></path>
+<text x="276.8" y="591.0" class="ink2 num" font-size="12" text-anchor="start">1.01 ms</text>
+<text x="616.0" y="478.0" class="ink" font-size="13" text-anchor="start" font-weight="600">缩进 1 MiB</text>
+<text x="1176.0" y="478.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">5.08×</text>
+<line class="axis" x1="812" y1="488" x2="812" y2="560"/>
+<text x="804.0" y="501.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,491.0H844.9A4,4 0 0 1 848.9,495.0V499.0A4,4 0 0 1 844.9,503.0H812.0Z"><title>moego/json 122 µs</title></path>
+<text x="854.9" y="501.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">122 µs</text>
+<text x="804.0" y="519.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,509.0H1048.0A4,4 0 0 1 1052.0,513.0V517.0A4,4 0 0 1 1048.0,521.0H812.0Z"><title>encoding/json 794 µs</title></path>
+<text x="1058.0" y="519.0" class="ink2 num" font-size="12" text-anchor="start">794 µs</text>
+<text x="804.0" y="537.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,527.0H1047.7A4,4 0 0 1 1051.7,531.0V535.0A4,4 0 0 1 1047.7,539.0H812.0Z"><title>encoding/json/v2 793 µs</title></path>
+<text x="1057.7" y="537.0" class="ink2 num" font-size="12" text-anchor="start">793 µs</text>
+<text x="804.0" y="555.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,545.0H993.0A4,4 0 0 1 997.0,549.0V553.0A4,4 0 0 1 993.0,557.0H812.0Z"><title>goccy/go-json 612 µs</title></path>
+<text x="1003.0" y="555.0" class="ink2 num" font-size="12" text-anchor="start">612 µs</text>
+<text x="24.0" y="630.0" class="ink2" font-size="12" text-anchor="start">每次分配的字节，越短越少；每个面板横轴比例各自不同</text>
+<text x="24.0" y="658.0" class="ink" font-size="13" text-anchor="start" font-weight="600">解析 1 MiB 带图聊天请求</text>
+<text x="584.0" y="658.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="220" y1="668" x2="220" y2="794"/>
+<text x="212.0" y="681.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,671.0H336.2A4,4 0 0 1 340.2,675.0V679.0A4,4 0 0 1 336.2,683.0H220.0Z"><title>moego/json 1 MiB</title></path>
+<text x="346.2" y="681.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1 MiB</text>
+<text x="212.0" y="699.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,689.0H220.5A0.5,0.5 0 0 1 221.0,689.5V700.5A0.5,0.5 0 0 1 220.5,701.0H220.0Z"><title>moego/json NoCopy 3.72 KiB</title></path>
+<text x="227.0" y="699.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">3.72 KiB · 276×</text>
+<text x="212.0" y="717.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,707.0H336.2A4,4 0 0 1 340.2,711.0V715.0A4,4 0 0 1 336.2,719.0H220.0Z"><title>encoding/json 1 MiB</title></path>
+<text x="346.2" y="717.0" class="ink2 num" font-size="12" text-anchor="start">1 MiB</text>
+<text x="212.0" y="735.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,725.0H336.2A4,4 0 0 1 340.2,729.0V733.0A4,4 0 0 1 336.2,737.0H220.0Z"><title>encoding/json/v2 1 MiB</title></path>
+<text x="346.2" y="735.0" class="ink2 num" font-size="12" text-anchor="start">1 MiB</text>
+<text x="212.0" y="753.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,743.0H456.0A4,4 0 0 1 460.0,747.0V751.0A4,4 0 0 1 456.0,755.0H220.0Z"><title>sonic Std 2 MiB</title></path>
+<text x="466.0" y="753.0" class="ink2 num" font-size="12" text-anchor="start">2 MiB</text>
+<text x="212.0" y="771.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,761.0H336.2A4,4 0 0 1 340.2,765.0V769.0A4,4 0 0 1 336.2,773.0H220.0Z"><title>sonic Default 1 MiB</title></path>
+<text x="346.2" y="771.0" class="ink2 num" font-size="12" text-anchor="start">1 MiB</text>
+<text x="212.0" y="789.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,779.0H336.4A4,4 0 0 1 340.4,783.0V787.0A4,4 0 0 1 336.4,791.0H220.0Z"><title>goccy/go-json 1.01 MiB</title></path>
+<text x="346.4" y="789.0" class="ink2 num" font-size="12" text-anchor="start">1.01 MiB</text>
+<text x="616.0" y="658.0" class="ink" font-size="13" text-anchor="start" font-weight="600">解析 100K token 的对话</text>
+<text x="1176.0" y="658.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.15×</text>
+<line class="axis" x1="812" y1="668" x2="812" y2="794"/>
+<text x="804.0" y="681.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,671.0H921.8A4,4 0 0 1 925.8,675.0V679.0A4,4 0 0 1 921.8,683.0H812.0Z"><title>moego/json 406 KiB</title></path>
+<text x="931.8" y="681.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">406 KiB</text>
+<text x="804.0" y="699.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M812.0,689.0H920.5A4,4 0 0 1 924.5,693.0V697.0A4,4 0 0 1 920.5,701.0H812.0Z"><title>moego/json NoCopy 401 KiB</title></path>
+<text x="930.5" y="699.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">401 KiB · 1.16×</text>
+<text x="804.0" y="717.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,707.0H1043.4A4,4 0 0 1 1047.4,711.0V715.0A4,4 0 0 1 1043.4,719.0H812.0Z"><title>encoding/json 840 KiB</title></path>
+<text x="1053.4" y="717.0" class="ink2 num" font-size="12" text-anchor="start">840 KiB</text>
+<text x="804.0" y="735.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,725.0H1042.4A4,4 0 0 1 1046.4,729.0V733.0A4,4 0 0 1 1042.4,737.0H812.0Z"><title>encoding/json/v2 836 KiB</title></path>
+<text x="1052.4" y="735.0" class="ink2 num" font-size="12" text-anchor="start">836 KiB</text>
+<text x="804.0" y="753.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,743.0H1048.0A4,4 0 0 1 1052.0,747.0V751.0A4,4 0 0 1 1048.0,755.0H812.0Z"><title>sonic Std 856 KiB</title></path>
+<text x="1058.0" y="753.0" class="ink2 num" font-size="12" text-anchor="start">856 KiB</text>
+<text x="804.0" y="771.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,761.0H1047.1A4,4 0 0 1 1051.1,765.0V769.0A4,4 0 0 1 1047.1,773.0H812.0Z"><title>sonic Default 853 KiB</title></path>
+<text x="1057.1" y="771.0" class="ink2 num" font-size="12" text-anchor="start">853 KiB</text>
+<text x="804.0" y="789.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,779.0H938.5A4,4 0 0 1 942.5,783.0V787.0A4,4 0 0 1 938.5,791.0H812.0Z"><title>goccy/go-json 466 KiB</title></path>
+<text x="948.5" y="789.0" class="ink2 num" font-size="12" text-anchor="start">466 KiB</text>
+<text x="24.0" y="826.0" class="ink" font-size="13" text-anchor="start" font-weight="600">序列化 100K token 的对话</text>
+<text x="584.0" y="826.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="220" y1="836" x2="220" y2="944"/>
+<text x="212.0" y="849.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,839.0H290.3A4,4 0 0 1 294.3,843.0V847.0A4,4 0 0 1 290.3,851.0H220.0Z"><title>moego/json 739 KiB</title></path>
+<text x="300.3" y="849.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">739 KiB</text>
+<text x="212.0" y="867.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,857.0H294.2A4,4 0 0 1 298.2,861.0V865.0A4,4 0 0 1 294.2,869.0H220.0Z"><title>encoding/json 778 KiB</title></path>
+<text x="304.2" y="867.0" class="ink2 num" font-size="12" text-anchor="start">778 KiB</text>
+<text x="212.0" y="885.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,875.0H294.3A4,4 0 0 1 298.3,879.0V883.0A4,4 0 0 1 294.3,887.0H220.0Z"><title>encoding/json/v2 779 KiB</title></path>
+<text x="304.3" y="885.0" class="ink2 num" font-size="12" text-anchor="start">779 KiB</text>
+<text x="212.0" y="903.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,893.0H456.0A4,4 0 0 1 460.0,897.0V901.0A4,4 0 0 1 456.0,905.0H220.0Z"><title>sonic Std 2.33 MiB</title></path>
+<text x="466.0" y="903.0" class="ink2 num" font-size="12" text-anchor="start">2.33 MiB</text>
+<text x="212.0" y="921.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,911.0H290.3A4,4 0 0 1 294.3,915.0V919.0A4,4 0 0 1 290.3,923.0H220.0Z"><title>sonic Default 739 KiB</title></path>
+<text x="300.3" y="921.0" class="ink2 num" font-size="12" text-anchor="start">739 KiB</text>
+<text x="212.0" y="939.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,929.0H290.3A4,4 0 0 1 294.3,933.0V937.0A4,4 0 0 1 290.3,941.0H220.0Z"><title>goccy/go-json 740 KiB</title></path>
+<text x="300.3" y="939.0" class="ink2 num" font-size="12" text-anchor="start">740 KiB</text>
+<text x="616.0" y="826.0" class="ink" font-size="13" text-anchor="start" font-weight="600">用 RawMessage 转发 64 KiB 请求</text>
+<text x="1176.0" y="826.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.00×</text>
+<line class="axis" x1="812" y1="836" x2="812" y2="944"/>
+<text x="804.0" y="849.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,839.0H968.8A4,4 0 0 1 972.8,843.0V847.0A4,4 0 0 1 968.8,851.0H812.0Z"><title>moego/json 147 KiB</title></path>
+<text x="978.8" y="849.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">147 KiB</text>
+<text x="804.0" y="867.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,857.0H969.0A4,4 0 0 1 973.0,861.0V865.0A4,4 0 0 1 969.0,869.0H812.0Z"><title>encoding/json 147 KiB</title></path>
+<text x="979.0" y="867.0" class="ink2 num" font-size="12" text-anchor="start">147 KiB</text>
+<text x="804.0" y="885.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,875.0H968.9A4,4 0 0 1 972.9,879.0V883.0A4,4 0 0 1 968.9,887.0H812.0Z"><title>encoding/json/v2 147 KiB</title></path>
+<text x="978.9" y="885.0" class="ink2 num" font-size="12" text-anchor="start">147 KiB</text>
+<text x="804.0" y="903.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,893.0H1048.0A4,4 0 0 1 1052.0,897.0V901.0A4,4 0 0 1 1048.0,905.0H812.0Z"><title>sonic Std 219 KiB</title></path>
+<text x="1058.0" y="903.0" class="ink2 num" font-size="12" text-anchor="start">219 KiB</text>
+<text x="804.0" y="921.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,911.0H1047.9A4,4 0 0 1 1051.9,915.0V919.0A4,4 0 0 1 1047.9,923.0H812.0Z"><title>sonic Default 219 KiB</title></path>
+<text x="1057.9" y="921.0" class="ink2 num" font-size="12" text-anchor="start">219 KiB</text>
+<text x="804.0" y="939.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,929.0H968.8A4,4 0 0 1 972.8,933.0V937.0A4,4 0 0 1 968.8,941.0H812.0Z"><title>goccy/go-json 147 KiB</title></path>
+<text x="978.8" y="939.0" class="ink2 num" font-size="12" text-anchor="start">147 KiB</text>
+<text x="24.0" y="976.0" class="ink" font-size="13" text-anchor="start" font-weight="600">解析 16 个 1536 维向量</text>
+<text x="584.0" y="976.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">3.20×</text>
+<line class="axis" x1="220" y1="986" x2="220" y2="1094"/>
+<text x="212.0" y="999.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,989.0H261.6A4,4 0 0 1 265.6,993.0V997.0A4,4 0 0 1 261.6,1001.0H220.0Z"><title>moego/json 194 KiB</title></path>
+<text x="271.6" y="999.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">194 KiB</text>
+<text x="212.0" y="1017.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,1007.0H361.8A4,4 0 0 1 365.8,1011.0V1015.0A4,4 0 0 1 361.8,1019.0H220.0Z"><title>encoding/json 620 KiB</title></path>
+<text x="371.8" y="1017.0" class="ink2 num" font-size="12" text-anchor="start">620 KiB</text>
+<text x="212.0" y="1035.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,1025.0H361.8A4,4 0 0 1 365.8,1029.0V1033.0A4,4 0 0 1 361.8,1037.0H220.0Z"><title>encoding/json/v2 620 KiB</title></path>
+<text x="371.8" y="1035.0" class="ink2 num" font-size="12" text-anchor="start">620 KiB</text>
+<text x="212.0" y="1053.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,1043.0H456.0A4,4 0 0 1 460.0,1047.0V1051.0A4,4 0 0 1 456.0,1055.0H220.0Z"><title>sonic Std 0.996 MiB</title></path>
+<text x="466.0" y="1053.0" class="ink2 num" font-size="12" text-anchor="start">0.996 MiB</text>
+<text x="212.0" y="1071.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,1061.0H455.9A4,4 0 0 1 459.9,1065.0V1069.0A4,4 0 0 1 455.9,1073.0H220.0Z"><title>sonic Default 0.996 MiB</title></path>
+<text x="465.9" y="1071.0" class="ink2 num" font-size="12" text-anchor="start">0.996 MiB</text>
+<text x="212.0" y="1089.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,1079.0H367.9A4,4 0 0 1 371.9,1083.0V1087.0A4,4 0 0 1 367.9,1091.0H220.0Z"><title>goccy/go-json 646 KiB</title></path>
+<text x="377.9" y="1089.0" class="ink2 num" font-size="12" text-anchor="start">646 KiB</text>
+<text x="616.0" y="976.0" class="ink" font-size="13" text-anchor="start" font-weight="600">缩进 1 MiB</text>
+<text x="1176.0" y="976.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">持平</text>
+<line class="axis" x1="812" y1="986" x2="812" y2="1058"/>
+<text x="804.0" y="999.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<text x="818.0" y="999.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">0 B</text>
+<text x="804.0" y="1017.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<text x="818.0" y="1017.0" class="ink2 num" font-size="12" text-anchor="start">0 B</text>
+<text x="804.0" y="1035.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,1025.0H1048.0A4,4 0 0 1 1052.0,1029.0V1033.0A4,4 0 0 1 1048.0,1037.0H812.0Z"><title>encoding/json/v2 1.54 KiB</title></path>
+<text x="1058.0" y="1035.0" class="ink2 num" font-size="12" text-anchor="start">1.54 KiB</text>
+<text x="804.0" y="1053.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<text x="818.0" y="1053.0" class="ink2 num" font-size="12" text-anchor="start">0 B</text>
+<text x="24.0" y="1132.0" class="muted" font-size="12" text-anchor="start">耗时倍数取最接近的竞品：逐轮计算 moego/json ÷ 竞品，取中位数后再取倒数。</text>
+<text x="24.0" y="1148.0" class="muted" font-size="12" text-anchor="start">计时前已核对输出：解析出的值都与 encoding/json 相同；输出字节也相同，sonic Default 和 encoding/json/v2 除外，它们不保证与 encoding/json 逐字节相同。</text>
+<text x="24.0" y="1164.0" class="muted" font-size="12" text-anchor="start">数据由 bench/json/codec 测得，图由 bench/json/codec/plot.py 生成</text>
+<text x="24.0" y="1180.0" class="muted" font-size="12" text-anchor="start">竞品版本：bytedance/sonic v1.15.5 · goccy/go-json v0.12.0</text>
+</svg>

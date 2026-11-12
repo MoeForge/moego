@@ -1,0 +1,406 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1842" viewBox="0 0 1200 1842" role="img" aria-labelledby="t">
+<title id="t">Decoding: Time per call, shorter is faster</title>
+<style>
+  svg { font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans CJK SC", "PingFang SC", sans-serif; }
+  .surface { fill: #fcfcfb; }
+  .ink { fill: #0b0b0b; }
+  .ink2 { fill: #52514e; }
+  .muted { fill: #6f6d68; }
+  .axis { stroke: #c3c2b7; stroke-width: 1; }
+  .own { fill: #2a78d6; }
+  .peer { fill: #898781; }
+  .num { font-variant-numeric: tabular-nums; }
+  @media (prefers-color-scheme: dark) {
+    .surface { fill: #1a1a19; }
+    .ink { fill: #ffffff; }
+    .ink2 { fill: #c3c2b7; }
+    .muted { fill: #9a9891; }
+    .axis { stroke: #383835; }
+    .own { fill: #3987e5; }
+  }
+</style>
+<rect class="surface" width="1200" height="1842" rx="8"/>
+<text x="24.0" y="36.0" class="ink" font-size="18" text-anchor="start" font-weight="600">Decoding: Time per call, shorter is faster</text>
+<text x="24.0" y="58.0" class="ink2" font-size="13" text-anchor="start">Unmarshal into new-api&#x27;s request and response types; top-right: the closest competitor ÷ moego/json; each panel has its own scale</text>
+<text x="24.0" y="78.0" class="muted" font-size="12" text-anchor="start">Intel Xeon E5-2699A v4 @ 2.40GHz · linux/amd64 · Go 1.27.3 · GOMAXPROCS=1 on one pinned CPU · one process per row and engine, 6 rotated rounds</text>
+<text x="24.0" y="98.0" class="muted" font-size="12" text-anchor="start">KVM virtual machine; results apply to this machine only</text>
+<text x="24.0" y="132.0" class="ink2" font-size="12" text-anchor="start">Chat request with an image (GeneralOpenAIRequest)</text>
+<text x="24.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 KiB</text>
+<text x="584.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.10×</text>
+<line class="axis" x1="220" y1="170" x2="220" y2="296"/>
+<text x="212.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,173.0H300.2A4,4 0 0 1 304.2,177.0V181.0A4,4 0 0 1 300.2,185.0H220.0Z"><title>moego/json 4.72 µs</title></path>
+<text x="310.2" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">4.72 µs</text>
+<text x="212.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,191.0H297.4A4,4 0 0 1 301.4,195.0V199.0A4,4 0 0 1 297.4,203.0H220.0Z"><title>moego/json NoCopy 4.56 µs</title></path>
+<text x="307.4" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">4.56 µs · 1.14×</text>
+<text x="212.0" y="219.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,209.0H456.0A4,4 0 0 1 460.0,213.0V217.0A4,4 0 0 1 456.0,221.0H220.0Z"><title>encoding/json 13.4 µs</title></path>
+<text x="466.0" y="219.0" class="ink2 num" font-size="12" text-anchor="start">13.4 µs</text>
+<text x="212.0" y="237.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,227.0H386.7A4,4 0 0 1 390.7,231.0V235.0A4,4 0 0 1 386.7,239.0H220.0Z"><title>encoding/json/v2 9.56 µs</title></path>
+<text x="396.7" y="237.0" class="ink2 num" font-size="12" text-anchor="start">9.56 µs</text>
+<text x="212.0" y="255.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,245.0H324.8A4,4 0 0 1 328.8,249.0V253.0A4,4 0 0 1 324.8,257.0H220.0Z"><title>sonic Std 6.1 µs</title></path>
+<text x="334.8" y="255.0" class="ink2 num" font-size="12" text-anchor="start">6.1 µs</text>
+<text x="212.0" y="273.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,263.0H308.6A4,4 0 0 1 312.6,267.0V271.0A4,4 0 0 1 308.6,275.0H220.0Z"><title>sonic Default 5.19 µs</title></path>
+<text x="318.6" y="273.0" class="ink2 num" font-size="12" text-anchor="start">5.19 µs</text>
+<text x="212.0" y="291.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,281.0H309.9A4,4 0 0 1 313.9,285.0V289.0A4,4 0 0 1 309.9,293.0H220.0Z"><title>goccy/go-json 5.26 µs</title></path>
+<text x="319.9" y="291.0" class="ink2 num" font-size="12" text-anchor="start">5.26 µs</text>
+<text x="616.0" y="160.0" class="ink" font-size="13" text-anchor="start" font-weight="600">64 KiB</text>
+<text x="1176.0" y="160.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.09×</text>
+<line class="axis" x1="812" y1="170" x2="812" y2="296"/>
+<text x="804.0" y="183.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,173.0H853.5A4,4 0 0 1 857.5,177.0V181.0A4,4 0 0 1 853.5,185.0H812.0Z"><title>moego/json 20.4 µs</title></path>
+<text x="863.5" y="183.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">20.4 µs</text>
+<text x="804.0" y="201.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M812.0,191.0H822.8A4,4 0 0 1 826.8,195.0V199.0A4,4 0 0 1 822.8,203.0H812.0Z"><title>moego/json NoCopy 6.61 µs</title></path>
+<text x="832.8" y="201.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">6.61 µs · 3.34×</text>
+<text x="804.0" y="219.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,209.0H1048.0A4,4 0 0 1 1052.0,213.0V217.0A4,4 0 0 1 1048.0,221.0H812.0Z"><title>encoding/json 108 µs</title></path>
+<text x="1058.0" y="219.0" class="ink2 num" font-size="12" text-anchor="start">108 µs</text>
+<text x="804.0" y="237.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,227.0H949.8A4,4 0 0 1 953.8,231.0V235.0A4,4 0 0 1 949.8,239.0H812.0Z"><title>encoding/json/v2 63.5 µs</title></path>
+<text x="959.8" y="237.0" class="ink2 num" font-size="12" text-anchor="start">63.5 µs</text>
+<text x="804.0" y="255.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,245.0H901.9A4,4 0 0 1 905.9,249.0V253.0A4,4 0 0 1 901.9,257.0H812.0Z"><title>sonic Std 42.1 µs</title></path>
+<text x="911.9" y="255.0" class="ink2 num" font-size="12" text-anchor="start">42.1 µs</text>
+<text x="804.0" y="273.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,263.0H857.7A4,4 0 0 1 861.7,267.0V271.0A4,4 0 0 1 857.7,275.0H812.0Z"><title>sonic Default 22.3 µs</title></path>
+<text x="867.7" y="273.0" class="ink2 num" font-size="12" text-anchor="start">22.3 µs</text>
+<text x="804.0" y="291.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,281.0H910.7A4,4 0 0 1 914.7,285.0V289.0A4,4 0 0 1 910.7,293.0H812.0Z"><title>goccy/go-json 46 µs</title></path>
+<text x="920.7" y="291.0" class="ink2 num" font-size="12" text-anchor="start">46 µs</text>
+<text x="24.0" y="328.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 MiB</text>
+<text x="584.0" y="328.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.10×</text>
+<line class="axis" x1="220" y1="338" x2="220" y2="464"/>
+<text x="212.0" y="351.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,341.0H248.0A4,4 0 0 1 252.0,345.0V349.0A4,4 0 0 1 248.0,353.0H220.0Z"><title>moego/json 195 µs</title></path>
+<text x="258.0" y="351.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">195 µs</text>
+<text x="212.0" y="369.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,359.0H223.7A3.695856862551289,3.695856862551289 0 0 1 227.4,362.7V367.3A3.695856862551289,3.695856862551289 0 0 1 223.7,371.0H220.0Z"><title>moego/json NoCopy 45 µs</title></path>
+<text x="233.4" y="369.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">45 µs · 4.82×</text>
+<text x="212.0" y="387.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,377.0H456.0A4,4 0 0 1 460.0,381.0V385.0A4,4 0 0 1 456.0,389.0H220.0Z"><title>encoding/json 1.46 ms</title></path>
+<text x="466.0" y="387.0" class="ink2 num" font-size="12" text-anchor="start">1.46 ms</text>
+<text x="212.0" y="405.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,395.0H351.4A4,4 0 0 1 355.4,399.0V403.0A4,4 0 0 1 351.4,407.0H220.0Z"><title>encoding/json/v2 825 µs</title></path>
+<text x="361.4" y="405.0" class="ink2 num" font-size="12" text-anchor="start">825 µs</text>
+<text x="212.0" y="423.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,413.0H297.2A4,4 0 0 1 301.2,417.0V421.0A4,4 0 0 1 297.2,425.0H220.0Z"><title>sonic Std 495 µs</title></path>
+<text x="307.2" y="423.0" class="ink2 num" font-size="12" text-anchor="start">495 µs</text>
+<text x="212.0" y="441.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,431.0H251.4A4,4 0 0 1 255.4,435.0V439.0A4,4 0 0 1 251.4,443.0H220.0Z"><title>sonic Default 216 µs</title></path>
+<text x="261.4" y="441.0" class="ink2 num" font-size="12" text-anchor="start">216 µs</text>
+<text x="212.0" y="459.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,449.0H315.7A4,4 0 0 1 319.7,453.0V457.0A4,4 0 0 1 315.7,461.0H220.0Z"><title>goccy/go-json 607 µs</title></path>
+<text x="325.7" y="459.0" class="ink2 num" font-size="12" text-anchor="start">607 µs</text>
+<text x="616.0" y="328.0" class="ink" font-size="13" text-anchor="start" font-weight="600">8 MiB</text>
+<text x="1176.0" y="328.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.83×</text>
+<line class="axis" x1="812" y1="338" x2="812" y2="464"/>
+<text x="804.0" y="351.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,341.0H832.0A4,4 0 0 1 836.0,345.0V349.0A4,4 0 0 1 832.0,353.0H812.0Z"><title>moego/json 1.1 ms</title></path>
+<text x="842.0" y="351.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.1 ms</text>
+<text x="804.0" y="369.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M812.0,359.0H815.4A3.4280309065967303,3.4280309065967303 0 0 1 818.9,362.4V367.6A3.4280309065967303,3.4280309065967303 0 0 1 815.4,371.0H812.0Z"><title>moego/json NoCopy 313 µs</title></path>
+<text x="824.9" y="369.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">313 µs · 6.38×</text>
+<text x="804.0" y="387.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,377.0H1048.0A4,4 0 0 1 1052.0,381.0V385.0A4,4 0 0 1 1048.0,389.0H812.0Z"><title>encoding/json 11 ms</title></path>
+<text x="1058.0" y="387.0" class="ink2 num" font-size="12" text-anchor="start">11 ms</text>
+<text x="804.0" y="405.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,395.0H938.1A4,4 0 0 1 942.1,399.0V403.0A4,4 0 0 1 938.1,407.0H812.0Z"><title>encoding/json/v2 5.94 ms</title></path>
+<text x="948.1" y="405.0" class="ink2 num" font-size="12" text-anchor="start">5.94 ms</text>
+<text x="804.0" y="423.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,413.0H909.2A4,4 0 0 1 913.2,417.0V421.0A4,4 0 0 1 909.2,425.0H812.0Z"><title>sonic Std 4.62 ms</title></path>
+<text x="919.2" y="423.0" class="ink2 num" font-size="12" text-anchor="start">4.62 ms</text>
+<text x="804.0" y="441.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,431.0H851.9A4,4 0 0 1 855.9,435.0V439.0A4,4 0 0 1 851.9,443.0H812.0Z"><title>sonic Default 2 ms</title></path>
+<text x="861.9" y="441.0" class="ink2 num" font-size="12" text-anchor="start">2 ms</text>
+<text x="804.0" y="459.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,449.0H913.0A4,4 0 0 1 917.0,453.0V457.0A4,4 0 0 1 913.0,461.0H812.0Z"><title>goccy/go-json 4.79 ms</title></path>
+<text x="923.0" y="459.0" class="ink2 num" font-size="12" text-anchor="start">4.79 ms</text>
+<text x="24.0" y="498.0" class="ink2" font-size="12" text-anchor="start">Text chat and coding-agent conversations (GeneralOpenAIRequest)</text>
+<text x="24.0" y="526.0" class="ink" font-size="13" text-anchor="start" font-weight="600">16 KiB</text>
+<text x="584.0" y="526.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.25×</text>
+<line class="axis" x1="220" y1="536" x2="220" y2="662"/>
+<text x="212.0" y="549.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,539.0H280.4A4,4 0 0 1 284.4,543.0V547.0A4,4 0 0 1 280.4,551.0H220.0Z"><title>moego/json 21.2 µs</title></path>
+<text x="290.4" y="549.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">21.2 µs</text>
+<text x="212.0" y="567.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,557.0H279.4A4,4 0 0 1 283.4,561.0V565.0A4,4 0 0 1 279.4,569.0H220.0Z"><title>moego/json NoCopy 20.9 µs</title></path>
+<text x="289.4" y="567.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">20.9 µs · 1.28×</text>
+<text x="212.0" y="585.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,575.0H456.0A4,4 0 0 1 460.0,579.0V583.0A4,4 0 0 1 456.0,587.0H220.0Z"><title>encoding/json 79 µs</title></path>
+<text x="466.0" y="585.0" class="ink2 num" font-size="12" text-anchor="start">79 µs</text>
+<text x="212.0" y="603.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,593.0H407.9A4,4 0 0 1 411.9,597.0V601.0A4,4 0 0 1 407.9,605.0H220.0Z"><title>encoding/json/v2 63.2 µs</title></path>
+<text x="417.9" y="603.0" class="ink2 num" font-size="12" text-anchor="start">63.2 µs</text>
+<text x="212.0" y="621.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,611.0H303.9A4,4 0 0 1 307.9,615.0V619.0A4,4 0 0 1 303.9,623.0H220.0Z"><title>sonic Std 28.9 µs</title></path>
+<text x="313.9" y="621.0" class="ink2 num" font-size="12" text-anchor="start">28.9 µs</text>
+<text x="212.0" y="639.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,629.0H296.9A4,4 0 0 1 300.9,633.0V637.0A4,4 0 0 1 296.9,641.0H220.0Z"><title>sonic Default 26.6 µs</title></path>
+<text x="306.9" y="639.0" class="ink2 num" font-size="12" text-anchor="start">26.6 µs</text>
+<text x="212.0" y="657.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,647.0H299.1A4,4 0 0 1 303.1,651.0V655.0A4,4 0 0 1 299.1,659.0H220.0Z"><title>goccy/go-json 27.4 µs</title></path>
+<text x="309.1" y="657.0" class="ink2 num" font-size="12" text-anchor="start">27.4 µs</text>
+<text x="616.0" y="526.0" class="ink" font-size="13" text-anchor="start" font-weight="600">100K tokens</text>
+<text x="1176.0" y="526.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.18×</text>
+<line class="axis" x1="812" y1="536" x2="812" y2="662"/>
+<text x="804.0" y="549.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,539.0H845.5A4,4 0 0 1 849.5,543.0V547.0A4,4 0 0 1 845.5,551.0H812.0Z"><title>moego/json 399 µs</title></path>
+<text x="855.5" y="549.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">399 µs</text>
+<text x="804.0" y="567.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M812.0,557.0H844.4A4,4 0 0 1 848.4,561.0V565.0A4,4 0 0 1 844.4,569.0H812.0Z"><title>moego/json NoCopy 387 µs</title></path>
+<text x="854.4" y="567.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">387 µs · 1.22×</text>
+<text x="804.0" y="585.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,575.0H1048.0A4,4 0 0 1 1052.0,579.0V583.0A4,4 0 0 1 1048.0,587.0H812.0Z"><title>encoding/json 2.55 ms</title></path>
+<text x="1058.0" y="585.0" class="ink2 num" font-size="12" text-anchor="start">2.55 ms</text>
+<text x="804.0" y="603.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,593.0H984.4A4,4 0 0 1 988.4,597.0V601.0A4,4 0 0 1 984.4,605.0H812.0Z"><title>encoding/json/v2 1.87 ms</title></path>
+<text x="994.4" y="603.0" class="ink2 num" font-size="12" text-anchor="start">1.87 ms</text>
+<text x="804.0" y="621.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,611.0H855.7A4,4 0 0 1 859.7,615.0V619.0A4,4 0 0 1 855.7,623.0H812.0Z"><title>sonic Std 506 µs</title></path>
+<text x="865.7" y="621.0" class="ink2 num" font-size="12" text-anchor="start">506 µs</text>
+<text x="804.0" y="639.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,629.0H852.4A4,4 0 0 1 856.4,633.0V637.0A4,4 0 0 1 852.4,641.0H812.0Z"><title>sonic Default 472 µs</title></path>
+<text x="862.4" y="639.0" class="ink2 num" font-size="12" text-anchor="start">472 µs</text>
+<text x="804.0" y="657.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,647.0H903.4A4,4 0 0 1 907.4,651.0V655.0A4,4 0 0 1 903.4,659.0H812.0Z"><title>goccy/go-json 1.01 ms</title></path>
+<text x="913.4" y="657.0" class="ink2 num" font-size="12" text-anchor="start">1.01 ms</text>
+<text x="24.0" y="694.0" class="ink" font-size="13" text-anchor="start" font-weight="600">256K tokens</text>
+<text x="584.0" y="694.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.17×</text>
+<line class="axis" x1="220" y1="704" x2="220" y2="830"/>
+<text x="212.0" y="717.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,707.0H253.1A4,4 0 0 1 257.1,711.0V715.0A4,4 0 0 1 253.1,719.0H220.0Z"><title>moego/json 997 µs</title></path>
+<text x="263.1" y="717.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">997 µs</text>
+<text x="212.0" y="735.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,725.0H252.0A4,4 0 0 1 256.0,729.0V733.0A4,4 0 0 1 252.0,737.0H220.0Z"><title>moego/json NoCopy 969 µs</title></path>
+<text x="262.0" y="735.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">969 µs · 1.21×</text>
+<text x="212.0" y="753.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,743.0H456.0A4,4 0 0 1 460.0,747.0V751.0A4,4 0 0 1 456.0,755.0H220.0Z"><title>encoding/json 6.45 ms</title></path>
+<text x="466.0" y="753.0" class="ink2 num" font-size="12" text-anchor="start">6.45 ms</text>
+<text x="212.0" y="771.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,761.0H389.3A4,4 0 0 1 393.3,765.0V769.0A4,4 0 0 1 389.3,773.0H220.0Z"><title>encoding/json/v2 4.66 ms</title></path>
+<text x="399.3" y="771.0" class="ink2 num" font-size="12" text-anchor="start">4.66 ms</text>
+<text x="212.0" y="789.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,779.0H263.3A4,4 0 0 1 267.3,783.0V787.0A4,4 0 0 1 263.3,791.0H220.0Z"><title>sonic Std 1.27 ms</title></path>
+<text x="273.3" y="789.0" class="ink2 num" font-size="12" text-anchor="start">1.27 ms</text>
+<text x="212.0" y="807.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,797.0H259.3A4,4 0 0 1 263.3,801.0V805.0A4,4 0 0 1 259.3,809.0H220.0Z"><title>sonic Default 1.16 ms</title></path>
+<text x="269.3" y="807.0" class="ink2 num" font-size="12" text-anchor="start">1.16 ms</text>
+<text x="212.0" y="825.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,815.0H309.5A4,4 0 0 1 313.5,819.0V823.0A4,4 0 0 1 309.5,827.0H220.0Z"><title>goccy/go-json 2.51 ms</title></path>
+<text x="319.5" y="825.0" class="ink2 num" font-size="12" text-anchor="start">2.51 ms</text>
+<text x="24.0" y="864.0" class="ink2" font-size="12" text-anchor="start">Claude Messages request with an image</text>
+<text x="24.0" y="892.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 KiB</text>
+<text x="584.0" y="892.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.30×</text>
+<line class="axis" x1="220" y1="902" x2="220" y2="1028"/>
+<text x="212.0" y="915.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,905.0H287.6A4,4 0 0 1 291.6,909.0V913.0A4,4 0 0 1 287.6,917.0H220.0Z"><title>moego/json 6.2 µs</title></path>
+<text x="297.6" y="915.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">6.2 µs</text>
+<text x="212.0" y="933.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,923.0H287.0A4,4 0 0 1 291.0,927.0V931.0A4,4 0 0 1 287.0,935.0H220.0Z"><title>moego/json NoCopy 6.15 µs</title></path>
+<text x="297.0" y="933.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">6.15 µs · 1.31×</text>
+<text x="212.0" y="951.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,941.0H456.0A4,4 0 0 1 460.0,945.0V949.0A4,4 0 0 1 456.0,953.0H220.0Z"><title>encoding/json 20.8 µs</title></path>
+<text x="466.0" y="951.0" class="ink2 num" font-size="12" text-anchor="start">20.8 µs</text>
+<text x="212.0" y="969.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,959.0H375.5A4,4 0 0 1 379.5,963.0V967.0A4,4 0 0 1 375.5,971.0H220.0Z"><title>encoding/json/v2 13.8 µs</title></path>
+<text x="385.5" y="969.0" class="ink2 num" font-size="12" text-anchor="start">13.8 µs</text>
+<text x="212.0" y="987.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,977.0H329.3A4,4 0 0 1 333.3,981.0V985.0A4,4 0 0 1 329.3,989.0H220.0Z"><title>sonic Std 9.81 µs</title></path>
+<text x="339.3" y="987.0" class="ink2 num" font-size="12" text-anchor="start">9.81 µs</text>
+<text x="212.0" y="1005.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,995.0H316.3A4,4 0 0 1 320.3,999.0V1003.0A4,4 0 0 1 316.3,1007.0H220.0Z"><title>sonic Default 8.68 µs</title></path>
+<text x="326.3" y="1005.0" class="ink2 num" font-size="12" text-anchor="start">8.68 µs</text>
+<text x="212.0" y="1023.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,1013.0H309.1A4,4 0 0 1 313.1,1017.0V1021.0A4,4 0 0 1 309.1,1025.0H220.0Z"><title>goccy/go-json 8.06 µs</title></path>
+<text x="319.1" y="1023.0" class="ink2 num" font-size="12" text-anchor="start">8.06 µs</text>
+<text x="616.0" y="892.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 MiB</text>
+<text x="1176.0" y="892.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">2.62×</text>
+<line class="axis" x1="812" y1="902" x2="812" y2="1028"/>
+<text x="804.0" y="915.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,905.0H830.0A4,4 0 0 1 834.0,909.0V913.0A4,4 0 0 1 830.0,917.0H812.0Z"><title>moego/json 248 µs</title></path>
+<text x="840.0" y="915.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">248 µs</text>
+<text x="804.0" y="933.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M812.0,923.0H815.8A3.758663321286738,3.758663321286738 0 0 1 819.5,926.8V931.2A3.758663321286738,3.758663321286738 0 0 1 815.8,935.0H812.0Z"><title>moego/json NoCopy 84.8 µs</title></path>
+<text x="825.5" y="933.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">84.8 µs · 7.57×</text>
+<text x="804.0" y="951.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,941.0H1048.0A4,4 0 0 1 1052.0,945.0V949.0A4,4 0 0 1 1048.0,953.0H812.0Z"><title>encoding/json 2.71 ms</title></path>
+<text x="1058.0" y="951.0" class="ink2 num" font-size="12" text-anchor="start">2.71 ms</text>
+<text x="804.0" y="969.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,959.0H937.5A4,4 0 0 1 941.5,963.0V967.0A4,4 0 0 1 937.5,971.0H812.0Z"><title>encoding/json/v2 1.46 ms</title></path>
+<text x="947.5" y="969.0" class="ink2 num" font-size="12" text-anchor="start">1.46 ms</text>
+<text x="804.0" y="987.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,977.0H898.4A4,4 0 0 1 902.4,981.0V985.0A4,4 0 0 1 898.4,989.0H812.0Z"><title>sonic Std 1.02 ms</title></path>
+<text x="908.4" y="987.0" class="ink2 num" font-size="12" text-anchor="start">1.02 ms</text>
+<text x="804.0" y="1005.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,995.0H865.3A4,4 0 0 1 869.3,999.0V1003.0A4,4 0 0 1 865.3,1007.0H812.0Z"><title>sonic Default 646 µs</title></path>
+<text x="875.3" y="1005.0" class="ink2 num" font-size="12" text-anchor="start">646 µs</text>
+<text x="804.0" y="1023.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,1013.0H928.6A4,4 0 0 1 932.6,1017.0V1021.0A4,4 0 0 1 928.6,1025.0H812.0Z"><title>goccy/go-json 1.36 ms</title></path>
+<text x="938.6" y="1023.0" class="ink2 num" font-size="12" text-anchor="start">1.36 ms</text>
+<text x="24.0" y="1062.0" class="ink2" font-size="12" text-anchor="start">OpenAI Responses request with an image</text>
+<text x="24.0" y="1090.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 KiB</text>
+<text x="584.0" y="1090.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.08×</text>
+<line class="axis" x1="220" y1="1100" x2="220" y2="1226"/>
+<text x="212.0" y="1113.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,1103.0H296.1A4,4 0 0 1 300.1,1107.0V1111.0A4,4 0 0 1 296.1,1115.0H220.0Z"><title>moego/json 1.99 µs</title></path>
+<text x="306.1" y="1113.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.99 µs</text>
+<text x="212.0" y="1131.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M220.0,1121.0H290.3A4,4 0 0 1 294.3,1125.0V1129.0A4,4 0 0 1 290.3,1133.0H220.0Z"><title>moego/json NoCopy 1.85 µs</title></path>
+<text x="300.3" y="1131.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.85 µs · 1.16×</text>
+<text x="212.0" y="1149.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,1139.0H456.0A4,4 0 0 1 460.0,1143.0V1147.0A4,4 0 0 1 456.0,1151.0H220.0Z"><title>encoding/json 5.97 µs</title></path>
+<text x="466.0" y="1149.0" class="ink2 num" font-size="12" text-anchor="start">5.97 µs</text>
+<text x="212.0" y="1167.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,1157.0H416.7A4,4 0 0 1 420.7,1161.0V1165.0A4,4 0 0 1 416.7,1169.0H220.0Z"><title>encoding/json/v2 4.99 µs</title></path>
+<text x="426.7" y="1167.0" class="ink2 num" font-size="12" text-anchor="start">4.99 µs</text>
+<text x="212.0" y="1185.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,1175.0H339.0A4,4 0 0 1 343.0,1179.0V1183.0A4,4 0 0 1 339.0,1187.0H220.0Z"><title>sonic Std 3.06 µs</title></path>
+<text x="349.0" y="1185.0" class="ink2 num" font-size="12" text-anchor="start">3.06 µs</text>
+<text x="212.0" y="1203.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,1193.0H329.7A4,4 0 0 1 333.7,1197.0V1201.0A4,4 0 0 1 329.7,1205.0H220.0Z"><title>sonic Default 2.83 µs</title></path>
+<text x="339.7" y="1203.0" class="ink2 num" font-size="12" text-anchor="start">2.83 µs</text>
+<text x="212.0" y="1221.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,1211.0H302.1A4,4 0 0 1 306.1,1215.0V1219.0A4,4 0 0 1 302.1,1223.0H220.0Z"><title>goccy/go-json 2.14 µs</title></path>
+<text x="312.1" y="1221.0" class="ink2 num" font-size="12" text-anchor="start">2.14 µs</text>
+<text x="616.0" y="1090.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 MiB</text>
+<text x="1176.0" y="1090.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">2.63×</text>
+<line class="axis" x1="812" y1="1100" x2="812" y2="1226"/>
+<text x="804.0" y="1113.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,1103.0H839.9A4,4 0 0 1 843.9,1107.0V1111.0A4,4 0 0 1 839.9,1115.0H812.0Z"><title>moego/json 194 µs</title></path>
+<text x="849.9" y="1113.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">194 µs</text>
+<text x="804.0" y="1131.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json NoCopy</text>
+<path class="own" d="M812.0,1121.0H815.3A3.2959296065358306,3.2959296065358306 0 0 1 818.6,1124.3V1129.7A3.2959296065358306,3.2959296065358306 0 0 1 815.3,1133.0H812.0Z"><title>moego/json NoCopy 40.1 µs</title></path>
+<text x="824.6" y="1131.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">40.1 µs · 12.5×</text>
+<text x="804.0" y="1149.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,1139.0H1048.0A4,4 0 0 1 1052.0,1143.0V1147.0A4,4 0 0 1 1048.0,1151.0H812.0Z"><title>encoding/json 1.46 ms</title></path>
+<text x="1058.0" y="1149.0" class="ink2 num" font-size="12" text-anchor="start">1.46 ms</text>
+<text x="804.0" y="1167.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,1157.0H943.2A4,4 0 0 1 947.2,1161.0V1165.0A4,4 0 0 1 943.2,1169.0H812.0Z"><title>encoding/json/v2 822 µs</title></path>
+<text x="953.2" y="1167.0" class="ink2 num" font-size="12" text-anchor="start">822 µs</text>
+<text x="804.0" y="1185.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,1175.0H904.4A4,4 0 0 1 908.4,1179.0V1183.0A4,4 0 0 1 904.4,1187.0H812.0Z"><title>sonic Std 586 µs</title></path>
+<text x="914.4" y="1185.0" class="ink2 num" font-size="12" text-anchor="start">586 µs</text>
+<text x="804.0" y="1203.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,1193.0H892.3A4,4 0 0 1 896.3,1197.0V1201.0A4,4 0 0 1 892.3,1205.0H812.0Z"><title>sonic Default 513 µs</title></path>
+<text x="902.3" y="1203.0" class="ink2 num" font-size="12" text-anchor="start">513 µs</text>
+<text x="804.0" y="1221.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,1211.0H910.1A4,4 0 0 1 914.1,1215.0V1219.0A4,4 0 0 1 910.1,1223.0H812.0Z"><title>goccy/go-json 620 µs</title></path>
+<text x="920.1" y="1221.0" class="ink2 num" font-size="12" text-anchor="start">620 µs</text>
+<text x="24.0" y="1260.0" class="ink2" font-size="12" text-anchor="start">Decode one stream chunk</text>
+<text x="24.0" y="1288.0" class="ink" font-size="13" text-anchor="start" font-weight="600">content delta</text>
+<text x="584.0" y="1288.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.12×</text>
+<line class="axis" x1="220" y1="1298" x2="220" y2="1406"/>
+<text x="212.0" y="1311.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,1301.0H296.1A4,4 0 0 1 300.1,1305.0V1309.0A4,4 0 0 1 296.1,1313.0H220.0Z"><title>moego/json 979 ns</title></path>
+<text x="306.1" y="1311.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">979 ns</text>
+<text x="212.0" y="1329.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,1319.0H456.0A4,4 0 0 1 460.0,1323.0V1327.0A4,4 0 0 1 456.0,1331.0H220.0Z"><title>encoding/json 2.93 µs</title></path>
+<text x="466.0" y="1329.0" class="ink2 num" font-size="12" text-anchor="start">2.93 µs</text>
+<text x="212.0" y="1347.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,1337.0H414.9A4,4 0 0 1 418.9,1341.0V1345.0A4,4 0 0 1 414.9,1349.0H220.0Z"><title>encoding/json/v2 2.43 µs</title></path>
+<text x="424.9" y="1347.0" class="ink2 num" font-size="12" text-anchor="start">2.43 µs</text>
+<text x="212.0" y="1365.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,1355.0H335.0A4,4 0 0 1 339.0,1359.0V1363.0A4,4 0 0 1 335.0,1367.0H220.0Z"><title>sonic Std 1.45 µs</title></path>
+<text x="345.0" y="1365.0" class="ink2 num" font-size="12" text-anchor="start">1.45 µs</text>
+<text x="212.0" y="1383.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,1373.0H315.4A4,4 0 0 1 319.4,1377.0V1381.0A4,4 0 0 1 315.4,1385.0H220.0Z"><title>sonic Default 1.22 µs</title></path>
+<text x="325.4" y="1383.0" class="ink2 num" font-size="12" text-anchor="start">1.22 µs</text>
+<text x="212.0" y="1401.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,1391.0H305.7A4,4 0 0 1 309.7,1395.0V1399.0A4,4 0 0 1 305.7,1403.0H220.0Z"><title>goccy/go-json 1.1 µs</title></path>
+<text x="315.7" y="1401.0" class="ink2 num" font-size="12" text-anchor="start">1.1 µs</text>
+<text x="616.0" y="1288.0" class="ink" font-size="13" text-anchor="start" font-weight="600">tool call delta</text>
+<text x="1176.0" y="1288.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.18×</text>
+<line class="axis" x1="812" y1="1298" x2="812" y2="1406"/>
+<text x="804.0" y="1311.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,1301.0H883.3A4,4 0 0 1 887.3,1305.0V1309.0A4,4 0 0 1 883.3,1313.0H812.0Z"><title>moego/json 1.5 µs</title></path>
+<text x="893.3" y="1311.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.5 µs</text>
+<text x="804.0" y="1329.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,1319.0H1048.0A4,4 0 0 1 1052.0,1323.0V1327.0A4,4 0 0 1 1048.0,1331.0H812.0Z"><title>encoding/json 4.77 µs</title></path>
+<text x="1058.0" y="1329.0" class="ink2 num" font-size="12" text-anchor="start">4.77 µs</text>
+<text x="804.0" y="1347.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,1337.0H1002.3A4,4 0 0 1 1006.3,1341.0V1345.0A4,4 0 0 1 1002.3,1349.0H812.0Z"><title>encoding/json/v2 3.86 µs</title></path>
+<text x="1012.3" y="1347.0" class="ink2 num" font-size="12" text-anchor="start">3.86 µs</text>
+<text x="804.0" y="1365.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,1355.0H922.4A4,4 0 0 1 926.4,1359.0V1363.0A4,4 0 0 1 922.4,1367.0H812.0Z"><title>sonic Std 2.27 µs</title></path>
+<text x="932.4" y="1365.0" class="ink2 num" font-size="12" text-anchor="start">2.27 µs</text>
+<text x="804.0" y="1383.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,1373.0H906.6A4,4 0 0 1 910.6,1377.0V1381.0A4,4 0 0 1 906.6,1385.0H812.0Z"><title>sonic Default 1.96 µs</title></path>
+<text x="916.6" y="1383.0" class="ink2 num" font-size="12" text-anchor="start">1.96 µs</text>
+<text x="804.0" y="1401.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,1391.0H897.1A4,4 0 0 1 901.1,1395.0V1399.0A4,4 0 0 1 897.1,1403.0H812.0Z"><title>goccy/go-json 1.77 µs</title></path>
+<text x="907.1" y="1401.0" class="ink2 num" font-size="12" text-anchor="start">1.77 µs</text>
+<text x="24.0" y="1438.0" class="ink" font-size="13" text-anchor="start" font-weight="600">final usage chunk</text>
+<text x="584.0" y="1438.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.21×</text>
+<line class="axis" x1="220" y1="1448" x2="220" y2="1556"/>
+<text x="212.0" y="1461.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,1451.0H268.3A4,4 0 0 1 272.3,1455.0V1459.0A4,4 0 0 1 268.3,1463.0H220.0Z"><title>moego/json 1.19 µs</title></path>
+<text x="278.3" y="1461.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">1.19 µs</text>
+<text x="212.0" y="1479.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,1469.0H456.0A4,4 0 0 1 460.0,1473.0V1477.0A4,4 0 0 1 456.0,1481.0H220.0Z"><title>encoding/json 5.47 µs</title></path>
+<text x="466.0" y="1479.0" class="ink2 num" font-size="12" text-anchor="start">5.47 µs</text>
+<text x="212.0" y="1497.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,1487.0H411.7A4,4 0 0 1 415.7,1491.0V1495.0A4,4 0 0 1 411.7,1499.0H220.0Z"><title>encoding/json/v2 4.46 µs</title></path>
+<text x="421.7" y="1497.0" class="ink2 num" font-size="12" text-anchor="start">4.46 µs</text>
+<text x="212.0" y="1515.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,1505.0H314.2A4,4 0 0 1 318.2,1509.0V1513.0A4,4 0 0 1 314.2,1517.0H220.0Z"><title>sonic Std 2.24 µs</title></path>
+<text x="324.2" y="1515.0" class="ink2 num" font-size="12" text-anchor="start">2.24 µs</text>
+<text x="212.0" y="1533.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,1523.0H303.3A4,4 0 0 1 307.3,1527.0V1531.0A4,4 0 0 1 303.3,1535.0H220.0Z"><title>sonic Default 1.99 µs</title></path>
+<text x="313.3" y="1533.0" class="ink2 num" font-size="12" text-anchor="start">1.99 µs</text>
+<text x="212.0" y="1551.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,1541.0H278.9A4,4 0 0 1 282.9,1545.0V1549.0A4,4 0 0 1 278.9,1553.0H220.0Z"><title>goccy/go-json 1.43 µs</title></path>
+<text x="288.9" y="1551.0" class="ink2 num" font-size="12" text-anchor="start">1.43 µs</text>
+<text x="24.0" y="1590.0" class="ink2" font-size="12" text-anchor="start">Decode an embedding response</text>
+<text x="24.0" y="1618.0" class="ink" font-size="13" text-anchor="start" font-weight="600">1 vector × 1536</text>
+<text x="584.0" y="1618.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.04×</text>
+<line class="axis" x1="220" y1="1628" x2="220" y2="1736"/>
+<text x="212.0" y="1641.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M220.0,1631.0H263.4A4,4 0 0 1 267.4,1635.0V1639.0A4,4 0 0 1 263.4,1643.0H220.0Z"><title>moego/json 59.1 µs</title></path>
+<text x="273.4" y="1641.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">59.1 µs</text>
+<text x="212.0" y="1659.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M220.0,1649.0H456.0A4,4 0 0 1 460.0,1653.0V1657.0A4,4 0 0 1 456.0,1661.0H220.0Z"><title>encoding/json 300 µs</title></path>
+<text x="466.0" y="1659.0" class="ink2 num" font-size="12" text-anchor="start">300 µs</text>
+<text x="212.0" y="1677.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M220.0,1667.0H410.0A4,4 0 0 1 414.0,1671.0V1675.0A4,4 0 0 1 410.0,1679.0H220.0Z"><title>encoding/json/v2 242 µs</title></path>
+<text x="420.0" y="1677.0" class="ink2 num" font-size="12" text-anchor="start">242 µs</text>
+<text x="212.0" y="1695.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M220.0,1685.0H284.7A4,4 0 0 1 288.7,1689.0V1693.0A4,4 0 0 1 284.7,1697.0H220.0Z"><title>sonic Std 85.8 µs</title></path>
+<text x="294.7" y="1695.0" class="ink2 num" font-size="12" text-anchor="start">85.8 µs</text>
+<text x="212.0" y="1713.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M220.0,1703.0H284.5A4,4 0 0 1 288.5,1707.0V1711.0A4,4 0 0 1 284.5,1715.0H220.0Z"><title>sonic Default 85.5 µs</title></path>
+<text x="294.5" y="1713.0" class="ink2 num" font-size="12" text-anchor="start">85.5 µs</text>
+<text x="212.0" y="1731.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M220.0,1721.0H265.5A4,4 0 0 1 269.5,1725.0V1729.0A4,4 0 0 1 265.5,1733.0H220.0Z"><title>goccy/go-json 61.8 µs</title></path>
+<text x="275.5" y="1731.0" class="ink2 num" font-size="12" text-anchor="start">61.8 µs</text>
+<text x="616.0" y="1618.0" class="ink" font-size="13" text-anchor="start" font-weight="600">16 vectors × 1536</text>
+<text x="1176.0" y="1618.0" class="ink num" font-size="13" text-anchor="end" font-weight="600">1.07×</text>
+<line class="axis" x1="812" y1="1628" x2="812" y2="1736"/>
+<text x="804.0" y="1641.0" class="ink" font-size="12" text-anchor="end" font-weight="600">moego/json</text>
+<path class="own" d="M812.0,1631.0H855.6A4,4 0 0 1 859.6,1635.0V1639.0A4,4 0 0 1 855.6,1643.0H812.0Z"><title>moego/json 943 µs</title></path>
+<text x="865.6" y="1641.0" class="ink num" font-size="12" text-anchor="start" font-weight="600">943 µs</text>
+<text x="804.0" y="1659.0" class="ink2" font-size="12" text-anchor="end">encoding/json</text>
+<path class="peer" d="M812.0,1649.0H1048.0A4,4 0 0 1 1052.0,1653.0V1657.0A4,4 0 0 1 1048.0,1661.0H812.0Z"><title>encoding/json 4.75 ms</title></path>
+<text x="1058.0" y="1659.0" class="ink2 num" font-size="12" text-anchor="start">4.75 ms</text>
+<text x="804.0" y="1677.0" class="ink2" font-size="12" text-anchor="end">encoding/json/v2</text>
+<path class="peer" d="M812.0,1667.0H1002.7A4,4 0 0 1 1006.7,1671.0V1675.0A4,4 0 0 1 1002.7,1679.0H812.0Z"><title>encoding/json/v2 3.85 ms</title></path>
+<text x="1012.7" y="1677.0" class="ink2 num" font-size="12" text-anchor="start">3.85 ms</text>
+<text x="804.0" y="1695.0" class="ink2" font-size="12" text-anchor="end">sonic Std</text>
+<path class="peer" d="M812.0,1685.0H878.7A4,4 0 0 1 882.7,1689.0V1693.0A4,4 0 0 1 878.7,1697.0H812.0Z"><title>sonic Std 1.4 ms</title></path>
+<text x="888.7" y="1695.0" class="ink2 num" font-size="12" text-anchor="start">1.4 ms</text>
+<text x="804.0" y="1713.0" class="ink2" font-size="12" text-anchor="end">sonic Default</text>
+<path class="peer" d="M812.0,1703.0H877.1A4,4 0 0 1 881.1,1707.0V1711.0A4,4 0 0 1 877.1,1715.0H812.0Z"><title>sonic Default 1.37 ms</title></path>
+<text x="887.1" y="1713.0" class="ink2 num" font-size="12" text-anchor="start">1.37 ms</text>
+<text x="804.0" y="1731.0" class="ink2" font-size="12" text-anchor="end">goccy/go-json</text>
+<path class="peer" d="M812.0,1721.0H858.8A4,4 0 0 1 862.8,1725.0V1729.0A4,4 0 0 1 858.8,1733.0H812.0Z"><title>goccy/go-json 1.01 ms</title></path>
+<text x="868.8" y="1731.0" class="ink2 num" font-size="12" text-anchor="start">1.01 ms</text>
+<text x="24.0" y="1774.0" class="muted" font-size="12" text-anchor="start">The time multiplier is the reciprocal of the median of the per-round ratios moego/json ÷ competitor, for the closest competitor.</text>
+<text x="24.0" y="1790.0" class="muted" font-size="12" text-anchor="start">Outputs were checked before timing: values equal encoding/json&#x27;s; bytes too, except sonic Default and encoding/json/v2, which do not promise encoding/json&#x27;s bytes.</text>
+<text x="24.0" y="1806.0" class="muted" font-size="12" text-anchor="start">Measured with bench/json/codec, drawn by bench/json/codec/plot.py</text>
+<text x="24.0" y="1822.0" class="muted" font-size="12" text-anchor="start">Versions: bytedance/sonic v1.15.5 · goccy/go-json v0.12.0</text>
+</svg>

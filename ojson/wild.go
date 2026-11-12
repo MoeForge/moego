@@ -1,6 +1,10 @@
 package ojson
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
+)
 
 // Wildcard components whose only wildcard is a final '*' after ASCII bytes,
 // such as "tr*", match the keys that start with those bytes. find reads
@@ -69,7 +73,7 @@ func memberPrefix(json string, i int, prefix string, pw, pm uint64) int {
 		var match bool
 		if i = quickEnd(json, ks); i > 0 {
 			if pm != 0 {
-				match = (load64(json, ks)^pw)&pm == 0
+				match = (jsonsimd.Load64(json, ks)^pw)&pm == 0
 			} else {
 				match = strings.HasPrefix(json[ks:i-1], prefix)
 			}

@@ -7,6 +7,8 @@ import (
 	"strings"
 	"unicode/utf16"
 	"unicode/utf8"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
 )
 
 // The scanner works on strings. []byte inputs are viewed as strings without
@@ -45,7 +47,7 @@ func stringEnd(s string, i int) int {
 // values within four words; scanLong goes on from there.
 func scanString(s string, i int) (end int, esc bool) {
 	for k := 0; k < 4 && i+8 <= len(s); k++ {
-		m := quoteOrSlash(load64(s, i))
+		m := quoteOrSlash(jsonsimd.Load64(s, i))
 		if m == 0 {
 			i += 8
 			continue
@@ -92,7 +94,7 @@ func scanLong(s string, i int, esc bool) (int, bool) {
 			i, esc = q+1, true
 			continue
 		}
-		m := quoteOrSlash(load64(s, i))
+		m := quoteOrSlash(jsonsimd.Load64(s, i))
 		if m == 0 {
 			i += 8
 			plain++
@@ -127,7 +129,7 @@ func quickEnd(s string, i int) int {
 	if i+8 > len(s) {
 		return 0
 	}
-	w := load64(s, i)
+	w := jsonsimd.Load64(s, i)
 	q := zeroBytes(w ^ lsb*'"')
 	if q == 0 || zeroBytes(w^lsb*'\\')&(q^(q-1)) != 0 {
 		return 0
@@ -176,7 +178,7 @@ func containerEndScalar(s string, i int) int {
 	i++
 	for {
 		for i+8 <= len(s) {
-			w := load64(s, i)
+			w := jsonsimd.Load64(s, i)
 			b := w | lsb*0x20
 			m := zeroBytes(w^lsb*'"') | zeroBytes(b^lsb*'{') | zeroBytes(b^lsb*'}')
 			if m == 0 {
@@ -249,7 +251,7 @@ func unescape(dst []byte, raw string) ([]byte, bool) {
 	i := 0
 	for i < len(raw) {
 		for i+8 <= len(raw) {
-			x := load64(raw, i)
+			x := jsonsimd.Load64(raw, i)
 			binary.LittleEndian.PutUint64(b[w:], x)
 			m := zeroBytes(x ^ lsb*'\\')
 			if m == 0 {

@@ -17,7 +17,7 @@ func TestReplaceInPlace(t *testing.T) {
 	r := rand.New(rand.NewSource(9))
 	opts := &Options{Optimistic: true, ReplaceInPlace: true}
 	copyOpts := &Options{Optimistic: true}
-	for n := 0; n < 40000; n++ {
+	for n := 0; n < randomIterations(40000); n++ {
 		doc, paths := randomDoc(r)
 		if n%4 == 3 && doc != "" {
 			b := []byte(doc)

@@ -10,21 +10,42 @@ permissions:
 
 jobs:
   test:
-    name: Go ${{ matrix.go }} / linux-${{ matrix.arch }}
+    name: Go ${{ matrix.go }}${{ matrix.goexperiment && format(' {0}', matrix.goexperiment) || '' }} / linux-${{ matrix.arch }}
     strategy:
       fail-fast: false
       matrix:
-        go: ['1.23.x', '1.26.x']
+        # moego/json follows the encoding/json of each build: the classic
+        # one (1.23, 1.26, 1.27 with nojsonv2) or the one built on
+        # encoding/json/v2 (1.26 with jsonv2, 1.27).
+        go: ['1.23.x', '1.26.x', '1.27.x']
         arch: [amd64, arm64]
+        goexperiment: ['']
         include:
           - arch: amd64
             runner: ubuntu-24.04
           - arch: arm64
             runner: ubuntu-24.04-arm
+          - go: '1.27.x'
+            goexperiment: nojsonv2
+            arch: amd64
+            runner: ubuntu-24.04
+          - go: '1.27.x'
+            goexperiment: nojsonv2
+            arch: arm64
+            runner: ubuntu-24.04-arm
+          - go: '1.26.x'
+            goexperiment: jsonv2
+            arch: amd64
+            runner: ubuntu-24.04
+          - go: '1.26.x'
+            goexperiment: jsonv2
+            arch: arm64
+            runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 15
     env:
       MOEGO_REQUIRE_AVX2: ${{ matrix.arch == 'amd64' && '1' || '0' }}
+      GOEXPERIMENT: ${{ matrix.goexperiment }}
       GOTOOLCHAIN: local
       GOPROXY: 'off'
       GOSUMDB: 'off'
@@ -40,7 +61,7 @@ jobs:
         run: test "$(go list -m all)" = "$(go list -m)"
       - name: Check formatting and assembly declarations
         run: |
-          test -z "$(gofmt -l base64 ojson)"
+          test -z "$(gofmt -l base64 internal json ojson regexp)"
           go vet ./...
           go vet -tags=purego ./...
       - name: Native correctness and protected-page boundaries
@@ -53,7 +74,67 @@ jobs:
         run: go test -tags=purego -count=1 ./...
 
   json:
-    name: ojson differential tests / linux-${{ matrix.arch }}
+    name: JSON differential tests / Go ${{ matrix.go }}${{ matrix.goexperiment && format(' {0}', matrix.goexperiment) || '' }} / linux-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        go: ['1.26.x', '1.27.x']
+        arch: [amd64, arm64]
+        goexperiment: ['']
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+          - go: '1.27.x'
+            goexperiment: nojsonv2
+            arch: amd64
+            runner: ubuntu-24.04
+          - go: '1.26.x'
+            goexperiment: jsonv2
+            arch: amd64
+            runner: ubuntu-24.04
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      MOEGO_REQUIRE_AVX2: ${{ matrix.arch == 'amd64' && '1' || '0' }}
+      GOEXPERIMENT: ${{ matrix.goexperiment }}
+      GOTOOLCHAIN: local
+    defaults:
+      run:
+        working-directory: bench/json
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: bench/json/go.sum
+      - name: Download pinned gjson, sjson and sonic
+        run: |
+          go mod download
+          go mod verify
+      - name: Check formatting
+        run: |
+          test -z "$(gofmt -l .)"
+          go vet ./...
+      # Compares ojson with gjson and sjson and moego/json with the
+      # encoding/json of the build on every exported identifier, the
+      # retained regression cases and generated documents, and checks that
+      # the benchmarked engines produce the same output.
+      - name: API surface, differential, regression and output tests
+        run: go test -count=1 ./...
+      - name: Race detector
+        run: go test -race -count=1 ./diff ./jdiff
+      - name: Pointer checks
+        run: go test -gcflags=all=-d=checkptr=2 -count=1 ./diff ./jdiff
+      - name: Portable fallback
+        run: go test -tags=purego -count=1 ./diff ./jdiff
+
+  regexp:
+    name: regexp comparisons / linux-${{ matrix.arch }}
+    needs: test
     strategy:
       fail-fast: false
       matrix:
@@ -67,36 +148,64 @@ jobs:
     env:
       MOEGO_REQUIRE_AVX2: ${{ matrix.arch == 'amd64' && '1' || '0' }}
       GOTOOLCHAIN: local
+      GOMAXPROCS: '1'
     defaults:
       run:
-        working-directory: bench/json
+        working-directory: bench/regexp
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
       - uses: actions/setup-go@v7
         with:
-          go-version-file: bench/json/go.mod
-          cache-dependency-path: bench/json/go.sum
-      - name: Download pinned gjson, sjson and sonic
+          go-version-file: bench/regexp/go.mod
+          cache-dependency-path: bench/regexp/go.sum
+      - name: Check native SIMD support
+        working-directory: .
+        run: go test -run '^Test(AMD64|ARM64)' -count=1 ./regexp
+      - name: Download and verify pinned competitors
         run: |
           go mod download
+          # Treat the locally replaced module as source, not a downloaded archive.
+          verify_dir=$(mktemp -d)
+          trap 'rm -rf "$verify_dir"' EXIT
+          export GOWORK="$verify_dir/go.work"
+          go work init ../.. .
           go mod verify
-      - name: Check formatting
+      - name: Check formatting and declarations
         run: |
           test -z "$(gofmt -l .)"
           go vet ./...
-      # Compares ojson with gjson and sjson on every exported identifier,
-      # the retained regression cases and generated documents, and checks
-      # that the benchmarked engines produce the same output.
-      - name: API surface, differential, regression and output tests
-        run: go test -count=1 ./...
-      - name: Race detector
-        run: go test -race -count=1 ./diff
-      - name: Pointer checks
-        run: go test -gcflags=all=-d=checkptr=2 -count=1 ./diff
-      - name: Portable fallback
-        run: go test -tags=purego -count=1 ./diff
+      - name: Compare results and input fixtures
+        run: |
+          python3 -m unittest test_report.py
+          go test -count=1 ./...
+          go test -race -count=1 ./...
+          go test -gcflags=all=-d=checkptr=2 -count=1 ./...
+          go test -tags=purego -count=1 ./...
+      - name: Check equal-load memory sampling
+        env:
+          RXPEAK: Moego/F
+          RXPEAKRATE: '2'
+          RXPEAKN: '40'
+          GOGC: '100'
+          GOMEMLIMIT: 'off'
+        run: go test -run '^TestPeak$' -count=1 -v .
+      - name: Measure matching and cold compilation
+        run: |
+          go test -c -o regexp.test
+          python3 measure.py speed --binary ./regexp.test --output results --repetitions 5 --benchtime 200ms
+          go version > results/environment.txt
+          go env GOOS GOARCH GOAMD64 >> results/environment.txt
+          lscpu >> results/environment.txt
+      - name: Upload regex measurements
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: regexp-linux-${{ matrix.arch }}-${{ github.run_id }}
+          path: bench/regexp/results/
+          if-no-files-found: warn
+          retention-days: 30
 
   benchmark:
     name: Benchmark / linux-${{ matrix.arch }}

@@ -1,0 +1,10 @@
+{
+  "A": {"rate": 10000, "iterations": 80000},
+  "B": {"rate": 80, "iterations": 100},
+  "C": {"rate": 1.25, "iterations": 400},
+  "D": {"rate": 40, "iterations": 11000},
+  "E": {"rate": 500, "iterations": 4500},
+  "F": {"rate": 5, "iterations": 20},
+  "G": {"rate": 2, "iterations": 160},
+  "H": {"rate": 1, "iterations": 120}
+}

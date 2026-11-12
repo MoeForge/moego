@@ -2,7 +2,11 @@
 
 package ojson
 
-import "unsafe"
+import (
+	"unsafe"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
+)
 
 // uglyShuf[m] is the VPSHUFB control that moves the bytes of an 8-byte
 // group whose bits are set in m to the front, in order.
@@ -29,7 +33,7 @@ func uglyAVX2(dst, src *byte, n, i, w int, in uint64, shuf *[256]uint64) (int, i
 // the kept bytes to out[w:], and out is as long as json and w <= i. It
 // returns the new i and w, with st the string state at i.
 func uglyBlocks(out []byte, json string, i, w int, st *uglyState) (int, int) {
-	if !haveAVX2 || len(json)-i < 64 || w > i {
+	if !jsonsimd.HaveAVX2 || len(json)-i < 64 || w > i {
 		return i, w
 	}
 	var dst *byte

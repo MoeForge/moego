@@ -27,7 +27,7 @@ func TestAppendFloat(t *testing.T) {
 	}
 	r := rand.New(rand.NewSource(11))
 	for k := 0; k <= 12; k++ {
-		for n := 0; n < 200000; n++ {
+		for n := 0; n < randomIterations(200000); n++ {
 			var i int64
 			switch n % 4 {
 			case 0:
@@ -56,7 +56,7 @@ func TestAppendFloat(t *testing.T) {
 			checkFloat(t, math.Nextafter(f, -1))
 		}
 	}
-	for n := 0; n < 2000000; n++ {
+	for n := 0; n < randomIterations(2000000); n++ {
 		checkFloat(t, math.Float64frombits(r.Uint64()))
 		checkFloat(t, r.Float64()*math.Pow(10, float64(r.Intn(24)-9)))
 	}

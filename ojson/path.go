@@ -258,11 +258,18 @@ func quoteKeyPath(path string) bool {
 }
 
 // findIndex is setIndex for finding an existing element: sjson never finds
-// one by an escaped number, and pads the array from its end instead.
+// one by an escaped number, and pads the array from its end instead. With
+// a ':' prefix, which never creates an element, an escaped number names
+// none at all.
 func (c setComp) findIndex() (idx, kind int) {
 	idx, kind = c.setIndex()
-	if c.esc && kind == idxNumber {
-		kind = idxPad
+	if c.esc {
+		switch kind {
+		case idxNumber:
+			kind = idxPad
+		case idxForced:
+			kind = idxNone
+		}
 	}
 	return idx, kind
 }

@@ -519,3 +519,12 @@
 {"bucket": "deviation docset.deviation.dupkey.docset2 plain+dup", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "[{\"\":{},\"\":\"\"}]", "path": "0.!\\\\.!0", "raw": "0"}}
 {"bucket": "deviation docset.deviation.dupkey.docset2 plain", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": ":[0.�", "raw": "[]", "b64": {"path": "OlswLvw="}}}
 {"bucket": "deviation docset.deviation.dupkey.docset2 literal", "area": "deviation", "op": "docset", "field": "deviation.dupkey.docset2", "case": {"doc": "0", "path": ":!0.�", "raw": "[]", "b64": {"path": "OiEwLvw="}}}
+{"bucket": "path set.set.out plain", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0,0]", "path": ":\\0", "raw": "0"}}
+{"bucket": "path setraw.setraw.out plain", "area": "path", "op": "setraw", "field": "setraw.out", "case": {"doc": "[0,0]", "path": ":\\1", "raw": "\"r\""}}
+{"bucket": "path set.set.out plain", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0,0]", "path": ":\\00", "raw": "0"}}
+{"bucket": "path set.set.out plain", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0,1,2,3,4,5,6,7,8,9,10,11]", "path": ":1\\0", "raw": "0"}}
+{"bucket": "path del.del.out plain", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "{\"a\":[0,0]}", "path": "a.:\\1", "raw": "0"}}
+{"bucket": "path set.set.out plain", "area": "path", "op": "set", "field": "set.out", "case": {"doc": "[0]", "path": ":\\0.a", "raw": "0"}}
+{"bucket": "path docset.docset.out1 plain", "area": "path", "op": "docset", "field": "docset.out1", "case": {"doc": "{\"a\":[[0,0],1]}", "path": "a.0.:\\0", "raw": "[]"}}
+{"bucket": "path setopt.setopt1.out plain", "area": "path", "op": "setopt", "field": "setopt1.out", "case": {"doc": " [ 0 , [ 1 , 2 ] ] ", "path": "1.:\\1", "raw": "\"r\""}}
+{"bucket": "path del.del.out plain", "area": "path", "op": "del", "field": "del.out", "case": {"doc": "[[0,[1,2]],{\"b\":[3]}]", "path": "1.b.:\\0", "raw": "0"}}

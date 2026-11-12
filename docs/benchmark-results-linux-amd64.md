@@ -69,10 +69,18 @@ without line breaks.
 
 ## Results
 
-The table and the charts in the README come from the same complete run.
-Throughput is in GB/s of raw data; a multiplier is the other package's
-median time divided by the median time of `base64`; "fastest other" is the
-fastest package in the row apart from `base64`.
+<p align="center">
+  <img src="images/linux-amd64-1MiB-vs-stdlib.en.svg" alt="Throughput of base64 and encoding/base64 on 1 MiB of data">
+</p>
+
+<p align="center">
+  <img src="images/linux-amd64-1MiB-vs-competitors.en.svg" alt="Throughput of base64 and other Go Base64 implementations on 1 MiB of data">
+</p>
+
+The charts show 1 MiB of data and the table every size; both come from
+the same complete run. Throughput is in GB/s of raw data; a multiplier is
+the other package's median time divided by the median time of `base64`;
+"fastest other" is the fastest package in the row apart from `base64`.
 
 | Scenario | Size | base64 time (μs) | base64 (GB/s) | encoding/base64 (GB/s) | Fastest other (GB/s) | vs encoding/base64 | vs fastest other |
 |---|---|--:|--:|--:|---|--:|--:|
@@ -212,7 +220,7 @@ Replace the 2 in `taskset -c 2` with the number of an idle CPU; the
 `--output` directory must not exist yet. `compare.py` lists the median time
 and throughput multiplier of `base64` against the fastest other package for
 every row; `plot.py` draws the Chinese (`.zh.svg`) and English (`.en.svg`)
-charts of the README. For the `moego_zeroalloc` comparison, build the
+charts of this page and the README. For the `moego_zeroalloc` comparison, build the
 binary with `go test -c -tags moego_zeroalloc`, select only the 30 rows of
 `BenchmarkNewAPI` and `BenchmarkDataURL`, and compare with
 `compare.py --suite newapi` and `--suite dataurl`. Options and output files

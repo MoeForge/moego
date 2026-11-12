@@ -141,6 +141,47 @@ func TestDeleteQuoteKeyAcross(t *testing.T) {
 	}
 }
 
+// A ':' component with an escaped number names no array element: Set fails
+// as on a non-numeric key, Delete leaves the document as it is. An object
+// still takes it as a key.
+func TestForcedEscapedIndex(t *testing.T) {
+	for _, c := range []struct{ doc, path, set string }{
+		{`[0,0]`, `:\0`, ``},
+		{`[0,0]`, `:\1`, ``},
+		{`[0,0]`, `:\2`, ``},
+		{`[0,0]`, `:\00`, ``},
+		{`[]`, `:\0`, ``},
+		{`[0,1,2,3,4,5,6,7,8,9,10,11]`, `:1\0`, ``},
+		{`[0]`, `:\0.a`, ``},
+		{`[[0,0]]`, `0.:\1`, ``},
+		{`{"a":[0,0]}`, `a.:\1`, ``},
+		{` [ 0 , [ 1 , 2 ] ] `, `1.:\1`, ``},
+		{`{"a":[0,0]}`, `:\0`, `{"a":[0,0],"0":1}`},
+		{`{"a":[0,0]}`, `:\0.a`, `{"a":[0,0],"0":{"a":1}}`},
+		{`[0,0]`, `0.:\0`, `[{"0":1},0]`},
+	} {
+		got, err := Set(c.doc, c.path, 1)
+		want, fails := c.set, c.set == ""
+		if fails {
+			want = c.doc
+		}
+		if got != want || (err != nil) != fails {
+			t.Errorf("Set(%q, %q) = %q, %v; want %q (error %v)", c.doc, c.path, got, err, want, fails)
+		}
+		d := NewDocString(c.doc)
+		if err := d.Set(c.path, 1); d.String() != want || (err != nil) != fails {
+			t.Errorf("Doc.Set(%q, %q) = %q, %v; want %q (error %v)", c.doc, c.path, d.String(), err, want, fails)
+		}
+		if got, err := Delete(c.doc, c.path); err != nil || got != c.doc {
+			t.Errorf("Delete(%q, %q) = %q, %v; want the input", c.doc, c.path, got, err)
+		}
+		d = NewDocString(c.doc)
+		if err := d.Delete(c.path); err != nil || d.String() != c.doc {
+			t.Errorf("Doc.Delete(%q, %q) = %q, %v; want the input", c.doc, c.path, d.String(), err)
+		}
+	}
+}
+
 // A query path that reads into the text of a string finds there what looks
 // like a value; Set leaves the document as it is.
 func TestSetQueryInString(t *testing.T) {

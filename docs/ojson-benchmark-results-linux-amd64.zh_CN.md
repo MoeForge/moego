@@ -14,7 +14,7 @@
 | gjson | github.com/tidwall/gjson v1.19.0 | `GetBytes`、`GetManyBytes` |
 | sjson | github.com/tidwall/sjson v1.2.5 | `SetBytes`、`DeleteBytes`，每次修改调用一次 |
 | sonic.Get、sonic/ast | github.com/bytedance/sonic v1.15.5 | 每个路径调用一次 `sonic.Get`；修改 `ast.Node` 后调用 `MarshalJSON` |
-| encoding/json map、sonic map | Go 1.26.6、sonic v1.15.5 | 解码到 `map[string]any`，修改，再编码（成员顺序会丢失） |
+| encoding/json map、sonic map | Go 1.26.6、sonic v1.15.5 | 解析到 `map[string]any`，修改，再序列化（成员顺序会丢失） |
 
 `sonic` 用的是它的 JIT 实现；如果 `sonic.APIKind` 显示退回到了 `encoding/json`，基准测试会直接停止。两种 map 往返会打乱成员顺序，只作参考。测量用的 `ojson` 构建和这个版本的代码略有不同，两者在每个场景上每次调用的指令数相差不超过 0.36%。
 

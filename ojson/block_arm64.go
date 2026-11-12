@@ -8,7 +8,8 @@ import "unsafe"
 // of quotes, backslashes and brackets, so skipping a container takes a few
 // bit operations per block instead of a branch per byte.
 
-const haveAVX2 = true
+// blockKernels reports whether the block kernels run: always, on NEON.
+func blockKernels() bool { return true }
 
 // skipState is the state of a container skip at a block boundary.
 type skipState struct {

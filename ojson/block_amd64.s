@@ -2,38 +2,6 @@
 
 #include "textflag.h"
 
-// func cpuHasAVX2() bool
-//
-// Reports AVX2 with OS support, and the BMI1, BMI2, POPCNT and PCLMULQDQ
-// instructions skipAVX2 uses.
-TEXT ·cpuHasAVX2(SB), NOSPLIT, $0-1
-    MOVB $0, ret+0(FP)
-    XORL AX, AX
-    CPUID
-    CMPL AX, $7
-    JB no_avx2
-    MOVL $1, AX
-    CPUID
-    // PCLMULQDQ (bit 1), POPCNT (23), OSXSAVE (27) and AVX (28).
-    ANDL $0x18800002, CX
-    CMPL CX, $0x18800002
-    JNE no_avx2
-    XORL CX, CX
-    XGETBV
-    ANDL $6, AX
-    CMPL AX, $6
-    JNE no_avx2
-    MOVL $7, AX
-    XORL CX, CX
-    CPUID
-    // BMI1 (bit 3), AVX2 (5) and BMI2 (8).
-    ANDL $0x128, BX
-    CMPL BX, $0x128
-    JNE no_avx2
-    MOVB $1, ret+0(FP)
-no_avx2:
-    RET
-
 DATA jsonQuotes<>+0(SB)/8, $0x2222222222222222
 DATA jsonQuotes<>+8(SB)/8, $0x2222222222222222
 DATA jsonQuotes<>+16(SB)/8, $0x2222222222222222

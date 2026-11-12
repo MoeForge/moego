@@ -31,7 +31,15 @@
 
 ## 结果
 
-下表和 README 中的图来自同一次完整测量。吞吐量单位为 GB/s，按原始数据量计算；倍数为对方的中位耗时除以 `base64` 的中位耗时；“最快的其他实现”是该行中除 `base64` 以外最快的实现。
+<p align="center">
+  <img src="images/linux-amd64-1MiB-vs-stdlib.zh.svg" alt="base64 与 encoding/base64 在 1 MiB 数据上的吞吐量对比">
+</p>
+
+<p align="center">
+  <img src="images/linux-amd64-1MiB-vs-competitors.zh.svg" alt="base64 与其他 Go Base64 实现在 1 MiB 数据上的吞吐量对比">
+</p>
+
+图是 1 MiB 数据上的结果，下表是各个大小的结果，两者来自同一次完整测量。吞吐量单位为 GB/s，按原始数据量计算；倍数为对方的中位耗时除以 `base64` 的中位耗时；“最快的其他实现”是该行中除 `base64` 以外最快的实现。
 
 | 场景 | 大小 | base64 耗时 (μs) | base64 (GB/s) | encoding/base64 (GB/s) | 最快的其他实现 (GB/s) | 相比 encoding/base64 | 相比最快的其他实现 |
 |---|---|--:|--:|--:|---|--:|--:|
@@ -137,4 +145,4 @@ python3 plot.py results/linux-amd64 --output ../docs/images --lang zh --note "�
 python3 plot.py results/linux-amd64 --output ../docs/images --lang en --note "Shared KVM virtual machine; results apply to this machine only"
 ```
 
-把 `taskset -c 2` 中的 2 换成一个空闲 CPU 的编号；`--output` 的目录必须尚不存在。`compare.py` 逐项列出 `base64` 与最快的其他实现的中位耗时和吞吐量倍数；`plot.py` 生成 README 中的中文图（`.zh.svg`）和英文图（`.en.svg`）。`moego_zeroalloc` 的对照用 `go test -c -tags moego_zeroalloc` 构建二进制，只选 `BenchmarkNewAPI` 和 `BenchmarkDataURL` 的 30 项，再用 `compare.py --suite newapi` 和 `--suite dataurl` 对比。参数和输出文件的说明见 [bench/README.md](../bench/README.md) 和 [bench/rounds.md](../bench/rounds.md)。
+把 `taskset -c 2` 中的 2 换成一个空闲 CPU 的编号；`--output` 的目录必须尚不存在。`compare.py` 逐项列出 `base64` 与最快的其他实现的中位耗时和吞吐量倍数；`plot.py` 生成本页和 README 中的中文图（`.zh.svg`）和英文图（`.en.svg`）。`moego_zeroalloc` 的对照用 `go test -c -tags moego_zeroalloc` 构建二进制，只选 `BenchmarkNewAPI` 和 `BenchmarkDataURL` 的 30 项，再用 `compare.py --suite newapi` 和 `--suite dataurl` 对比。参数和输出文件的说明见 [bench/README.md](../bench/README.md) 和 [bench/rounds.md](../bench/rounds.md)。

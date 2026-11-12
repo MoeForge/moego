@@ -6,6 +6,8 @@ import (
 	"strings"
 	"unicode/utf8"
 	"unsafe"
+
+	"github.com/MoeForge/moego/internal/jsonsimd"
 )
 
 // Get searches json for path and returns the value it finds. A missing
@@ -528,7 +530,7 @@ func findWild(json string, i int, path string, oc *objComp) (vs, ve int, esc boo
 // common cases of nextMember and skipValue are written out in them: a call
 // costs more than scanning a short key or value.
 func memberValue(json string, i int, key string, kw, km uint64) int {
-	if !haveAVX2 {
+	if !blockKernels() {
 		v, _ := memberScalar(json, i, key, kw, km, -1)
 		return v
 	}
@@ -557,7 +559,7 @@ func memberScalar(json string, i int, key string, kw, km uint64, n int) (v, at i
 		var match bool
 		if i = quickEnd(json, ks); i > 0 {
 			if km != 0 {
-				match = (load64(json, ks)^kw)&km == 0
+				match = (jsonsimd.Load64(json, ks)^kw)&km == 0
 			} else {
 				match = json[ks:i-1] == key
 			}
@@ -627,9 +629,9 @@ func keyWord(path string, pi, e int) (kw, km uint64) {
 	var w uint64
 	switch {
 	case pi+8 <= len(path):
-		w = load64(path, pi)
+		w = jsonsimd.Load64(path, pi)
 	case len(path) >= 8:
-		w = load64(path, len(path)-8) >> (8 * uint(pi+8-len(path)))
+		w = jsonsimd.Load64(path, len(path)-8) >> (8 * uint(pi+8-len(path)))
 	default:
 		for j := e - 1; j >= pi; j-- {
 			w = w<<8 | uint64(path[j])
@@ -929,7 +931,7 @@ type pend struct {
 func (w *walker) pend(k, pi int) (pend, bool) {
 	p := w.paths[k]
 	j := pi
-	for j+8 <= len(p) && plainWord(load64(p, j)) {
+	for j+8 <= len(p) && plainWord(jsonsimd.Load64(p, j)) {
 		j += 8
 	}
 	raw, next, esc := getComp(p, pi, j)
