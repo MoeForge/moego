@@ -3,14 +3,33 @@
 #include "textflag.h"
 
 // func cpuHasAES() bool
+//
+// hashAES keeps to 128-bit lanes but is VEX-encoded throughout, so it needs
+// AVX as well as AES, and the OS has to save XMM state. Pentium, Celeron and
+// Atom SKUs ship AES-NI with AVX fused off; there AES alone would report
+// true and the first VMOVDQU would raise SIGILL.
 TEXT ·cpuHasAES(SB), NOSPLIT, $0-1
+    MOVB $0, ret+0(FP)
     MOVL $1, AX
     XORL CX, CX
     CPUID
-    // AES (bit 25).
+    // AES (25), OSXSAVE (27) and AVX (28).
+    ANDL $0x18000000, CX
+    CMPL CX, $0x18000000
+    JNE no_hash_aes
+    XORL CX, CX
+    XGETBV
+    // XMM (bit 1) and YMM (bit 2) state.
+    ANDL $6, AX
+    CMPL AX, $6
+    JNE no_hash_aes
+    MOVL $1, AX
+    XORL CX, CX
+    CPUID
     SHRL $25, CX
     ANDL $1, CX
     MOVB CX, ret+0(FP)
+no_hash_aes:
     RET
 
 // func hashAES(key *[24]uint64, p *byte, n int, tail *[128]byte, total int) uint64

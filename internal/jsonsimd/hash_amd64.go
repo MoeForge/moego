@@ -2,7 +2,10 @@
 
 package jsonsimd
 
-// haveAES reports whether the CPU has the AES instructions of hashAES.
+// haveAES reports whether hashAES runs: the CPU has AES with OS support for
+// XMM state, and AVX, which its VEX-encoded instructions need. AES alone is
+// not enough: some SKUs ship AES-NI with AVX fused off, and hashAES starts
+// with a VEX-encoded VMOVDQU.
 var haveAES = cpuHasAES()
 
 //go:noescape
