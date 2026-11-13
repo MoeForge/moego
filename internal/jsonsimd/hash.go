@@ -22,6 +22,13 @@ func NewHashKey() *HashKey {
 	return h
 }
 
+// The kernels of Sum, for 128 bytes on.
+const (
+	hashNone = iota // none: Sum is maphash.Bytes
+	hashSSE         // AES instructions in legacy SSE encodings
+	hashVEX         // AES instructions in VEX encodings, which need AVX
+)
+
 // Sum returns the hash of b under the key. From 128 bytes on, with AES
 // instructions, eight lanes of 16 bytes take b 128 bytes at a time, each
 // with an AES round whose round key is its 16 bytes, and last the rest of
@@ -30,15 +37,15 @@ func NewHashKey() *HashKey {
 // taken twice could undo a change to itself through the S-box. Otherwise
 // Sum is maphash.Bytes.
 func (h *HashKey) Sum(b []byte) uint64 {
-	if !haveAES || len(b) < 128 {
+	if hashKernel == hashNone || len(b) < 128 {
 		return maphash.Bytes(h.seed, b)
 	}
 	n := len(b) &^ 127
 	var tail [128]byte
 	copy(tail[:], b[n:])
-	return hashAES(&h.k, unsafe.SliceData(b), n, &tail, len(b))
+	return hashBlocks(&h.k, unsafe.SliceData(b), n, &tail, len(b))
 }
 
-// FastSum reports whether Sum reads long bytes with its AES kernel, which
+// FastSum reports whether Sum reads long bytes with an AES kernel, which
 // reads them faster than a check of JSON does.
-func FastSum() bool { return haveAES }
+func FastSum() bool { return hashKernel != hashNone }

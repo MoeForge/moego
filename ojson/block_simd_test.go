@@ -230,6 +230,9 @@ func refStates(s string, o int) []skipState {
 // TestSkipAVX2States ends the input after each whole block and compares the
 // depth, string and escape state skipAVX2 reports with refStates.
 func TestSkipAVX2States(t *testing.T) {
+	if !blockKernels() {
+		t.Skip("no block kernels")
+	}
 	r := rand.New(rand.NewSource(3))
 	for n := 0; n < randomIterations(20000); n++ {
 		doc, _ := randomDoc(r)
@@ -253,9 +256,14 @@ func TestSkipAVX2States(t *testing.T) {
 	}
 }
 
-// pathDotsRef is pathDots one byte at a time.
+// pathDotsRef is pathDots one byte at a time: the dots of a plain path
+// where the block kernels run, and 0 elsewhere, where getComp reads every
+// path.
 func pathDotsRef(path string) uint64 {
 	n := len(path)
+	if !blockKernels() {
+		return 0
+	}
 	if n < 16 || n >= 64 {
 		return 0
 	}
@@ -354,6 +362,9 @@ func TestMembersAVX2(t *testing.T) {
 			if got != want {
 				t.Fatalf("memberValue(%q, %d, %q) = %d, want %d", doc, i+1, key, got, want)
 			}
+			if !blockKernels() {
+				continue
+			}
 			v, at := membersFast(doc, i+1, key)
 			if v == membersSlow {
 				v, _ = memberScalar(doc, at, key, kw, km, -1)
@@ -387,6 +398,9 @@ func TestMembersAVX2NearKeys(t *testing.T) {
 					}
 					if got, _ := memberScalar(doc, 1, key, kw, km, -1); got != want {
 						t.Fatalf("memberScalar(%q, 1, %q) = %d, want %d", doc, key, got, want)
+					}
+					if !blockKernels() {
+						continue
 					}
 					v, at := membersFast(doc, 1, key)
 					if v == membersSlow {
