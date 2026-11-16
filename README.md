@@ -569,19 +569,18 @@ largest image is 6.8 megapixels.
 | | amd64 with AVX2 | arm64 with NEON |
 |---|---|---|
 | `base64` | Encoding, decoding and validation | Same as amd64 |
-| `json` | Scanning, validation and string quoting | Checking long strings for characters to escape, and validation in `Valid` and `Indent` |
+| `json` | Scanning, validation and string quoting | Same as amd64 |
 | `ojson` | Scanning and validation | Same as amd64 |
 | `regexp` | Literal and character-class searches | Same as amd64 |
 | `png` | Row filters, filter costs, pixel conversions and Adler-32 | Same as amd64 |
 | `webp` | Residuals, color transforms, cost lookups and pixel conversion | Residuals, subtract and add green and color transforms |
 
 Everything else runs without SIMD and returns the same results: on amd64
-CPUs without AVX2, on other architectures, in builds with `-tags purego`,
-and for the rest of the work of `json` on arm64. There `base64` calls
-`encoding/base64`, as it also does for custom alphabets and very short
-inputs, and the other packages run portable Go code. Speed was measured on
-linux/amd64 only; the arm64 and portable paths are tested for
-correctness.
+CPUs without AVX2, on other architectures, and in builds with
+`-tags purego`. There `base64` calls `encoding/base64`, as it also does
+for custom alphabets and very short inputs, and the other packages run
+portable Go code. Speed was measured on linux/amd64 only; the arm64 and
+portable paths are tested for correctness.
 
 ## Result buffers are not zeroed first
 

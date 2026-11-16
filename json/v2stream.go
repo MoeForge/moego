@@ -100,12 +100,14 @@ func (dec *Decoder) readValueV2(t *jsonsimd.Tables) (int, bool, error) {
 	dec.scan.bytes = dec.scanned + int64(dec.scanp)
 	whole := true // the scanner has not started
 	checked := 0  // with whole, the bytes validated so far
+	again := true // with whole, a read that did not double them may be validated once
 	scanp := dec.scanp
 	for {
 		if whole {
 			s := dec.buf[dec.scanp:]
 			whole = false
-			if (s[0] == '{' || s[0] == '[') && len(s) >= 2*checked {
+			if (s[0] == '{' || s[0] == '[') && (len(s) >= 2*checked || again && len(s) > checked) {
+				again = again && len(s) >= 2*checked
 				end := jsonsimd.ValidatePrefix(bytesView(s), maxNestingDepth, t)
 				if end >= 0 {
 					return end, true, nil

@@ -1743,7 +1743,7 @@ func appendShortString(dst []byte, s string, html bool) ([]byte, bool) {
 	// As jsonsimd.CopyShort, without a call to it: out has room for 32
 	// bytes from at, and the kernel reads 32 bytes from s, which must
 	// then be in its page.
-	if p := unsafe.StringData(s); jsonsimd.HaveCopyShort && n != 0 && (n >= 32 || uintptr(unsafe.Pointer(p))&4095 <= 4096-32) &&
+	if p := unsafe.StringData(s); jsonsimd.HaveCopyShort && n >= jsonsimd.CopyShortMin && (n >= 32 || uintptr(unsafe.Pointer(p))&4095 <= 4096-32) &&
 		jsonsimd.CopyShortFast(&out[at], p, n, html) {
 		out[at+n] = '"'
 		return out[:at+n+1], true

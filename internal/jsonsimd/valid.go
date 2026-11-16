@@ -1134,8 +1134,8 @@ func PlainRun(s string, i int, hi uint64) (int, uint64) {
 		}
 		hi |= w
 		i += 8
-		// Past 16 bytes, a longer run: find its end with SIMD.
-		if n++; n == 2 && HaveStrSkip && len(s)-i >= 32 {
+		// A longer run: find its end with SIMD.
+		if n++; n == strEndAfter && HaveStrSkip && len(s)-i >= 32 {
 			var h bool
 			if i, h = strEnd(s, i); h {
 				hi |= msb
@@ -1168,8 +1168,8 @@ func ScanString(s string, i int) (int, uint32) {
 			}
 			hi |= w
 			i += 8
-			// Past 16 bytes, a longer run: find its end with SIMD.
-			if n++; n == 2 && HaveStrSkip && len(s)-i >= 32 {
+			// A longer run: find its end with SIMD.
+			if n++; n == strEndAfter && HaveStrSkip && len(s)-i >= 32 {
 				var h bool
 				if i, h = strEnd(s, i); h {
 					flags |= SpanHigh

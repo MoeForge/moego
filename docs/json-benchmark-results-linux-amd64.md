@@ -272,11 +272,10 @@ Eight rows lead the closest competitor by less than 10%:
   built on `encoding/json/v2`. With Go 1.26 or earlier, or with
   `GOEXPERIMENT=nojsonv2`, `moego/json` follows the classic `encoding/json`,
   whose speed relative to `moego/json` has not been measured here.
-- On arm64 `moego/json` checks long strings for characters to escape, and
-  validates JSON in `Valid` and `Indent`, with NEON kernels, and uses
-  portable Go code for the rest; on amd64 CPUs without AVX2 and with
-  `-tags purego` it uses portable Go code instead of the AVX2 kernels. Its
-  speed in those cases has not been measured.
+- On arm64 `moego/json` uses NEON kernels where it uses AVX2 kernels on
+  amd64; on amd64 CPUs without AVX2 and with `-tags purego` it uses
+  portable Go code instead. Its speed in those cases has not been
+  measured.
 - The bodies are synthetic requests and responses with new-api's types.
   Real traffic differs in layout and size.
 

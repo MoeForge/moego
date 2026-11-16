@@ -18,6 +18,19 @@ const (
 	HaveZero        = false
 )
 
+// Where the kernels take over from the loops that read eight bytes at a
+// time.
+const (
+	// strEndAfter is the number of words of a string that PlainRun and
+	// ScanString read before strEnd looks for its end. The NEON kernel
+	// costs more to start than the AVX2 one: it pays from 128 bytes on.
+	strEndAfter = 16
+	// CopyShortMin is the length of the shortest string that package json
+	// copies with CopyShort's kernel. Below 16 bytes the words are faster
+	// than its masked store.
+	CopyShortMin = 16
+)
+
 // useAES is cpuAES less what LimitCPU dropped.
 var useAES = cpuAES
 

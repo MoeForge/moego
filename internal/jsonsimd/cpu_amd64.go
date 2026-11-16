@@ -20,6 +20,17 @@ var (
 	HaveZero        = HaveAVX2
 )
 
+// Where the kernels take over from the loops that read eight bytes at a
+// time.
+const (
+	// strEndAfter is the number of words of a string that PlainRun and
+	// ScanString read before strEnd looks for its end.
+	strEndAfter = 2
+	// CopyShortMin is the length of the shortest string that package json
+	// copies with CopyShort's kernel.
+	CopyShortMin = 1
+)
+
 // useAES and useAVX are cpuAES and cpuAVX less what LimitCPU dropped.
 var useAES, useAVX = cpuAES, cpuAVX
 

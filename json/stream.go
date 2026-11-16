@@ -128,7 +128,9 @@ func (dec *Decoder) InputOffset() int64 {
 //
 // While the value is an array or object and each read at least doubles
 // the data buffered, the data is checked with one validating pass from the
-// start of the value. Otherwise the scanner checks each byte once. Either
+// start of the value, and so is the first read that does not double it:
+// that is often the last one of a reader that has all its data. Otherwise
+// the scanner checks each byte once. Either
 // way every buffered byte is checked before the next read, so a syntax
 // error is reported as soon as it is read.
 func (dec *Decoder) readValue(t *jsonsimd.Tables) (int, bool, error) {
@@ -136,6 +138,7 @@ func (dec *Decoder) readValue(t *jsonsimd.Tables) (int, bool, error) {
 	startBytes := dec.scan.bytes
 	whole := true // the scanner has not started
 	checked := 0  // with whole, the bytes validated so far
+	again := true // with whole, a read that did not double them may be validated once
 	scanp := dec.scanp
 	var err error
 	for {
@@ -148,7 +151,8 @@ func (dec *Decoder) readValue(t *jsonsimd.Tables) (int, bool, error) {
 			switch {
 			case k == len(s) && err == nil:
 				// Only space so far.
-			case k < len(s) && (s[k] == '{' || s[k] == '[') && len(s) >= 2*checked:
+			case k < len(s) && (s[k] == '{' || s[k] == '[') && (len(s) >= 2*checked || again && len(s) > checked):
+				again = again && len(s) >= 2*checked
 				end := jsonsimd.ValidatePrefix(bytesView(s), maxNestingDepth, t)
 				if end >= 0 {
 					dec.scan.bytes += int64(end)

@@ -175,7 +175,7 @@ Go 1.27 的 `encoding/json` 基于 `encoding/json/v2` 实现，`moego/json` 给�
 
 - 只测了一台 KVM 虚拟机，结果只代表这台机器；缓存大小和内存带宽不同的其他 CPU，结果可能不同。
 - 只测了 linux/amd64 上的 Go 1.27.3，这时 `encoding/json` 基于 `encoding/json/v2` 实现。在 Go 1.26 及更早版本上，或设置 `GOEXPERIMENT=nojsonv2` 时，`moego/json` 跟随经典的 `encoding/json`，这里没有测量两者在那种情况下的速度对比。
-- 在 arm64 上，`moego/json` 检查长字符串里要转义的字符，以及 `Valid` 和 `Indent` 校验 JSON 时，用 NEON 内核，其余用可移植的 Go 代码；在不支持 AVX2 的 amd64 CPU 上，以及使用 `-tags purego` 时，用可移植的 Go 代码代替 AVX2 内核。这些情况下的速度没有测量。
+- 在 arm64 上，`moego/json` 在 amd64 用 AVX2 内核的地方用 NEON 内核；在不支持 AVX2 的 amd64 CPU 上，以及使用 `-tags purego` 时，用可移植的 Go 代码代替。这些情况下的速度没有测量。
 - 请求体是按 new-api 类型合成的请求和响应，真实流量的排版和大小会有所不同。
 
 ## 复现

@@ -18,6 +18,17 @@ const (
 	HaveZero        = false
 )
 
+// Where the kernels take over from the loops that read eight bytes at a
+// time.
+const (
+	// strEndAfter is the number of words of a string that PlainRun and
+	// ScanString read before strEnd looks for its end. No kernel runs here.
+	strEndAfter = 2
+	// CopyShortMin is the length of the shortest string that package json
+	// copies with CopyShort's kernel.
+	CopyShortMin = 1
+)
+
 // LimitCPU does nothing but check drop: no kernel here needs the features
 // it names.
 func LimitCPU(drop string) (undo func()) {
