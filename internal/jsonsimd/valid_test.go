@@ -119,7 +119,7 @@ func tablesOf(s string, blocks bool) (bool, Tables) {
 	var t Tables
 	var ok bool
 	if blocks {
-		ok = validateBlocks(s, 10000, resetTables(&t, len(s)), nil, nil)
+		ok = validateBlocks[blocksPlain](s, 10000, resetTables(&t, len(s)), nil, nil, nil)
 	} else {
 		ok = validateScalar(s, 10000, resetTables(&t, len(s)), nil, nil)
 	}
@@ -785,7 +785,7 @@ func BenchmarkValidate(b *testing.B) {
 		b.Run(d.name+"/blocks", func(b *testing.B) {
 			b.SetBytes(int64(len(d.doc)))
 			for i := 0; i < b.N; i++ {
-				validateBlocks(d.doc, 10000, resetTables(&t, len(d.doc)), nil, nil)
+				validateBlocks[blocksPlain](d.doc, 10000, resetTables(&t, len(d.doc)), nil, nil, nil)
 			}
 		})
 		b.Run(d.name+"/scalar", func(b *testing.B) {
@@ -797,7 +797,7 @@ func BenchmarkValidate(b *testing.B) {
 		b.Run(d.name+"/blocks-notab", func(b *testing.B) {
 			b.SetBytes(int64(len(d.doc)))
 			for i := 0; i < b.N; i++ {
-				validateBlocks(d.doc, 10000, nil, nil, nil)
+				validateBlocks[blocksPlain](d.doc, 10000, nil, nil, nil, nil)
 			}
 		})
 		b.Run(d.name+"/lean", func(b *testing.B) {

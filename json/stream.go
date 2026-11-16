@@ -3,6 +3,7 @@ package json
 import (
 	"bytes"
 	"io"
+	"sync"
 
 	"github.com/MoeForge/moego/internal/jsonsimd"
 )
@@ -126,19 +127,18 @@ func (dec *Decoder) InputOffset() int64 {
 // readValue reads a whole JSON value into dec.buf and returns its length
 // from dec.scanp. It reports whether t holds the tables of the value.
 //
-// While the value is an array or object and each read at least doubles
-// the data buffered, the data is checked with one validating pass from the
-// start of the value, and so is the first read that does not double it:
-// that is often the last one of a reader that has all its data. Otherwise
-// the scanner checks each byte once. Either
-// way every buffered byte is checked before the next read, so a syntax
-// error is reported as soon as it is read.
+// While the value is an array or object, the data is checked after each
+// read with a validating pass, except after a read that gives fewer than
+// 64 bytes and does not double the data. From the third pass on, a pass
+// goes on from where the pass before it stopped. Otherwise the scanner
+// checks each byte once. Either way every buffered byte is checked before
+// the next read, so a syntax error is reported as soon as it is read.
 func (dec *Decoder) readValue(t *jsonsimd.Tables) (int, bool, error) {
 	dec.scan.reset()
 	startBytes := dec.scan.bytes
 	whole := true // the scanner has not started
 	checked := 0  // with whole, the bytes validated so far
-	again := true // with whole, a read that did not double them may be validated once
+	var ps *jsonsimd.PrefixState
 	scanp := dec.scanp
 	var err error
 	for {
@@ -151,20 +151,27 @@ func (dec *Decoder) readValue(t *jsonsimd.Tables) (int, bool, error) {
 			switch {
 			case k == len(s) && err == nil:
 				// Only space so far.
-			case k < len(s) && (s[k] == '{' || s[k] == '[') && (len(s) >= 2*checked || again && len(s) > checked):
-				again = again && len(s) >= 2*checked
-				end := jsonsimd.ValidatePrefix(bytesView(s), maxNestingDepth, t)
+			case k < len(s) && (s[k] == '{' || s[k] == '[') && morePrefix(len(s), checked):
+				end := validatePrefix(bytesView(s), t, ps)
 				if end >= 0 {
+					putPrefixState(ps)
 					dec.scan.bytes += int64(end)
 					return end, true, nil
 				}
 				if end == jsonsimd.PrefixIncomplete && err == nil {
 					checked = len(s)
+					if ps == nil {
+						ps = getPrefixState()
+					}
 					break
 				}
 				whole = false
 			default:
 				whole = false
+			}
+			if !whole {
+				putPrefixState(ps)
+				ps = nil
 			}
 		}
 		if !whole {
@@ -196,6 +203,9 @@ func (dec *Decoder) readValue(t *jsonsimd.Tables) (int, bool, error) {
 		if len(dec.buf)-dec.scanp >= streamTrigger && !dec.noLarge {
 			if rs, ok := dec.r.(io.ReadSeeker); ok && startsLarge(dec.buf[dec.scanp:]) {
 				ok, lerr := dec.checkLarge(rs)
+				if ok || lerr != nil {
+					putPrefixState(ps)
+				}
 				if ok {
 					// decodeLarge counts the bytes of the value.
 					dec.scan.bytes = startBytes
@@ -208,6 +218,47 @@ func (dec *Decoder) readValue(t *jsonsimd.Tables) (int, bool, error) {
 		}
 		err = dec.refill()
 		scanp = dec.scanp + n
+	}
+}
+
+// morePrefix reports whether readValue validates the n bytes of a value
+// that it validated checked of before: at first, and then after a read
+// that gave at least 64 bytes or doubled them.
+func morePrefix(n, checked int) bool {
+	return checked == 0 || n-checked >= 64 || n >= 2*checked
+}
+
+// validatePrefix validates the value at the start of s as
+// jsonsimd.ValidatePrefix does and, with ps not nil, keeps in ps where it
+// stopped, to go on from there in the next call with ps.
+func validatePrefix(s string, t *jsonsimd.Tables, ps *jsonsimd.PrefixState) int {
+	if ps == nil {
+		return jsonsimd.ValidatePrefix(s, maxNestingDepth, t)
+	}
+	return jsonsimd.ValidatePrefixMore(s, maxNestingDepth, t, ps)
+}
+
+// prefixStates holds the states in which validatePrefix keeps where it
+// stopped in a value that the buffered data cuts. A value that one read
+// gives needs none.
+var prefixStates sync.Pool
+
+// getPrefixState returns a state that holds nothing, or nil when the
+// validation cannot go on from where it stopped.
+func getPrefixState() *jsonsimd.PrefixState {
+	if !jsonsimd.HaveValidBlocks {
+		return nil
+	}
+	if p, _ := prefixStates.Get().(*jsonsimd.PrefixState); p != nil {
+		*p = jsonsimd.PrefixState{}
+		return p
+	}
+	return new(jsonsimd.PrefixState)
+}
+
+func putPrefixState(p *jsonsimd.PrefixState) {
+	if p != nil {
+		prefixStates.Put(p)
 	}
 }
 

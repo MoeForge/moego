@@ -52,6 +52,33 @@ type Tables struct {
 	lean   leanScratch
 }
 
+// A PrefixState is where ValidatePrefixMore stopped in a value that s cut,
+// at the start of a block, for its next call to go on from: the label of
+// validateBlocks, its variables, and the state of its blocks there.
+type PrefixState struct {
+	on                        bool
+	at                        uint8
+	depth, entry              int
+	cur, top                  uint64
+	n                         uint32
+	ncont, nspans             int
+	next, strStart            int
+	inStr, escNext, otherLast uint64
+	strFlags                  uint32
+	frames                    [TrackDepth + 1]frame
+}
+
+// The labels of validateBlocks that it stops at to read a block.
+const (
+	atValue = iota + 1
+	atComma
+	atValueOrEnd
+	atKeyOrEnd
+	atKey
+	atColon
+	atAfter
+)
+
 // maxContainers bounds the container entries recorded for n input bytes.
 func maxContainers(n int) int { return n/4 + 64 }
 
@@ -71,7 +98,7 @@ func Validate(s string, maxDepth int, t *Tables) bool {
 			}
 			return validateScalar(s, maxDepth, nil, nil, nil)
 		}
-		return validateBlocks(s, maxDepth, t, nil, nil)
+		return validateBlocks[blocksPlain](s, maxDepth, t, nil, nil, nil)
 	}
 	if plainMasks && t == nil && len(s) >= 64 && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
 		if r := validatePlain(s); r != leanDeep {
@@ -216,16 +243,40 @@ const (
 // with t filled as Validate fills it for s[:end]. Otherwise it returns
 // PrefixIncomplete when s ends inside a value that is valid so far, or
 // PrefixInvalid. What follows the value does not matter, except that a
-// malformed string after it in the same 512 bytes gives PrefixInvalid,
-// and a number, literal or escape cut by the end of s may too.
+// malformed string after it in the same 512 bytes gives PrefixInvalid.
+// Without HaveValidBlocks, and for s of fewer than 64 bytes, a value that
+// s cuts gives PrefixInvalid too.
 func ValidatePrefix(s string, maxDepth int, t *Tables) int {
+	return validatePrefix(s, maxDepth, t, nil)
+}
+
+// ValidatePrefixMore is ValidatePrefix that keeps in p where it stopped
+// in a value that s cuts. When p holds that of its last call with t, for
+// an s that this s starts with, it goes on from there instead of from the
+// start of s. maxDepth must be the same in each call, and t must not be
+// used in between. A zero p holds nothing.
+func ValidatePrefixMore(s string, maxDepth int, t *Tables, p *PrefixState) int {
+	if !p.on || t == nil || uint64(len(s)) >= math.MaxUint32 {
+		return validatePrefix(s, maxDepth, t, p)
+	}
+	end := PrefixInvalid
+	validateBlocks[blocksResume](s, maxDepth, t, &end, nil, p)
+	return end
+}
+
+// validatePrefix is ValidatePrefix, which keeps in p, when not nil, where
+// it stopped.
+func validatePrefix(s string, maxDepth int, t *Tables, p *PrefixState) int {
+	if p != nil {
+		p.on = false
+	}
 	t = resetTables(t, len(s))
 	end := PrefixInvalid
 	if i := skipSpace(s, 0); i == len(s) || s[i] != '{' && s[i] != '[' {
 		return PrefixInvalid
 	}
 	if HaveValidBlocks && len(s) >= 64 {
-		validateBlocks(s, maxDepth, t, &end, nil)
+		validateBlocks[blocksResume](s, maxDepth, t, &end, nil, p)
 	} else {
 		validateScalar(s, maxDepth, t, &end, nil)
 	}
@@ -266,7 +317,10 @@ type vblocks struct {
 	s    string
 	next int // the start of the next block
 	k, n int // the next of the n blocks in masks
-	bad  bool
+	// lim is where the blocks stop for now: len(s), or for a prefix the
+	// last block boundary at least four bytes before it, until
+	// validateBlocks moves it.
+	lim int
 	// At the end of the last block read: all ones inside a string, 1 when
 	// the next byte is escaped, and 1 when the last byte was part of a value
 	// other than a string or container.
@@ -278,14 +332,18 @@ type vblocks struct {
 	spans    *[]Span
 	strStart int
 	strFlags uint32
-	masks    [validBatch]vmask
-	his      [validBatch]uint64 // the bytes of 0x80 and up in each block
-	tail     [64]byte
+	bad      bool
+	// cut is set when the end of s may cut the value: an escape that it
+	// cuts is not checked.
+	cut   bool
+	masks [validBatch]vmask
+	his   [validBatch]uint64 // the bytes of 0x80 and up in each block
+	tail  [64]byte
 }
 
 // reset prepares v to read s, leaving its buffers as they are.
 func (v *vblocks) reset(s string) {
-	v.s, v.next, v.k, v.n, v.bad = s, 0, 0, 0, false
+	v.s, v.next, v.k, v.n, v.lim, v.bad, v.cut = s, 0, 0, 0, len(s), false, false
 	v.inStr, v.escNext, v.otherLast, v.wsOut = 0, 0, 0, 0
 	v.spans, v.strStart, v.strFlags = nil, 0, 0
 }
@@ -297,22 +355,22 @@ func (v *vblocks) block() (uint64, int) {
 	s := v.s
 	for {
 		if v.k == v.n {
-			if v.next >= len(s) {
+			if v.next >= v.lim {
 				return 0, 0
 			}
-			if v.inStr != 0 && v.escNext == 0 && len(s)-v.next >= 64 {
+			if v.inStr != 0 && v.escNext == 0 && v.lim-v.next >= 64 {
 				// Inside a string, only a quote, a backslash or a control
 				// byte matters: skip the blocks that hold none.
-				p, hi := strSkip(s, v.next)
+				p, hi := strSkip(s[:v.lim], v.next)
 				if hi {
 					v.strFlags |= SpanHigh
 				}
 				v.next = p
-				if p >= len(s) {
+				if p >= v.lim {
 					return 0, 0
 				}
 			}
-			v.k, v.n = 0, validMasks(s, v.next, &v.masks, &v.tail, &v.his)
+			v.k, v.n = 0, validMasks(s[:v.lim], v.next, &v.masks, &v.tail, &v.his)
 		}
 		m := &v.masks[v.k]
 		base := v.next
@@ -325,7 +383,11 @@ func (v *vblocks) block() (uint64, int) {
 			e, v.escNext = escapes(m.bslash, v.escNext)
 			q &^= e
 			r = prefixXor(q) ^ v.inStr
-			if !validEscapes(s, base, e&r, m, carried) {
+			ev := e & r
+			if v.cut && len(s)-base < 64+4 {
+				ev = cutEscapes(s, base, ev)
+			}
+			if !validEscapes(s, base, ev, m, carried) {
 				v.bad = true
 				return 0, 0
 			}
@@ -411,17 +473,29 @@ type frame struct {
 // that end where a delimiter follows. The loop calls out only to read a
 // block, so that its variables stay in registers.
 //
-// With end not nil, it stops at the end of the first top-level value,
-// which must be an array or object, and sets *end. With spaced not nil, it
-// reports there whether s holds whitespace outside strings.
-func validateBlocks(s string, maxDepth int, t *Tables, end *int, spaced *bool) bool {
+// With spaced not nil, it reports there whether s holds whitespace
+// outside strings.
+//
+// With M blocksResume and end not nil, it is ValidatePrefix: it stops at
+// the end of the first top-level value, which must be an array or object,
+// and sets *end, and a value that s cuts is incomplete when what s holds
+// of it is valid, even a number, literal or escape cut short. With ps and
+// t not nil too, it then keeps in ps where it was at a block boundary near
+// the end of s, and goes on from there when ps is set on entry. With M
+// blocksPlain, which serves Validate, end and ps must be nil.
+func validateBlocks[M blocksMode](s string, maxDepth int, t *Tables, end *int, spaced *bool, ps *PrefixState) bool {
+	var mode M
+	resume := uint16(^mode) == math.MaxUint16 // a constant in each instance
+	// prefix is whether the call is for ValidatePrefix, which only the
+	// code of blocksResume serves.
+	prefix := resume && end != nil
 	var v *vblocks
 	var frames *[TrackDepth + 1]frame
 	if t != nil {
 		v, frames = &t.vb, &t.frames
 		v.reset(s)
 	} else {
-		v = &vblocks{s: s}
+		v = &vblocks{s: s, lim: len(s), cut: prefix}
 	}
 	limit := maxDepth
 	if limit <= 0 || limit > blockMaxDepth {
@@ -442,15 +516,31 @@ func validateBlocks(s string, maxDepth int, t *Tables, end *int, spaced *bool) b
 	var cont []Container
 	entry, maxCont := -1, 0
 	var n uint32
+	// at is the label where the blocks stopped, one of atValue and on.
+	var at uint8
 	if t != nil {
 		cont, maxCont = t.Containers, maxContainers(len(s))
 		v.spans = &t.Spans
+		v.cut = prefix
+		if prefix && ps != nil {
+			// Stop first at the last block boundary at least four
+			// bytes before the end of s: where the value is there can
+			// be kept in ps, as the blocks before it have the four hex
+			// digits of a \u escape at their end.
+			v.lim = max(len(s)-4, 0) &^ 63
+			if ps.on {
+				at, depth, entry, cur, top, n = ps.restore(t, frames, v)
+				cont = t.Containers
+				goto dispatch
+			}
+		}
 	}
 
 	// Each label first reads the next structural byte into c at s[i].
 value:
 	for st == 0 {
 		if st, base = v.block(); st == 0 {
+			at = atValue
 			goto eof
 		}
 	}
@@ -511,6 +601,9 @@ valueAt:
 		// The integer part: one digit, or digits that do not start with 0.
 		nd := nonDigits(x)
 		if nd&0x80 != 0 || byte(x) == '0' && nd&0x8000 == 0 {
+			if j >= len(s) && prefix {
+				goto cut
+			}
 			goto done
 		}
 		for nd == 0 {
@@ -525,6 +618,9 @@ valueAt:
 			j++
 			x = vload(s, j)
 			if nd = nonDigits(x); nd&0x80 != 0 {
+				if j >= len(s) && prefix {
+					goto cut
+				}
 				goto done
 			}
 			for nd == 0 {
@@ -542,6 +638,9 @@ valueAt:
 				x = vload(s, j)
 			}
 			if nd = nonDigits(x); nd&0x80 != 0 {
+				if j >= len(s) && prefix {
+					goto cut
+				}
 				goto done
 			}
 			for nd == 0 {
@@ -553,16 +652,25 @@ valueAt:
 		}
 	case c == 't':
 		if uint32(x) != 't'|'r'<<8|'u'<<16|'e'<<24 {
+			if prefix && cutLiteral(s, i, "true") {
+				goto cut
+			}
 			goto done
 		}
 		x >>= 32
 	case c == 'f':
 		if x&(1<<40-1) != 'f'|'a'<<8|'l'<<16|'s'<<24|'e'<<32 {
+			if prefix && cutLiteral(s, i, "false") {
+				goto cut
+			}
 			goto done
 		}
 		x >>= 40
 	case c == 'n':
 		if uint32(x) != 'n'|'u'<<8|'l'<<16|'l'<<24 {
+			if prefix && cutLiteral(s, i, "null") {
+				goto cut
+			}
 			goto done
 		}
 		x >>= 32
@@ -573,7 +681,8 @@ valueAt:
 		// The comma is the next structural byte: take it here.
 		for st == 0 {
 			if st, base = v.block(); st == 0 {
-				goto done
+				at = atComma
+				goto eof
 			}
 		}
 		st &= st - 1
@@ -584,9 +693,23 @@ valueAt:
 	}
 	goto after
 
+commaNext:
+	// As after a number or literal above, for ValidatePrefixMore to go on
+	// from: the next structural byte is the comma that follows one. The
+	// loop above stays in place, where it is fastest.
+	for st == 0 {
+		if st, base = v.block(); st == 0 {
+			at = atComma
+			goto eof
+		}
+	}
+	st &= st - 1
+	goto comma
+
 valueOrEnd:
 	for st == 0 {
 		if st, base = v.block(); st == 0 {
+			at = atValueOrEnd
 			goto eof
 		}
 	}
@@ -601,6 +724,7 @@ valueOrEnd:
 keyOrEnd:
 	for st == 0 {
 		if st, base = v.block(); st == 0 {
+			at = atKeyOrEnd
 			goto eof
 		}
 	}
@@ -615,6 +739,7 @@ keyOrEnd:
 key:
 	for st == 0 {
 		if st, base = v.block(); st == 0 {
+			at = atKey
 			goto eof
 		}
 	}
@@ -624,8 +749,10 @@ keyAt:
 	if c != '"' {
 		goto done
 	}
+colon:
 	for st == 0 {
 		if st, base = v.block(); st == 0 {
+			at = atColon
 			goto eof
 		}
 	}
@@ -639,7 +766,8 @@ keyAt:
 after:
 	for st == 0 {
 		if st, base = v.block(); st == 0 {
-			if end != nil {
+			if prefix {
+				at = atAfter
 				goto eof
 			}
 			ok = !v.bad && depth == 0 && v.inStr == 0
@@ -680,15 +808,34 @@ pop:
 			cur = stack[d>>6]
 		}
 		top = cur >> uint(d&63) & 1
-	} else if end != nil {
+	} else if prefix {
 		*end, ok = i+1, true
 		goto done
 	}
 	goto after
 
 eof:
-	// The input ended, or a string in the last block read is not valid.
-	if end != nil && !v.bad {
+	// The input ended, a string in the last block read is not valid, or
+	// the blocks stopped at v.lim, before the last block of s.
+	if prefix && ps != nil && !v.bad && v.lim < len(s) {
+		if v.next <= v.lim && depth < 64 && len(cont) < maxCont {
+			// Keep where the value is, to go on from here in a longer
+			// s. Past v.lim an escape or a block padded with spaces may
+			// be cut. With as many containers as the tables take for
+			// this s, one call on a longer s would take more.
+			ps.save(at, depth, entry, cur, top, n, len(cont), t, frames, v)
+		}
+		// Read the rest too, so that all of s is checked.
+		v.lim = len(s)
+		goto dispatch
+	}
+	if prefix && !v.bad {
+		*end = PrefixIncomplete
+	}
+	goto done
+cut:
+	// A number or literal that the end of s cuts, valid so far.
+	if !v.bad {
 		*end = PrefixIncomplete
 	}
 done:
@@ -699,6 +846,72 @@ done:
 		*spaced = v.wsOut != 0
 	}
 	return ok
+
+dispatch:
+	// Go on reading blocks where they stopped.
+	switch at {
+	case atValue:
+		goto value
+	case atComma:
+		goto commaNext
+	case atValueOrEnd:
+		goto valueOrEnd
+	case atKeyOrEnd:
+		goto keyOrEnd
+	case atKey:
+		goto key
+	case atColon:
+		goto colon
+	}
+	goto after
+}
+
+// blocksMode is the mode validateBlocks is compiled for: blocksPlain for
+// Validate, or blocksResume for ValidatePrefix. The two are of different
+// sizes, so each has code of its own, and that of blocksPlain leaves out
+// the checks for a value cut short and the paths that go back into the
+// grammar from a PrefixState, which would make the loop slower.
+type blocksMode interface{ ~uint8 | ~uint16 }
+
+type (
+	blocksPlain  uint8
+	blocksResume uint16
+)
+
+// save keeps in p where validateBlocks stopped: at the label at, with its
+// variables, the first ncont containers of t and the frames, and the state
+// of the blocks of v. It is out of line to keep validateBlocks small.
+//
+//go:noinline
+func (p *PrefixState) save(at uint8, depth, entry int, cur, top uint64, n uint32, ncont int, t *Tables, frames *[TrackDepth + 1]frame, v *vblocks) {
+	p.on, p.at, p.depth, p.entry, p.cur, p.top, p.n = true, at, depth, entry, cur, top, n
+	p.ncont, p.nspans = ncont, len(t.Spans)
+	copy(p.frames[:], frames[:min(depth, TrackDepth+1)])
+	p.next, p.inStr, p.escNext, p.otherLast = v.next, v.inStr, v.escNext, v.otherLast
+	p.strStart, p.strFlags = v.strStart, v.strFlags
+}
+
+// restore sets t, the frames and the blocks of v back to where p holds
+// that validateBlocks stopped, and returns the label and the variables
+// there. p then holds nothing.
+//
+//go:noinline
+func (p *PrefixState) restore(t *Tables, frames *[TrackDepth + 1]frame, v *vblocks) (at uint8, depth, entry int, cur, top uint64, n uint32) {
+	p.on = false
+	t.Containers = t.Containers[:p.ncont]
+	t.Spans = t.Spans[:p.nspans]
+	copy(frames[:], p.frames[:min(p.depth, TrackDepth+1)])
+	v.next, v.inStr, v.escNext, v.otherLast = p.next, p.inStr, p.escNext, p.otherLast
+	v.strStart, v.strFlags = p.strStart, p.strFlags
+	return p.at, p.depth, p.entry, p.cur, p.top, p.n
+}
+
+// cutLiteral reports whether s from i, at a literal, is the start of lit
+// that the end of s cuts. It is out of line to keep validateBlocks small.
+//
+//go:noinline
+func cutLiteral(s string, i int, lit string) bool {
+	return len(s)-i < len(lit) && s[i:] == lit[:len(s)-i]
 }
 
 // validScalar reports whether the number or literal at s[i] is valid and
@@ -871,6 +1084,30 @@ func hex4(s string, i int) bool {
 		}
 	}
 	return true
+}
+
+// cutEscapes drops from ev, the escaped bytes of the block of s at
+// s[base:], those of escapes that the end of s cuts while what they have
+// is valid: a byte past the end, and a 'u' with fewer than four bytes
+// after it, all hex digits. Such an escape may go on in a longer s.
+func cutEscapes(s string, base int, ev uint64) uint64 {
+	n := len(s) - base
+	if n < 64 {
+		ev &= 1<<uint(n) - 1
+	}
+	for p := max(n-4, 0); p < min(n, 64); p++ {
+		if ev>>uint(p)&1 == 0 || s[base+p] != 'u' {
+			continue
+		}
+		ok := true
+		for _, c := range []byte(s[base+p+1:]) {
+			ok = ok && hexVal[c] >= 0
+		}
+		if ok {
+			ev &^= 1 << uint(p)
+		}
+	}
+	return ev
 }
 
 // hexVal maps hexadecimal digits to their value and other bytes to -1.
