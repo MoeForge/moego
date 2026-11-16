@@ -192,3 +192,181 @@ write_done:
     MOVD R3, ret+64(FP)
     MOVD R4, ret1+72(FP)
     RET
+
+// PLAIN_STOP_CMGT marks in dst (0xff/0x00) quotes, control bytes, >= 0x80,
+// and backslashes of src using V17=0x5c, V25=0x02, V26=0x21. Clobbers t.
+#define PLAIN_STOP_CMGT(src, dst, t, cmgt_word) \
+    VEOR V25.B16, src.B16, dst.B16; \
+    WORD $cmgt_word; \
+    VCMEQ V17.B16, src.B16, t.B16; \
+    VORR t.B16, dst.B16, dst.B16
+
+// PLAIN_HTML adds '<', '>', '&' (in V20..V22, zero when !html) to dst. Clobbers t.
+#define PLAIN_HTML(src, dst, t) \
+    VCMEQ V20.B16, src.B16, t.B16; \
+    VORR t.B16, dst.B16, dst.B16; \
+    VCMEQ V21.B16, src.B16, t.B16; \
+    VORR t.B16, dst.B16, dst.B16; \
+    VCMEQ V22.B16, src.B16, t.B16; \
+    VORR t.B16, dst.B16, dst.B16
+
+// func copyPlainNEON(dst, src *byte, n int, html bool) int
+//
+// Copies the 64-byte blocks of src[:n] to dst while no byte of a block
+// needs an escape, quotes and backslashes included, and returns the length
+// copied.
+TEXT ·copyPlainNEON(SB), NOSPLIT, $0-40
+    MOVD dst+0(FP), R0
+    MOVD src+8(FP), R1
+    MOVD n+16(FP), R2
+    MOVBU html+24(FP), R3
+    MOVD $0, R4
+    VMOVI $0x5c, V17.B16
+    VMOVI $0x02, V25.B16
+    VMOVI $0x21, V26.B16
+    VEOR V20.B16, V20.B16, V20.B16
+    VEOR V21.B16, V21.B16, V21.B16
+    VEOR V22.B16, V22.B16, V22.B16
+    CBZ R3, plain_block
+    VMOVI $0x3c, V20.B16
+    VMOVI $0x3e, V21.B16
+    VMOVI $0x26, V22.B16
+
+plain_block:
+    ADD $64, R4, R5
+    CMP R2, R5
+    BHI plain_done
+    ADD R4, R1, R6
+    VLD1 (R6), [V0.B16, V1.B16, V2.B16, V3.B16]
+    PLAIN_STOP_CMGT(V0, V4, V8, 0x4e243744)
+    PLAIN_STOP_CMGT(V1, V5, V8, 0x4e253745)
+    PLAIN_STOP_CMGT(V2, V6, V8, 0x4e263746)
+    PLAIN_STOP_CMGT(V3, V7, V8, 0x4e273747)
+    CBZ R3, plain_check
+    PLAIN_HTML(V0, V4, V8)
+    PLAIN_HTML(V1, V5, V8)
+    PLAIN_HTML(V2, V6, V8)
+    PLAIN_HTML(V3, V7, V8)
+
+plain_check:
+    VORR V5.B16, V4.B16, V4.B16
+    VORR V7.B16, V6.B16, V6.B16
+    VORR V6.B16, V4.B16, V4.B16
+    WORD $0x6e30a884            // UMAXV B4, V4.16B
+    VMOV V4.B[0], R7
+    CBNZ R7, plain_done
+    ADD R4, R0, R6
+    VST1 [V0.B16, V1.B16, V2.B16, V3.B16], (R6)
+    ADD $64, R4, R4
+    B plain_block
+
+plain_done:
+    MOVD R4, ret+32(FP)
+    RET
+
+// func CopyShortNEON(dst, src *byte, n int, html bool) bool
+//
+// Copies src[:n], 0 < n < 64, to dst when no byte of it needs an escape
+// in a JSON string, and reports whether it did; or reports false. Under
+// 32 bytes, src must have 32 bytes in its page and dst must have room for
+// 32 bytes.
+TEXT ·CopyShortNEON(SB), NOSPLIT, $0-33
+    MOVD dst+0(FP), R0
+    MOVD src+8(FP), R1
+    MOVD n+16(FP), R2
+    MOVBU html+24(FP), R3
+    VMOVI $0x5c, V17.B16
+    VMOVI $0x02, V25.B16
+    VMOVI $0x21, V26.B16
+    VEOR V20.B16, V20.B16, V20.B16
+    VEOR V21.B16, V21.B16, V21.B16
+    VEOR V22.B16, V22.B16, V22.B16
+    CBZ R3, short_dispatch
+    VMOVI $0x3c, V20.B16
+    VMOVI $0x3e, V21.B16
+    VMOVI $0x26, V22.B16
+
+short_dispatch:
+    CMP $32, R2
+    BLO short_mid
+    // 32 <= n < 64: two overlapping 32-byte halves.
+    VLD1 (R1), [V0.B16, V1.B16]
+    ADD R2, R1, R5
+    SUB $32, R5, R5
+    VLD1 (R5), [V2.B16, V3.B16]
+    PLAIN_STOP_CMGT(V0, V4, V8, 0x4e243744)
+    PLAIN_STOP_CMGT(V1, V5, V8, 0x4e253745)
+    PLAIN_STOP_CMGT(V2, V6, V8, 0x4e263746)
+    PLAIN_STOP_CMGT(V3, V7, V8, 0x4e273747)
+    CBZ R3, short_check32
+    PLAIN_HTML(V0, V4, V8)
+    PLAIN_HTML(V1, V5, V8)
+    PLAIN_HTML(V2, V6, V8)
+    PLAIN_HTML(V3, V7, V8)
+
+short_check32:
+    VORR V5.B16, V4.B16, V4.B16
+    VORR V7.B16, V6.B16, V6.B16
+    VORR V6.B16, V4.B16, V4.B16
+    WORD $0x6e30a884            // UMAXV B4, V4.16B
+    VMOV V4.B[0], R7
+    CBNZ R7, short_fail
+    VST1 [V0.B16, V1.B16], (R0)
+    ADD R2, R0, R5
+    SUB $32, R5, R5
+    VST1 [V2.B16, V3.B16], (R5)
+    MOVD $1, R7
+    MOVB R7, ret+32(FP)
+    RET
+
+short_mid:
+    CMP $16, R2
+    BLO short_small
+    // 16 <= n < 32: two overlapping 16-byte halves.
+    VLD1 (R1), [V0.B16]
+    ADD R2, R1, R5
+    SUB $16, R5, R5
+    VLD1 (R5), [V1.B16]
+    PLAIN_STOP_CMGT(V0, V4, V8, 0x4e243744)
+    PLAIN_STOP_CMGT(V1, V5, V8, 0x4e253745)
+    CBZ R3, short_check16
+    PLAIN_HTML(V0, V4, V8)
+    PLAIN_HTML(V1, V5, V8)
+
+short_check16:
+    VORR V5.B16, V4.B16, V4.B16
+    WORD $0x6e30a884            // UMAXV B4, V4.16B
+    VMOV V4.B[0], R7
+    CBNZ R7, short_fail
+    VST1 [V0.B16], (R0)
+    ADD R2, R0, R5
+    SUB $16, R5, R5
+    VST1 [V1.B16], (R5)
+    MOVD $1, R7
+    MOVB R7, ret+32(FP)
+    RET
+
+short_small:
+    // 1 <= n < 16: single 16-byte load, masked via 4-bit nibbles.
+    VLD1 (R1), [V0.B16]
+    PLAIN_STOP_CMGT(V0, V4, V8, 0x4e243744)
+    CBZ R3, short_check_small
+    PLAIN_HTML(V0, V4, V8)
+
+short_check_small:
+    WORD $0x0f0c8484            // SHRN V4.8B, V4.8H, #4
+    VMOV V4.D[0], R4
+    MOVD $-1, R6
+    MOVD $64, R7
+    SUB R2<<2, R7, R7
+    LSR R7, R6, R6
+    TST R6, R4
+    BNE short_fail
+    VST1 [V0.B16], (R0)
+    MOVD $1, R7
+    MOVB R7, ret+32(FP)
+    RET
+
+short_fail:
+    MOVB $0, ret+32(FP)
+    RET

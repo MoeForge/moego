@@ -275,7 +275,7 @@ func inHeap(p unsafe.Pointer) {
 // them: the target was usually just cleared, and comparing it with zeroed
 // memory elsewhere would read that too.
 func isZeroMem(p unsafe.Pointer, n uintptr) bool {
-	if jsonsimd.HaveAVX2 && n >= 32 {
+	if jsonsimd.HaveZero && n >= 32 {
 		return jsonsimd.ZeroAVX2(p, n)
 	}
 	var x uint64
@@ -539,7 +539,7 @@ const restMax = 2 << 10
 // the ends of the values at this depth, which skip reads instead of the
 // input.
 func (d *decodeState) validateShortRest() {
-	if c := d.s[d.i]; c != '{' && c != '[' || !jsonsimd.HaveAVX2 || uint(len(d.s)-d.i-64) > restMax-64 || d.depth == 0 || d.depth > openTrack || len(d.path) == 0 {
+	if c := d.s[d.i]; c != '{' && c != '[' || !jsonsimd.HaveValidBlocks || uint(len(d.s)-d.i-64) > restMax-64 || d.depth == 0 || d.depth > openTrack || len(d.path) == 0 {
 		return
 	}
 	st := d.path[len(d.path)-1]
@@ -663,7 +663,7 @@ func (d *decodeState) countFrom(i int) int {
 	j := i
 	// Past 64 bytes, a long array: count in blocks.
 	blocks := math.MaxInt
-	if jsonsimd.HaveAVX2 {
+	if jsonsimd.HaveCount {
 		blocks = i + 64
 	}
 	for ; j < len(s); j++ {
@@ -843,7 +843,7 @@ func (d *decodeState) skip() {
 		// Counting reads a block of 64 bytes, from a copy for a last one:
 		// that costs less than reading byte by byte, unless little input
 		// is left.
-		if jsonsimd.HaveAVX2 && len(s)-i >= skipCountMin {
+		if jsonsimd.HaveCount && len(s)-i >= skipCountMin {
 			_, end := jsonsimd.CountElements(s[i+1:], 0, 0)
 			d.i = i + end + 2
 			return
@@ -860,7 +860,7 @@ const skipCountMin = 24
 
 // skipChecked moves past the value at d.i, validating it.
 func (d *decodeState) skipChecked() {
-	if c := d.s[d.i]; (c == '{' || c == '[') && jsonsimd.HaveAVX2 && len(d.s)-d.i >= 64 {
+	if c := d.s[d.i]; (c == '{' || c == '[') && jsonsimd.HaveValidBlocks && len(d.s)-d.i >= 64 {
 		end := jsonsimd.ValidateValue(d.s[d.i:], maxNestingDepth-d.depth, &d.tab)
 		if end < 0 {
 			d.bad()
@@ -1028,7 +1028,7 @@ func (d *decodeState) rawChecked() (raw []byte, stamp bool) {
 		}
 		return d.rawValue(), false
 	}
-	if c := d.s[d.i]; c != '{' && c != '[' || !jsonsimd.HaveAVX2 || len(d.s)-d.i < 64 {
+	if c := d.s[d.i]; c != '{' && c != '[' || !jsonsimd.HaveValidBlocks || len(d.s)-d.i < 64 {
 		return d.rawValue(), false
 	}
 	start := d.i

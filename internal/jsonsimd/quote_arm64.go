@@ -4,9 +4,10 @@ package jsonsimd
 
 import "unsafe"
 
-// LazyCopy is false: QuoteCountBlocks reads blocks with NEON, but
-// CopyPlainBlocks needs AVX2, so a string cannot be checked as it is copied.
-const LazyCopy = false
+// LazyCopy is true: CopyPlainBlocks runs wherever QuoteCountBlocks reads
+// blocks, so a long string found plain in its first blocks can be checked
+// again as it is copied.
+const LazyCopy = true
 
 // quoteShuf[m] is the VTBL control that writes an 8-byte group, held in the
 // low half of a register whose high half is backslashes, with a backslash
@@ -39,6 +40,17 @@ func quoteCountNEON(src *byte, n, i int, html bool) (int, int)
 //go:noescape
 func quoteNEON(dst *byte, dn int, src *byte, n, i, w int, html bool, shuf *[256][2]uint64) (int, int)
 
+//go:noescape
+func copyPlainNEON(dst, src *byte, n int, html bool) int
+
+//go:noescape
+func CopyShortNEON(dst, src *byte, n int, html bool) bool
+
+// CopyShortFast is CopyShort for callers that checked what it checks.
+func CopyShortFast(dst, src *byte, n int, html bool) bool {
+	return CopyShortNEON(dst, src, n, html)
+}
+
 // QuoteCountBlocks counts for quotedLen the 64-byte blocks of s from i
 // whose only escapes are quotes and backslashes. It returns the new i and
 // the number of those escapes.
@@ -57,4 +69,34 @@ func QuoteBlocks(out []byte, s string, i, w int, html bool) (int, int) {
 		return i, w
 	}
 	return quoteNEON(unsafe.SliceData(out), len(out), unsafe.StringData(s), len(s), i, w, html, &quoteShuf)
+}
+
+// CopyPlainBlocks copies the 64-byte blocks of s to dst, which has room for
+// s, while no byte of a block needs an escape in a JSON string: it copies
+// ASCII without control bytes, quotes, backslashes and, with html, '<',
+// '>' and '&'. It returns how many bytes it copied.
+func CopyPlainBlocks(dst []byte, s string, html bool) int {
+	if len(s) < 64 {
+		return 0
+	}
+	_ = dst[len(s)-1]
+	return copyPlainNEON(unsafe.SliceData(dst), unsafe.StringData(s), len(s), html)
+}
+
+// CopyShort copies s, shorter than 64 bytes, to dst when no byte of s
+// needs an escape in a JSON string, and reports whether it did. Bytes of
+// 0x80 and above, and with html '<', '>' and '&', count as needing one. It
+// may also report false for such s, and it may write to dst either way.
+// dst has room for max(len(s), 32) bytes.
+func CopyShort(dst []byte, s string, html bool) bool {
+	if len(s) == 0 {
+		return false
+	}
+	p := unsafe.StringData(s)
+	if len(s) < 32 && uintptr(unsafe.Pointer(p))&4095 > 4096-32 {
+		// 32 bytes from p would reach into the next page.
+		return false
+	}
+	_ = dst[max(len(s), 32)-1]
+	return CopyShortNEON(unsafe.SliceData(dst), p, len(s), html)
 }

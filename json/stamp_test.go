@@ -142,9 +142,9 @@ func TestStampedRaw(t *testing.T) {
 		A RawMessage `json:"a"`
 		B RawMessage `json:"b"`
 	}
-	// Without AVX2 the decoder does not stamp: one round checks the
-	// values as they are.
-	learned := !jsonsimd.HaveAVX2
+	// Without block validation the decoder does not stamp: one round
+	// checks the values as they are.
+	learned := !jsonsimd.HaveValidBlocks
 	for round := 0; round == 0 || round < 100000 && !learned; round++ {
 		for _, v := range values {
 			for ei, edit := range edits {

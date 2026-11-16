@@ -27,7 +27,7 @@ func checkShort(t *testing.T, s string) {
 		if ok && (!want || string(dst[:len(s)]) != s) {
 			t.Fatalf("CopyShort(%q, %v) = true, copy %q, plain %v", s, html, dst[:len(s)], want)
 		}
-		if !ok && want && HaveAVX2 && len(s) > 0 && len(s) >= 32 {
+		if !ok && want && HaveCopyShort && len(s) > 0 && len(s) >= 32 {
 			t.Fatalf("CopyShort(%q, %v) = false for a plain string", s, html)
 		}
 	}

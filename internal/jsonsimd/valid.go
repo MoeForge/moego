@@ -62,7 +62,7 @@ func maxContainers(n int) int { return n/4 + 64 }
 // when Validate returns true.
 func Validate(s string, maxDepth int, t *Tables) bool {
 	t = resetTables(t, len(s))
-	if HaveAVX2 && len(s) >= 64 {
+	if HaveValidBlocks && len(s) >= 64 {
 		if t == nil {
 			if maxDepth <= 0 || maxDepth >= leanMaxDepth {
 				if r := validatePlain(s); r != leanDeep {
@@ -86,7 +86,7 @@ func Validate(s string, maxDepth int, t *Tables) bool {
 // and, with html, whether valid s holds a character HasHTML looks for.
 // Its long strings are read once for both.
 func ValidateSpaced(s string, maxDepth int, html bool) (ok, spaced, hasHTML bool) {
-	if !HaveAVX2 || len(s) < 64 {
+	if !HaveValidBlocks || len(s) < 64 {
 		ok = validateScalar(s, maxDepth, nil, nil, &spaced)
 		return ok, spaced, ok && html && HasHTML(s)
 	}
@@ -111,7 +111,7 @@ func ValidateRest(s string, kinds []uint64, depth, maxDepth int, t *Tables) bool
 	if depth == 0 {
 		return Validate(s, maxDepth, nil)
 	}
-	if HaveAVX2 && len(s) >= 64 && depth < leanMaxDepth && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
+	if HaveValidBlocks && len(s) >= 64 && depth < leanMaxDepth && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
 		if r := leanLoopIn(t, s, false, false, &leanOpen{kinds: kinds, depth: depth}, nil); r != leanDeep {
 			return r >= leanValid
 		}
@@ -136,7 +136,7 @@ func ValidateRest(s string, kinds []uint64, depth, maxDepth int, t *Tables) bool
 // them. It uses t, which must not be nil, and leaves its tables alone. The
 // ends are valid until t is used again.
 func ValidateRestEnds(s string, kinds []uint64, depth, maxDepth int, t *Tables) (ok bool, ends []int32, all bool) {
-	if depth > 0 && HaveAVX2 && len(s) >= 64 && depth < leanMaxDepth && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
+	if depth > 0 && HaveValidBlocks && len(s) >= 64 && depth < leanMaxDepth && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
 		if r := leanLoopIn(t, s, false, false, &leanOpen{kinds, depth, true}, nil); r != leanDeep {
 			sc := &t.lean
 			return r >= leanValid, sc.ends[:sc.nends], sc.nends < restEnds
@@ -163,7 +163,7 @@ func (t *Tables) Release() {
 // starts after it in the same 64 bytes is not valid. It uses the scratch
 // space of t when t is not nil, and leaves its tables alone.
 func ValidateValue(s string, maxDepth int, t *Tables) int {
-	if HaveAVX2 && len(s) >= 64 && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
+	if HaveValidBlocks && len(s) >= 64 && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
 		r := leanLoopIn(t, s, false, true, nil, nil)
 		if r >= leanEnd {
 			return r - leanEnd
@@ -182,7 +182,7 @@ func ValidateValue(s string, maxDepth int, t *Tables) int {
 // and how many bytes of its long strings it passed over without reading
 // them byte by byte.
 func ValidateValueInfo(s string, maxDepth int, t *Tables) (end int, spaced bool, long int) {
-	if HaveAVX2 && len(s) >= 64 && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
+	if HaveValidBlocks && len(s) >= 64 && (maxDepth <= 0 || maxDepth >= leanMaxDepth) {
 		var info leanInfo
 		r := leanLoopIn(t, s, true, true, nil, &info)
 		if r >= leanEnd {
@@ -224,7 +224,7 @@ func ValidatePrefix(s string, maxDepth int, t *Tables) int {
 	if i := skipSpace(s, 0); i == len(s) || s[i] != '{' && s[i] != '[' {
 		return PrefixInvalid
 	}
-	if HaveAVX2 && len(s) >= 64 {
+	if HaveValidBlocks && len(s) >= 64 {
 		validateBlocks(s, maxDepth, t, &end, nil)
 	} else {
 		validateScalar(s, maxDepth, t, &end, nil)
@@ -1105,7 +1105,7 @@ func PlainEnd(s string, i int) int {
 			return i + bits.TrailingZeros64(m)>>3
 		}
 		i += 8
-		if n++; n == 8 && HaveAVX2 && len(s)-i >= 64 {
+		if n++; n == 8 && HaveStrSkip && len(s)-i >= 64 {
 			i, _ = strSkipBytes(s, i)
 			n = 0
 		}
@@ -1134,8 +1134,8 @@ func PlainRun(s string, i int, hi uint64) (int, uint64) {
 		}
 		hi |= w
 		i += 8
-		// Past 16 bytes, a longer run: find its end with AVX2.
-		if n++; n == 2 && HaveAVX2 && len(s)-i >= 32 {
+		// Past 16 bytes, a longer run: find its end with SIMD.
+		if n++; n == 2 && HaveStrSkip && len(s)-i >= 32 {
 			var h bool
 			if i, h = strEnd(s, i); h {
 				hi |= msb
@@ -1168,8 +1168,8 @@ func ScanString(s string, i int) (int, uint32) {
 			}
 			hi |= w
 			i += 8
-			// Past 16 bytes, a longer run: find its end with AVX2.
-			if n++; n == 2 && HaveAVX2 && len(s)-i >= 32 {
+			// Past 16 bytes, a longer run: find its end with SIMD.
+			if n++; n == 2 && HaveStrSkip && len(s)-i >= 32 {
 				var h bool
 				if i, h = strEnd(s, i); h {
 					flags |= SpanHigh
@@ -1218,8 +1218,8 @@ func stringEnd(s string, i int) int {
 				break
 			}
 			i += 8
-			// Past 64 bytes, a long string: skip blocks with AVX2.
-			if n++; n == 8 && HaveAVX2 && len(s)-i >= 64 {
+			// Past 64 bytes, a long string: skip blocks with SIMD.
+			if n++; n == 8 && HaveStrSkip && len(s)-i >= 64 {
 				i, _ = strSkipBytes(s, i)
 				n = 0
 			}

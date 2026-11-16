@@ -821,7 +821,7 @@ func (e *encodeState) str(b []byte, s string) []byte {
 		b = append(b, s...)
 		return append(b, '"')
 	}
-	if jsonsimd.HaveAVX2 {
+	if jsonsimd.HaveEscape {
 		// result escapes it into the output, which it is not copied into
 		// again.
 		if n := jsonsimd.EscapedLen(s, html); n >= 0 {
@@ -1630,9 +1630,9 @@ func appendString(dst []byte, s string, html bool) []byte {
 func appendStringSlow(dst []byte, s string, html bool) []byte {
 	dst = append(dst, '"')
 	i := 0
-	kernel := jsonsimd.HaveAVX2
+	kernel := jsonsimd.HaveEscape
 	for i < len(s) {
-		if len(s)-i >= 64 && jsonsimd.HaveAVX2 {
+		if len(s)-i >= 64 && jsonsimd.HaveQuote {
 			n, k := jsonsimd.QuoteCountBlocks(s, i, html)
 			if n > i {
 				need := len(dst) + (n - i) + k + 136
@@ -1743,8 +1743,8 @@ func appendShortString(dst []byte, s string, html bool) ([]byte, bool) {
 	// As jsonsimd.CopyShort, without a call to it: out has room for 32
 	// bytes from at, and the kernel reads 32 bytes from s, which must
 	// then be in its page.
-	if p := unsafe.StringData(s); jsonsimd.HaveAVX2 && n != 0 && (n >= 32 || uintptr(unsafe.Pointer(p))&4095 <= 4096-32) &&
-		jsonsimd.CopyShortAVX2(&out[at], p, n, html) {
+	if p := unsafe.StringData(s); jsonsimd.HaveCopyShort && n != 0 && (n >= 32 || uintptr(unsafe.Pointer(p))&4095 <= 4096-32) &&
+		jsonsimd.CopyShortFast(&out[at], p, n, html) {
 		out[at+n] = '"'
 		return out[:at+n+1], true
 	}

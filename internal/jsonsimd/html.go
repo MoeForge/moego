@@ -7,7 +7,7 @@ func HasHTML(s string) bool { return hasHTMLIn(s, 0, len(s)) }
 // hasHTMLIn reports whether one of the characters HasHTML looks for starts
 // in s[i:j].
 func hasHTMLIn(s string, i, j int) bool {
-	for HaveAVX2 && j-i >= 64 {
+	for HaveStrSkip && j-i >= 64 {
 		if i = htmlSkip(s[:j], i); j-i < 64 {
 			break
 		}

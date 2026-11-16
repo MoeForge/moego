@@ -41,7 +41,7 @@ func TestScanUnquote(t *testing.T) {
 			if v := unquote([]byte("pre"), s[1:end]); !bytes.Equal(out, v) {
 				t.Fatalf("scanUnquote(%.80q) value %q, want %q", s, out, v)
 			}
-		case flags&jsonsimd.SpanEscaped != 0 && end-1 < unquoteMax && (utf8.ValidString(s[1:end]) || !jsonsimd.HaveAVX2):
+		case flags&jsonsimd.SpanEscaped != 0 && end-1 < unquoteMax && (utf8.ValidString(s[1:end]) || !jsonsimd.HaveEscape):
 			// With the kernel, a string that is not valid UTF-8 is left
 			// to unquote.
 			t.Fatalf("scanUnquote(%.80q) did not decode a short string", s)

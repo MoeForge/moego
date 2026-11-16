@@ -25,12 +25,17 @@ func CopyShortAVX2(dst, src *byte, n int, html bool) bool
 //go:noescape
 func quoteAVX2(dst *byte, dn int, src *byte, n, i, w int, html bool, shuf *[256][16]byte) (int, int)
 
+// CopyShortFast is CopyShort for callers that checked what it checks.
+func CopyShortFast(dst, src *byte, n int, html bool) bool {
+	return CopyShortAVX2(dst, src, n, html)
+}
+
 // QuoteCountBlocks counts the 64-byte blocks of s from i that are ASCII and
 // whose only bytes to escape are quotes and backslashes (and, with html,
 // no '<', '>' or '&'). It returns the index of the first block it did not
 // count and the number of quotes and backslashes in the counted blocks.
 func QuoteCountBlocks(s string, i int, html bool) (int, int) {
-	if !HaveAVX2 || len(s)-i < 64 {
+	if !HaveQuote || len(s)-i < 64 {
 		return i, 0
 	}
 	return quoteCountAVX2(unsafe.StringData(s), len(s), i, html)
@@ -41,7 +46,7 @@ func QuoteCountBlocks(s string, i int, html bool) (int, int) {
 // backslash, while out has room for the worst case of a block (136
 // bytes). It returns the new i and w.
 func QuoteBlocks(out []byte, s string, i, w int, html bool) (int, int) {
-	if !HaveAVX2 || len(s)-i < 64 {
+	if !HaveQuote || len(s)-i < 64 {
 		return i, w
 	}
 	return quoteAVX2(unsafe.SliceData(out), len(out), unsafe.StringData(s), len(s), i, w, html, &escapeExp)
@@ -52,7 +57,7 @@ func QuoteBlocks(out []byte, s string, i, w int, html bool) (int, int) {
 // ASCII without control bytes, quotes, backslashes and, with html, '<',
 // '>' and '&'. It returns how many bytes it copied.
 func CopyPlainBlocks(dst []byte, s string, html bool) int {
-	if !HaveAVX2 || len(s) < 64 {
+	if !HaveQuote || len(s) < 64 {
 		return 0
 	}
 	_ = dst[len(s)-1]
@@ -65,7 +70,7 @@ func CopyPlainBlocks(dst []byte, s string, html bool) int {
 // may also report false for such s, and it may write to dst either way.
 // dst has room for max(len(s), 32) bytes.
 func CopyShort(dst []byte, s string, html bool) bool {
-	if !HaveAVX2 || len(s) == 0 {
+	if !HaveCopyShort || len(s) == 0 {
 		return false
 	}
 	p := unsafe.StringData(s)
