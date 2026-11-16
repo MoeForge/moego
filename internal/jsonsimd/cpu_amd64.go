@@ -9,6 +9,17 @@ import "strings"
 // instructions the kernels also use.
 var HaveAVX2 = cpuHasAVX2()
 
+// Per-feature SIMD capabilities on amd64, all gated on HaveAVX2.
+var (
+	HaveQuote       = HaveAVX2
+	HaveStrSkip     = HaveAVX2
+	HaveValidBlocks = HaveAVX2
+	HaveCount       = HaveAVX2
+	HaveCopyShort   = HaveAVX2
+	HaveEscape      = HaveAVX2
+	HaveZero        = HaveAVX2
+)
+
 // useAES and useAVX are cpuAES and cpuAVX less what LimitCPU dropped.
 var useAES, useAVX = cpuAES, cpuAVX
 
@@ -33,11 +44,22 @@ func LimitCPU(drop string) (undo func()) {
 		}
 	}
 	avx2, aes, avx := HaveAVX2, useAES, useAVX
-	HaveAVX2 = HaveAVX2 && !noAVX2
+	setAVX2 := func(v bool) {
+		HaveAVX2 = v
+		HaveQuote = v
+		HaveStrSkip = v
+		HaveValidBlocks = v
+		HaveCount = v
+		HaveCopyShort = v
+		HaveEscape = v
+		HaveZero = v
+	}
+	setAVX2(HaveAVX2 && !noAVX2)
 	useAES, useAVX = useAES && !noAES, useAVX && !noAVX
 	hashKernel = pickHash(useAES, useAVX)
 	return func() {
-		HaveAVX2, useAES, useAVX = avx2, aes, avx
+		setAVX2(avx2)
+		useAES, useAVX = aes, avx
 		hashKernel = pickHash(aes, avx)
 	}
 }

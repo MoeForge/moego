@@ -1,0 +1,99 @@
+//go:build arm64 && !purego
+
+package jsonsimd
+
+import "unsafe"
+
+//go:noescape
+func escapeNEON(dst *byte, dn int, src *byte, n, i, w int, html bool, tab *[256]uint64, exp *[256][16]byte) (int, int)
+
+//go:noescape
+func unescapeNEON(dst *byte, dn int, src *byte, n, i, w int, tab *unescapeTables) (int, int, bool)
+
+//go:noescape
+func utf8NEON(src *byte, n int) int
+
+//go:noescape
+func escCountNEON(src *byte, n int, html bool) int
+
+// EscapeBlocks writes s[i:], valid UTF-8 without U+2028 or U+2029, to
+// out[w:] as JSON string contents, escaping quotes, backslashes, control
+// bytes and, with html, '<', '>' and '&' as encoding/json does. It requires
+// at least 32 bytes of s and 40 bytes of out on entry; internally its fast
+// 16-byte loop runs while 32 bytes of s and 160 bytes of out remain, and its
+// tail loop continues while 16 bytes of s and 24 bytes of out remain. It
+// returns the new i, at the start of a character, and the new w.
+func EscapeBlocks(out []byte, s string, i, w int, html bool) (int, int) {
+	if len(s)-i < 32 || len(out)-w < 40 {
+		return i, w
+	}
+	i, w = escapeNEON(unsafe.SliceData(out), len(out), unsafe.StringData(s), len(s), i, w, html, &escapeTab, &escapeExp)
+	// Bytes of 0x80 and above were copied as they are: step back over
+	// those of a character the last block ends inside.
+	for i < len(s) && s[i]&0xc0 == 0x80 {
+		i--
+		w--
+	}
+	return i, w
+}
+
+// UnescapeBlocks writes the value of the JSON string contents s[i:] to
+// out[w:], 16 bytes at a time, while 34 bytes of s are left and out has
+// room for 32 more bytes, faster with room for 64 and at least 49 bytes
+// of s left. It stops at a quote, a control byte, and a backslash that does
+// not start an escape of two bytes, except that in the fast loop (with
+// room for 64 and 49 bytes of s left) it also decodes an escape of six
+// bytes of a character outside the surrogates while 38 bytes of s are left
+// from it; bytes of 0x80 and above it copies as they are. It returns the
+// new i and w, and whether a byte it copied from s may be 0x80 or above.
+func UnescapeBlocks(out []byte, s string, i, w int) (int, int, bool) {
+	if len(s)-i < 34 || len(out)-w < 32 {
+		return i, w, false
+	}
+	return unescapeNEON(unsafe.SliceData(out), len(out), unsafe.StringData(s), len(s), i, w, &unescapeTabs)
+}
+
+// EscapedLen returns the length of s as JSON string contents escaped as
+// EscapeBlocks escapes them, when s is valid UTF-8 without U+2028 or
+// U+2029, else -1.
+func EscapedLen(s string, html bool) int {
+	if CheckUTF8(s) != 0 {
+		return -1
+	}
+	n := len(s) &^ 15
+	m := len(s)
+	if n > 0 {
+		m += escCountNEON(unsafe.StringData(s), n, html)
+	}
+	for _, c := range []byte(s[n:]) {
+		if c < 0x80 && (html || c != '<' && c != '>' && c != '&') {
+			m += int(escapeTab[c]>>56) - 1
+		}
+	}
+	return m
+}
+
+// CheckUTF8 returns 0 when s is valid UTF-8 without U+2028 or U+2029,
+// else UTF8Invalid, UTF8LineSep or both.
+func CheckUTF8(s string) int {
+	n := len(s) &^ 15
+	if n == 0 {
+		return checkUTF8(s)
+	}
+	r := utf8NEON(unsafe.StringData(s), n)
+	// The kernel leaves a character that starts in the last three bytes
+	// of its last block and does not end there: check from its first byte.
+	k := n
+	for j := n - 1; j >= n-3; j-- {
+		if c := s[j]; c >= 0xc0 {
+			k = j
+			break
+		} else if c < 0x80 {
+			break
+		}
+	}
+	if k < len(s) {
+		r |= checkUTF8(s[k:])
+	}
+	return r
+}

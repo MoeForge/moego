@@ -2,6 +2,7 @@ package jsonsimd
 
 import (
 	"math/rand"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -82,7 +83,7 @@ func TestEscapeBlocks(t *testing.T) {
 		if i < len(s) && !utf8.RuneStart(s[i]) {
 			t.Fatalf("EscapeBlocks(%q): stops inside a character at %d", s, i)
 		}
-		if HaveAVX2 && len(s)-i >= 35 && len(out)-w >= 43 {
+		if HaveEscape && len(s)-i >= 35 && len(out)-w >= 43 {
 			t.Fatalf("EscapeBlocks(%q): stops at %d with room %d", s, i, len(out)-w)
 		}
 	}
@@ -161,7 +162,7 @@ func TestUnescapeBlocks(t *testing.T) {
 		if !hi && strings.IndexFunc(s[:i], func(c rune) bool { return c >= 0x80 }) >= 0 {
 			t.Fatalf("UnescapeBlocks(%q) to %d: no high bytes reported", s, i)
 		}
-		if HaveAVX2 && len(s)-i >= 34 && len(out)-w >= 32 {
+		if HaveEscape && len(s)-i >= 34 && len(out)-w >= 32 {
 			switch c := s[i]; {
 			case c == '"' || c < 0x20:
 			case c == '\\' && unescapeByte(s[i+1]) == 0:
@@ -175,8 +176,8 @@ func TestUnescapeBlocks(t *testing.T) {
 // TestUnescapeBlocksSix checks that the kernel decodes an escape of six
 // bytes at each place in a block while 38 bytes are left from it.
 func TestUnescapeBlocksSix(t *testing.T) {
-	if !HaveAVX2 {
-		t.Skip("no AVX2 kernel")
+	if !HaveEscape {
+		t.Skip("no Escape kernel")
 	}
 	for _, e := range []string{`\u0026`, `\u00e9`, `\u4e2d`, `\uFFFF`, `\u0000`} {
 		for k := range 96 {
@@ -185,6 +186,28 @@ func TestUnescapeBlocksSix(t *testing.T) {
 			i, w, _ := UnescapeBlocks(out, s, 0, 0)
 			if want, ok := unescapeRef(s[:i]); !ok || string(out[:w]) != want || i <= k {
 				t.Fatalf("UnescapeBlocks(%q) to %d: %q, want past %d", s, i, out[:w], k)
+			}
+		}
+	}
+	for _, tail := range []int{31, 32, 42, 43, 58, 59} {
+		for _, k := range []int{0, 1, 10, 11, 12, 15, 16, 31} {
+			s := strings.Repeat("z", k) + `\u0026` + strings.Repeat("z", tail)
+			out := make([]byte, len(s)+128)
+			i, w, _ := UnescapeBlocks(out, s, 0, 0)
+			if want, ok := unescapeRef(s[:i]); !ok || string(out[:w]) != want {
+				t.Fatalf("UnescapeBlocks(k=%d, tail=%d) to %d: %q", k, tail, i, out[:w])
+			}
+			if runtime.GOARCH == "arm64" {
+				blockStart := k &^ 15
+				if k&15 == 15 {
+					blockStart = k
+				}
+				remBlock := len(s) - blockStart
+				remEscape := 6 + tail
+				wantPast := remBlock >= 49 && remEscape >= 38
+				if (i > k) != wantPast {
+					t.Fatalf("UnescapeBlocks(k=%d, tail=%d): i=%d, wantPast=%v", k, tail, i, wantPast)
+				}
 			}
 		}
 	}
@@ -227,7 +250,7 @@ func TestEscapedLen(t *testing.T) {
 	check := func(s string, html bool) {
 		t.Helper()
 		want := len(escapeRef(s, html))
-		if CheckUTF8(s) != 0 || !HaveAVX2 {
+		if CheckUTF8(s) != 0 || !HaveEscape {
 			want = -1
 		}
 		if got := EscapedLen(s, html); got != want {

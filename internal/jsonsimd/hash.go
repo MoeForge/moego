@@ -27,6 +27,7 @@ const (
 	hashNone = iota // none: Sum is maphash.Bytes
 	hashSSE         // AES instructions in legacy SSE encodings
 	hashVEX         // AES instructions in VEX encodings, which need AVX
+	hashNEON        // ARMv8 Crypto Extension AES instructions
 )
 
 // Sum returns the hash of b under the key. From 128 bytes on, with AES

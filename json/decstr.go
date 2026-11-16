@@ -64,7 +64,7 @@ const spanUnquoted = 1 << 3
 
 // unquoteMax is the length from which scanUnquote leaves the contents of a
 // string to be decoded once its end is known, into memory of their size.
-// With the AVX2 kernel, scanUnquote goes on to unquoteBlocksMax bytes of
+// With the SIMD kernel, scanUnquote goes on to unquoteBlocksMax bytes of
 // value, so that d.scratch stays of a size putDecodeState keeps.
 const (
 	unquoteMax       = slabMax
@@ -94,7 +94,7 @@ func scanUnquote(dst []byte, s string, start, i int, hi uint64) (out []byte, end
 	// With the kernel, bytes of 0x80 and above are copied as they are, and
 	// the value from checked on is checked at the end.
 	checked := -1
-	if jsonsimd.HaveAVX2 {
+	if jsonsimd.HaveEscape {
 		checked = len(dst)
 	}
 	for {
@@ -103,7 +103,7 @@ func scanUnquote(dst []byte, s string, start, i int, hi uint64) (out []byte, end
 		if hi&msb != 0 {
 			flags |= jsonsimd.SpanHigh
 		}
-		if i-start >= unquoteMax && (!jsonsimd.HaveAVX2 || len(dst)+i-run > unquoteBlocksMax) {
+		if i-start >= unquoteMax && (!jsonsimd.HaveEscape || len(dst)+i-run > unquoteBlocksMax) {
 			if s[i] == '"' {
 				return dst, i, flags
 			}
@@ -168,7 +168,7 @@ func scanUnquote(dst []byte, s string, start, i int, hi uint64) (out []byte, end
 		default:
 			return dst, -1, 0
 		}
-		if jsonsimd.HaveAVX2 && i-start >= 64 && (cap(dst)-len(dst) >= 256 || cap(dst) <= unquoteBlocksMax) {
+		if jsonsimd.HaveEscape && i-start >= 64 && (cap(dst)-len(dst) >= 256 || cap(dst) <= unquoteBlocksMax) {
 			// A long string: the kernel copies blocks and decodes the
 			// escapes of two bytes, into dst grown to at most twice
 			// unquoteBlocksMax.
@@ -281,7 +281,7 @@ func validUTF8(s string) bool { return utf8.ValidString(s) }
 // escapes are decoded, a surrogate escape that is not part of a pair and
 // each byte that is not part of valid UTF-8 become U+FFFD.
 func unquote(dst []byte, s string) []byte {
-	if len(s) >= 64 && jsonsimd.HaveAVX2 {
+	if len(s) >= 64 && jsonsimd.HaveEscape {
 		if out, ok := unquoteBlocks(dst, s); ok {
 			return out
 		}
@@ -350,7 +350,7 @@ func unquote(dst []byte, s string) []byte {
 	return dst
 }
 
-// unquoteBlocks is unquote for long s with the AVX2 kernel. The kernel
+// unquoteBlocks is unquote for long s with the SIMD kernel. The kernel
 // copies bytes of 0x80 and above as they are: when they are not valid
 // UTF-8, unquoteBlocks reports false, for unquote to decode s word by word.
 func unquoteBlocks(dst []byte, s string) ([]byte, bool) {

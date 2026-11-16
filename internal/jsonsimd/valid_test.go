@@ -230,7 +230,7 @@ func checkDoc(t *testing.T, doc []byte) {
 	if okS != want {
 		t.Fatalf("validateScalar(%q) = %v, want %v", s, okS, want)
 	}
-	if HaveAVX2 && len(s) >= 64 {
+	if HaveValidBlocks && len(s) >= 64 {
 		okB, tabB := tablesOf(s, true)
 		if okB != want {
 			t.Fatalf("validateBlocks(%q) = %v, want %v", s, okB, want)
@@ -239,7 +239,7 @@ func checkDoc(t *testing.T, doc []byte) {
 			t.Fatalf("tables differ for %q:\nblocks %+v\nscalar %+v", s, tabB, tabS)
 		}
 	}
-	if HaveAVX2 && len(s) >= 64 {
+	if HaveValidBlocks && len(s) >= 64 {
 		if r := validatePlain(s); r != leanDeep && (r == leanValid) != want {
 			t.Fatalf("validatePlain(%q) = %d, want %v", s, r, want)
 		}
@@ -253,7 +253,7 @@ func checkDoc(t *testing.T, doc []byte) {
 	checkRest(t, s)
 	checkValue(t, s)
 	checkCount(t, s, want)
-	if want && HaveAVX2 {
+	if want && HaveValidBlocks {
 		var c bytes.Buffer
 		json.Compact(&c, doc)
 		if got := AppendCompact(nil, s); string(got) != c.String() {
@@ -454,7 +454,7 @@ func TestValidateMemberAfterComma(t *testing.T) {
 				if got := Validate(s, 10000, nil); got != want {
 					t.Fatalf("Validate(%q) = %v, want %v", s, got, want)
 				}
-				if HaveAVX2 {
+				if HaveValidBlocks {
 					if got := validateLean(s, 10000, nil, nil); got != want {
 						t.Fatalf("validateLean(%q) = %v, want %v", s, got, want)
 					}
@@ -508,8 +508,8 @@ func TestStringEnd(t *testing.T) {
 // TestStrEnd checks strEnd against a byte loop, with stops and bytes of
 // 0x80 and above anywhere, before and after the end.
 func TestStrEnd(t *testing.T) {
-	if !HaveAVX2 {
-		t.Skip("no AVX2")
+	if !HaveStrSkip {
+		t.Skip("no StrSkip")
 	}
 	r := rand.New(rand.NewSource(11))
 	for n := 0; n < randomIterations(200000); n++ {
@@ -531,8 +531,8 @@ func TestStrEnd(t *testing.T) {
 // TestStrEndLong checks strEnd on runs long enough for its 128-byte
 // steps, with few stops and bytes of 0x80 and above, in any order.
 func TestStrEndLong(t *testing.T) {
-	if !HaveAVX2 {
-		t.Skip("no AVX2")
+	if !HaveStrSkip {
+		t.Skip("no StrSkip")
 	}
 	r := rand.New(rand.NewSource(12))
 	for n := 0; n < randomIterations(50000); n++ {
@@ -556,8 +556,8 @@ func TestStrEndLong(t *testing.T) {
 // TestStrSkip checks strSkip against a loop over the 64-byte blocks, on
 // runs with few stops and bytes of 0x80 and above, in any order.
 func TestStrSkip(t *testing.T) {
-	if !HaveAVX2 {
-		t.Skip("no AVX2")
+	if !HaveStrSkip {
+		t.Skip("no StrSkip")
 	}
 	r := rand.New(rand.NewSource(13))
 	for n := 0; n < randomIterations(50000); n++ {
@@ -597,8 +597,8 @@ func TestStrSkip(t *testing.T) {
 // blocks, on runs with few stops, bytes HasHTML looks for and other bytes
 // of 0x80 and above, in any order.
 func TestStrSkipHTML(t *testing.T) {
-	if !HaveAVX2 {
-		t.Skip("no AVX2")
+	if !HaveStrSkip {
+		t.Skip("no StrSkip")
 	}
 	r := rand.New(rand.NewSource(14))
 	for n := 0; n < randomIterations(50000); n++ {
@@ -726,7 +726,7 @@ func TestCopyPlainBlocks(t *testing.T) {
 		s := string(b)
 		for _, html := range []bool{false, true} {
 			want := 0
-			if HaveAVX2 {
+			if HaveQuote {
 				for want+64 <= len(s) && plainBlock(s[want:want+64], html) {
 					want += 64
 				}
@@ -914,7 +914,7 @@ func checkValue(t *testing.T, s string) {
 			}
 		}
 	}
-	if !HaveAVX2 || len(s) < 64 || len(s) > 1000 || !json.Valid([]byte(s)) {
+	if !HaveValidBlocks || len(s) < 64 || len(s) > 1000 || !json.Valid([]byte(s)) {
 		return
 	}
 	// A compact value is not spaced.
@@ -931,7 +931,7 @@ func checkValue(t *testing.T, s string) {
 // brackets, outside strings.
 func checkCount(t *testing.T, s string, valid bool) {
 	t.Helper()
-	if !HaveAVX2 {
+	if !HaveCount {
 		return
 	}
 	inStr, esc, tested := false, false, 0

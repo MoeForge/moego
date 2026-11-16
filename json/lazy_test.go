@@ -25,8 +25,8 @@ func TestLazyNeedsCopy(t *testing.T) {
 	switch {
 	case !jsonsimd.LazyCopy && lazy != 0:
 		t.Fatalf("%d lazy references without LazyCopy", lazy)
-	case jsonsimd.LazyCopy && jsonsimd.HaveAVX2 && lazy != 1:
-		t.Fatalf("%d lazy references with AVX2, want 1", lazy)
+	case jsonsimd.LazyCopy && jsonsimd.HaveQuote && lazy != 1:
+		t.Fatalf("%d lazy references with HaveQuote, want 1", lazy)
 	}
 	if out, err := Marshal([]string{s, s}); err != nil || string(out) != `["`+s+`","`+s+`"]` {
 		t.Fatalf("Marshal = %.40q..., %v", out, err)

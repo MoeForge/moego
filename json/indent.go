@@ -69,7 +69,7 @@ func appendCompactChecked(dst, src []byte, escape bool) ([]byte, error) {
 // appendCompactValid is appendCompactChecked for valid src.
 func appendCompactValid(dst, src []byte, escape bool) []byte {
 	s := bytesView(src)
-	if !escape && jsonsimd.HaveAVX2 {
+	if !escape && jsonsimd.HaveValidBlocks {
 		return jsonsimd.AppendCompact(dst, s)
 	}
 	start := 0
