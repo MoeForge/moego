@@ -61,7 +61,7 @@ jobs:
         run: test "$(go list -m all)" = "$(go list -m)"
       - name: Check formatting and assembly declarations
         run: |
-          test -z "$(gofmt -l base64 internal json ojson regexp)"
+          test -z "$(gofmt -l base64 internal json ojson png regexp webp)"
           go vet ./...
           go vet -tags=purego ./...
       - name: Native correctness and protected-page boundaries

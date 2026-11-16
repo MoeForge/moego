@@ -2,9 +2,10 @@
 
 <h1><img src="docs/images/moego-logo.svg" width="200" alt="moego"></h1>
 
-Fast Base64, JSON and regular expressions for Go, built for agent gateways,
-with the APIs and results of `encoding/base64`, `encoding/json`, `regexp`,
-`gjson` and `sjson`.
+Fast Base64, JSON, regular expressions and lossless PNG and WebP encoding
+for Go, built for agent gateways, with the APIs and results of
+`encoding/base64`, `encoding/json`, `regexp`, `gjson`, `sjson` and
+`image/png`.
 
 <p align="center">
   <a href="./README.zh_CN.md">简体中文</a> |
@@ -17,8 +18,9 @@ moego is built for products such as agent gateways, which read, rewrite,
 filter and forward large request bodies: JSON that often embeds images,
 audio and files as Base64. Each package keeps the API and the results of
 the package it follows, so moving to moego usually means changing one
-import. [new-api](https://github.com/QuantumNous/new-api) is the
-best-practice example of moego in use.
+import. [AstrLink](https://github.com/Calcium-Ion/AstrLink) and
+[New API](https://github.com/QuantumNous/new-api) are the best-practice
+examples of moego in use; see [Best practices](#best-practices).
 
 | Package | API and results of | Highlights |
 |---|---|---|
@@ -26,13 +28,58 @@ best-practice example of moego in use.
 | [`json`](#json) | [`encoding/json`](https://pkg.go.dev/encoding/json) | Fastest of the JSON packages measured in all 41 workloads, 4.51× `encoding/json` at the median; decoding without copies |
 | [`ojson`](#ojson) | [`gjson`](https://github.com/tidwall/gjson) v1.19.0 and [`sjson`](https://github.com/tidwall/sjson) v1.2.5, on valid JSON | Edits keep member order and every untouched byte; 20 overrides of a 1 MiB request 2.78× as fast as the fastest order-preserving alternative |
 | [`regexp`](#regexp) | [`regexp`](https://pkg.go.dev/regexp) | Linear-time matching, 43.4× the standard library and 7.25× the fastest other package over 40 workloads; compile cache; sets of expressions |
+| [`png`](#png) | [`image/png`](https://pkg.go.dev/image/png) for encoding | At each level smaller and faster than `image/png`, libpng and the other pure-Go encoders; 2.5× `image/png` at BestSpeed |
+| [`webp`](#webp) | `image/png`'s encoding API, lossless WebP | At each level smaller than libwebp, 1.65× to 10.5× its speed; 24–30% smaller than PNG |
 
-All four packages need Go 1.23 or later and depend only on the standard
+All packages need Go 1.23 or later and depend only on the standard
 library:
 
 ```sh
 go get github.com/MoeForge/moego
 ```
+
+## Best practices
+
+Two open-source AI gateways are built on moego. Both use `ojson` where a
+body needs only a few reads or edits, so the rest of it is never decoded
+and encoded again.
+
+### AstrLink
+
+[AstrLink](https://github.com/Calcium-Ion/AstrLink) is an open-source
+desktop gateway for AI agents on macOS, Windows and Linux. It detects and
+redacts sensitive content locally before a request reaches a model
+provider, and routes requests across existing subscriptions and APIs. It
+uses `ojson` and `base64`:
+
+- `ojson` reads requests and stream events in place and finds the strings
+  that redaction replaces; redactions are spliced in at the offsets it
+  reports. Reasoning settings and system prompt additions use `ojson`'s
+  set and delete or are spliced in at its offsets, so whitespace, member
+  order and untouched bytes stay as the client sent them.
+- `base64` decodes and re-encodes the images embedded in requests when
+  AstrLink recompresses them, and encodes PKCE verifiers and challenges
+  for subscription sign-in.
+
+### New API
+
+[New API](https://github.com/QuantumNous/new-api) is a self-hosted AI
+gateway with OpenAI-, Claude- and Gemini-compatible APIs, model routing,
+access control and usage accounting. It uses four of the packages:
+
+- `json` is its JSON engine. Relay requests held in memory are decoded
+  with `UnmarshalNoCopy`; bodies kept on disk are decoded from a file
+  reader through a bounded window.
+- `ojson` validates JSON request bodies and reads their `model` and
+  `group`; bodies kept on disk go through `ValidReader` and
+  `GetManyReaderAt` instead of being loaded. Parameter overrides and
+  pass-through edits, such as dropping `model` and `stream` for AWS, each
+  run on a single `Doc`, so untouched bytes and key order stay as the
+  client sent them.
+- `regexp` runs the patterns users configure for parameter overrides,
+  channel affinity and model settings, and caches the compiled patterns.
+- `base64` decodes and encodes the images, audio and files in requests and
+  responses.
 
 ## base64
 
@@ -362,6 +409,161 @@ standard library's type needs that type. Matching state is built on demand
 and released when unused, so the first searches after compiling a pattern
 or after an idle period take longer.
 
+## png
+
+`github.com/MoeForge/moego/png` encodes PNG with the API of `image/png`,
+so moving to it means changing one import. `Decode` and `DecodeConfig`
+call `image/png`. The output decodes to the same pixels as `image/png`'s.
+By default the encoder writes the smallest color type that holds the
+pixels: no alpha channel for opaque images, gray, or a palette for at most
+256 colors, so the decoded image can have another Go type than
+`image/png`'s output. `KeepColorType` writes `image/png`'s color type and
+bit depth.
+
+<p align="center">
+  <img src="docs/images/png-ratio-speed.en.svg" alt="Compression ratio and encode speed of png and other PNG encoders at three levels">
+</p>
+
+| Level | png | image/png | Fastest other pure Go | libdeflate (cgo) | libpng (cgo) |
+|---|--:|--:|--:|--:|--:|
+| BestSpeed | 34.6%, 26.6 MP/s | 36.2%, 10.7 MP/s | woozymasta 36.7%, 15.1 MP/s | level 1 34.8%, 16.9 MP/s | level 1 35.9%, 13.6 MP/s |
+| Default | 33.5%, 12.0 MP/s | 33.6%, 4.38 MP/s | woozymasta 35.0%, 10.9 MP/s | level 6 33.7%, 11.2 MP/s | level 6 33.9%, 4.32 MP/s |
+| BestCompression | 31.8%, 1.77 MP/s | 33.5%, 1.67 MP/s | calamus 33.5%, 1.72 MP/s | level 12 31.9%, 1.14 MP/s | level 9 33.5%, 1.65 MP/s |
+
+The ratio is the compressed size over the raw pixel data of 97 public
+images (photos, screenshots, icons, textures and cut-outs with alpha, 69.8
+megapixels), single thread, with `KeepColorType`; smaller is better. Each
+level is smaller and faster than the others in the table. fpnge (C++, cgo)
+is 5.7–7.4× as fast with files 13–27% larger. Color reduction makes each
+level about 0.4% smaller. Measured on an Intel Xeon E5-2699A v4 with Go
+1.26.6; image by image, the DEFLATE engine on its own and memory are in
+the [PNG results](docs/png-benchmark-results-linux-amd64.md).
+
+```go
+package main
+
+import (
+	"image"
+	"image/color"
+	"os"
+	"sync"
+
+	"github.com/MoeForge/moego/png"
+)
+
+// bufferPool lends the encoder's buffers to Encode. Once they are warm,
+// encoding the common image types allocates nothing.
+type bufferPool struct{ p sync.Pool }
+
+func (b *bufferPool) Get() *png.EncoderBuffer {
+	e, _ := b.p.Get().(*png.EncoderBuffer)
+	return e // nil the first time: Encode makes one
+}
+
+func (b *bufferPool) Put(e *png.EncoderBuffer) { b.p.Put(e) }
+
+var enc = &png.Encoder{CompressionLevel: png.BestCompression, BufferPool: &bufferPool{}}
+
+func main() {
+	m := image.NewNRGBA(image.Rect(0, 0, 256, 256))
+	for y := range 256 {
+		for x := range 256 {
+			m.SetNRGBA(x, y, color.NRGBA{R: uint8(x), G: uint8(y), B: 128, A: 255})
+		}
+	}
+
+	f, err := os.Create("gradient.png")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	// png.Encode(f, m) works as with image/png; enc picks the level and
+	// reuses buffers from one image to the next.
+	if err := enc.Encode(f, m); err != nil {
+		panic(err)
+	}
+}
+```
+
+A cold encode at BestCompression allocates 2.8× as much as `image/png`
+and at Default 3% more. The encoder keeps its buffers in an internal pool,
+and with a warm `BufferPool` an encode of the common image types allocates
+nothing. Like `image/png`, the encoder writes
+non-interlaced PNG without ancillary chunks.
+
+## webp
+
+`github.com/MoeForge/moego/webp` writes lossless WebP with the encoding API
+of `image/png`: `Encode`, an `Encoder` with `BestSpeed`,
+`DefaultCompression` and `BestCompression`, and a `BufferPool`. Decoding
+the output gives back every pixel as `color.NRGBAModel` converts it,
+including the color under fully transparent pixels. Browsers and libwebp
+read WebP; Go programs read it with `golang.org/x/image/webp`.
+
+<p align="center">
+  <img src="docs/images/webp-ratio-speed.en.svg" alt="Compression ratio and encode speed of webp, libwebp and other WebP encoders at three levels, with png">
+</p>
+
+| Level | webp | libwebp (cgo) | Smallest other pure Go | png |
+|---|--:|--:|--:|--:|
+| BestSpeed | 26.3%, 31.1 MP/s | z0 27.8%, 18.9 MP/s | SeriousBug 0 26.4%, 7.49 MP/s | 34.6%, 26.1 MP/s |
+| Default | 23.6%, 3.04 MP/s | z6 24.0%, 1.70 MP/s | SeriousBug 6 25.0%, 0.97 MP/s | 33.5%, 11.8 MP/s |
+| BestCompression | 23.3%, 0.94 MP/s | z9 23.5%, 0.09 MP/s | deepteams z9 24.6%, 0.40 MP/s | 31.8%, 1.74 MP/s |
+
+On the same 97 images, each level is smaller than libwebp at the same
+level (5.6%, 1.5% and 0.5%) and encodes 1.65×, 1.78× and 10.5× as fast;
+BestCompression and libwebp z9 were timed on all 97 images. On 51 other
+images of the same suite, BestSpeed and Default are again smaller and
+faster than libwebp z0 and z6, and BestCompression is smaller than z9.
+Files are 24–30% smaller than `png` at the same level. Measured on an
+Intel Xeon E5-2699A v4 with Go 1.26.6 and libwebp 1.5.0; every
+encoder, image by image, decoding and memory are in the
+[WebP results](docs/webp-benchmark-results-linux-amd64.md).
+
+```go
+package main
+
+import (
+	"image"
+	"image/color"
+	"os"
+
+	"github.com/MoeForge/moego/webp"
+)
+
+func main() {
+	m := image.NewNRGBA(image.Rect(0, 0, 256, 256))
+	for y := range 256 {
+		for x := range 256 {
+			m.SetNRGBA(x, y, color.NRGBA{R: uint8(x), G: uint8(y), B: 128, A: uint8(255 - y/2)})
+		}
+	}
+
+	f, err := os.Create("gradient.webp")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	// webp.Encode(f, m) encodes at DefaultCompression.
+	enc := &webp.Encoder{CompressionLevel: webp.BestCompression}
+	if err := enc.Encode(f, m); err != nil {
+		panic(err)
+	}
+}
+```
+
+Lossless WebP leaves little room on these images: the smallest file of
+every WebP encoder measured, picked image by image, adds up to only 1.04%
+less than libwebp z9. On icons, cut-outs and images with few colors,
+BestCompression is 1.6–3.9% larger than libwebp z9; photos and screenshots,
+most of the bytes, make the totals smaller. Very small images and some
+textures with few colors encode more slowly than with libwebp. The encoder
+writes lossless VP8L only, with no lossy, animation or metadata chunks. A
+cold encode allocates up to about 112 MB for one image of the corpus, whose
+largest image is 6.8 megapixels.
+
 ## Architectures
 
 | | amd64 with AVX2 | arm64 with NEON |
@@ -370,6 +572,8 @@ or after an idle period take longer.
 | `json` | Scanning, validation and string quoting | Checking long strings for characters to escape, and validation in `Valid` and `Indent` |
 | `ojson` | Scanning and validation | Same as amd64 |
 | `regexp` | Literal and character-class searches | Same as amd64 |
+| `png` | Row filters, filter costs, pixel conversions and Adler-32 | Same as amd64 |
+| `webp` | Residuals, color transforms, cost lookups and pixel conversion | Residuals, subtract and add green and color transforms |
 
 Everything else runs without SIMD and returns the same results: on amd64
 CPUs without AVX2, on other architectures, in builds with `-tags purego`,
@@ -402,9 +606,10 @@ changes.
 
 ## Testing
 
-`go test ./...` runs the unit tests of the four packages and the
-differential tests of `base64`, `json` and `regexp` against the standard
-library. The tests that compare with packages outside the standard
+`go test ./...` runs the unit tests of every package, the differential
+tests of `base64`, `json`, `regexp` and `png` against the standard library,
+and round-trip tests of `webp` with an RFC 9649 decoder written for the
+tests. The tests that compare with packages outside the standard
 library, and the benchmarks, are in separate modules, so those packages
 are never dependencies of moego:
 
@@ -413,11 +618,14 @@ are never dependencies of moego:
 | `bench/` | 1.26 | Benchmarks of `base64` against other Base64 packages |
 | `bench/json/` | 1.26 | Differential tests, fuzzing and benchmarks of `json` and `ojson` |
 | `bench/regexp/` | 1.27 | Comparisons and benchmarks of `regexp` |
+| `bench/image/` | 1.26 | Benchmarks of `png` and `webp` against other encoders, with Go and C decoders checking every output |
 
 ```sh
-# Fuzz against encoding/base64 and regexp.
+# Fuzz base64, regexp and png against the standard library, and webp round trips.
 go test -run '^$' -fuzz FuzzCodecDifferential ./base64
 go test -run '^$' -fuzz FuzzDiff ./regexp
+go test -run '^$' -fuzz FuzzEncode ./png
+go test -run '^$' -fuzz FuzzEncode ./webp
 
 # In bench/json: fuzz json against encoding/json, and ojson against gjson and sjson.
 go test -run '^$' -fuzz FuzzUnmarshal ./jdiff   # also FuzzDecoder, FuzzFormat, FuzzMarshal
@@ -428,8 +636,10 @@ How to reproduce the published numbers is in the reproducing section of
 each benchmark results page:
 [base64](docs/benchmark-results-linux-amd64.md#reproducing),
 [json](docs/json-benchmark-results-linux-amd64.md#reproducing),
-[ojson](docs/ojson-benchmark-results-linux-amd64.md#reproducing) and
-[regexp](docs/regexp-benchmark-results-linux-amd64.md#reproducing).
+[ojson](docs/ojson-benchmark-results-linux-amd64.md#reproducing),
+[regexp](docs/regexp-benchmark-results-linux-amd64.md#reproducing),
+[png](docs/png-benchmark-results-linux-amd64.md#reproducing) and
+[webp](docs/webp-benchmark-results-linux-amd64.md#reproducing).
 
 ## License
 

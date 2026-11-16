@@ -1,0 +1,6 @@
+go test fuzz v1
+byte(')')
+byte('\x1b')
+byte('\u0088')
+byte('\x01')
+[]byte("101C170y217001X0010B70C7000B87")
