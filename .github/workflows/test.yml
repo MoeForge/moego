@@ -1,12 +1,21 @@
 name: Test and benchmark
 
+# Pushes to main and pull requests run the tests. The benchmarks, which
+# take most of a runner's time and only describe that runner, run when the
+# workflow is started by hand.
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
+
+# A newer push to the same branch or pull request cancels the run before it.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -66,6 +75,34 @@ jobs:
           go vet -tags=purego ./...
       - name: Native correctness and protected-page boundaries
         run: go test -count=1 -v ./...
+
+  # The race detector, pointer checks and the portable fallback test the
+  # same code on every Go version, so they run once per architecture.
+  safety:
+    name: Race, pointer and portable checks / linux-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      MOEGO_REQUIRE_AVX2: ${{ matrix.arch == 'amd64' && '1' || '0' }}
+      GOTOOLCHAIN: local
+      GOPROXY: 'off'
+      GOSUMDB: 'off'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version: '1.27.x'
+          cache: false
       - name: Race detector
         run: go test -race -count=1 ./...
       - name: Pointer checks
@@ -125,11 +162,15 @@ jobs:
       # the benchmarked engines produce the same output.
       - name: API surface, differential, regression and output tests
         run: go test -count=1 ./...
+      # As in the tests above, once per architecture.
       - name: Race detector
+        if: matrix.go == '1.27.x' && matrix.goexperiment == ''
         run: go test -race -count=1 ./diff ./jdiff
       - name: Pointer checks
+        if: matrix.go == '1.27.x' && matrix.goexperiment == ''
         run: go test -gcflags=all=-d=checkptr=2 -count=1 ./diff ./jdiff
       - name: Portable fallback
+        if: matrix.go == '1.27.x' && matrix.goexperiment == ''
         run: go test -tags=purego -count=1 ./diff ./jdiff
 
   regexp:
@@ -192,6 +233,7 @@ jobs:
           GOMEMLIMIT: 'off'
         run: go test -run '^TestPeak$' -count=1 -v .
       - name: Measure matching and cold compilation
+        if: github.event_name == 'workflow_dispatch'
         run: |
           go test -c -o regexp.test
           python3 measure.py speed --binary ./regexp.test --output results --repetitions 5 --benchtime 200ms
@@ -199,7 +241,7 @@ jobs:
           go env GOOS GOARCH GOAMD64 >> results/environment.txt
           lscpu >> results/environment.txt
       - name: Upload regex measurements
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v7
         with:
           name: regexp-linux-${{ matrix.arch }}-${{ github.run_id }}
@@ -210,6 +252,7 @@ jobs:
   benchmark:
     name: Benchmark / linux-${{ matrix.arch }}
     needs: test
+    if: github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
