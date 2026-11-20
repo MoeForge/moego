@@ -770,12 +770,14 @@ func (d *Doc) remove(c *container, k setComp) (int, bool) {
 		return 0, false
 	}
 	m := c.items[i]
+	delta := -len(m.gap) - m.v.len()
 	switch {
 	case i > 0:
 		// From the comma before the member through its value: the
 		// whitespace after the previous value stays.
 		g := m.gap
 		ws := g[:skipSpace(g, 0)]
+		delta += len(ws)
 		if i+1 < len(c.items) {
 			n := &c.items[i+1]
 			n.gap = d.join(ws, n.gap)
@@ -788,18 +790,20 @@ func (d *Doc) remove(c *container, k setComp) (int, bool) {
 		n := &c.items[1]
 		cut := skipSpace(n.gap, 0) + 1
 		n.gap = n.gap[cut:]
+		delta -= cut
 		if c.obj {
 			n.shiftKey(-cut)
 		} else {
 			n.gap = d.join(m.gap, n.gap)
+			delta += len(m.gap)
 		}
 	case !c.obj:
 		c.tail = d.join(m.gap, c.tail)
+		delta += len(m.gap)
 	}
-	old := c.size
 	c.items = append(c.items[:i], c.items[i+1:]...)
-	c.size = c.measure()
-	return c.size - old, true
+	c.size += delta
+	return delta, true
 }
 
 func (d *Doc) flatDelete(path string) error {
