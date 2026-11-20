@@ -16,6 +16,8 @@ func FuzzDiff(f *testing.F) {
 		{`a+`, "baaab"}, {`(?i)error`, "An ERROR"}, {`(\w+)@(\w+)`, "x@y z@w"}, {`(?s)<think>(.*?)</think>`, "<think>a\nb</think>"},
 		{`\p{Han}+`, "日本語ab日"}, {`[^a]+`, "a\xffb\xe6\x97"}, {`\x{FFFD}`, "\xef\xbf\xbd\xff"}, {`(a|ab)(c|bcd)(d*)`, "abcd"},
 		{`^$`, ""}, {`\b`, "ab cd"}, {`(?m)^(\w+):\s*(.*)$`, "k: v\nx:y"}, {`(a*)+`, "b"}, {`[a-z]{2,4}?`, "abcdef"},
+		{isoDate, "2026-11-20T15:29:32.010+08:00"}, {`^((a)|(日))*?()$`, "a日a"},
+		{`\A((?i:k)|\x{FFFD})*(\b!)?\z`, "K\xffK!"},
 	}
 	for _, s := range seeds {
 		f.Add(s.pat, s.text, uint8(0))
@@ -31,6 +33,12 @@ func FuzzDiff(f *testing.F) {
 		}
 		if err != nil {
 			return
+		}
+		// Exercise the warmed capture search even when this input misses.
+		if got.c.anchorStart && got.c.numSubexp > 0 {
+			if p := got.c.engines().onePassCaptures(); p != nil && p.hits.CompareAndSwap(0, onePassTableHits) {
+				p.table.Store(p.buildTable())
+			}
 		}
 		texts := []string{text}
 		// Cut the text inside a multibyte sequence.

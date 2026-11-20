@@ -106,6 +106,8 @@ func (c *core) analyze(re *syntax.Regexp, rp *runPlan) {
 	if w := newWildPlan(re); w != nil {
 		c.kind = planWild
 		c.sub = unsafe.Pointer(w)
+		c.anchorStart, c.anchorEnd = true, true
+		c.reqPrefix, c.reqSuffix = w.prefix, w.suffix
 		return
 	}
 	if lr := newLitRunPlan(inner); lr != nil {

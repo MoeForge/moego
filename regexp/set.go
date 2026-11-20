@@ -107,9 +107,12 @@ func (s *Set) all(text string, n int, f func(a, b, i int)) {
 		return
 	}
 	var buf [smallSub]int
-	m := s.union.subBuf(&buf)
+	var m []int
 	count := 0
 	s.union.matches(text, func(a, b int) bool {
+		if m == nil {
+			m = s.union.subBuf(buf[:])
+		}
 		m[0], m[1] = a, b
 		s.union.c.captures(text, m)
 		f(a, b, s.which(m))

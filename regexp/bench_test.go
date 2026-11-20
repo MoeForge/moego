@@ -1,6 +1,9 @@
 package regexp
 
 import (
+	stdre "regexp"
+	"slices"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -93,4 +96,88 @@ func BenchmarkNegIndex(b *testing.B) {
 			}
 		}
 	})
+}
+
+// isoDate is the anchored pattern with 11 capture groups from issue #6.
+const isoDate = `^([+-][0-9]{6}|[0-9]{4})(?:-([0-9]{2})(?:-([0-9]{2}))?)?(?:[Tt]([0-9]{2}):([0-9]{2})(?::([0-9]{2})(?:\.([0-9]+))?)?(?:([Zz])|([+-])([0-9]{2}):?([0-9]{2}))?)?$`
+const isoDateHit = "2026-11-20T15:29:32.010+08:00"
+
+func BenchmarkISODate(b *testing.B) {
+	std, re := stdre.MustCompile(isoDate), MustCompile(isoDate)
+	for _, in := range []struct{ name, text string }{
+		{"hit", isoDateHit},
+		{"miss", "Fri, 20 Nov 2026 15:29:32 +0800"},
+		{"bad-zone-digit", "2026-11-20T15:29:32.010+08:0!"},
+		{"bad-minute-digit", "2026-11-20T15:2!:32.010+08:00"},
+	} {
+		if !slices.Equal(std.FindStringSubmatch(in.text), re.FindStringSubmatch(in.text)) {
+			b.Fatalf("%s: submatches differ", in.name)
+		}
+		for _, impl := range []struct {
+			name     string
+			match    func(string) bool
+			submatch func(string) []string
+		}{
+			{"stdlib", std.MatchString, std.FindStringSubmatch},
+			{"moego", re.MatchString, re.FindStringSubmatch},
+		} {
+			b.Run(in.name+"/MatchString/"+impl.name, func(b *testing.B) {
+				b.ReportAllocs()
+				for i := 0; i < b.N; i++ {
+					impl.match(in.text)
+				}
+			})
+			b.Run(in.name+"/FindStringSubmatch/"+impl.name, func(b *testing.B) {
+				b.ReportAllocs()
+				// Measure misses on the same warmed expression as hits.
+				for range 128 {
+					impl.submatch(isoDateHit)
+				}
+				b.ResetTimer()
+				for i := 0; i < b.N; i++ {
+					impl.submatch(in.text)
+				}
+			})
+		}
+	}
+}
+
+// Measure the search with an owned index result. These hits have the same
+// result allocation in both engines, including when the scratch is pooled.
+func BenchmarkOnePassSubmatchIndex(b *testing.B) {
+	for _, tc := range []struct{ name, pat, text string }{
+		{"date", isoDate, isoDateHit},
+		{"repeated", `^a(/b+(#c+)*)*$`, "a/b#cc/bb#ccc"},
+		{"unicode", `(?i)^((k)|(s)|(日)|([\x{FFFD}]))+$`, "K日ſ\xffK"},
+		{"many", "^" + strings.Repeat("(a)", 32) + "(z)?$", strings.Repeat("a", 32) + "z"},
+	} {
+		re, std := MustCompile(tc.pat), stdre.MustCompile(tc.pat)
+		want := std.FindStringSubmatchIndex(tc.text)
+		if want == nil || !slices.Equal(re.FindStringSubmatchIndex(tc.text), want) {
+			b.Fatalf("%s: submatch indexes differ or input does not match", tc.name)
+		}
+		b.Run(tc.name, func(b *testing.B) {
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				re.FindStringSubmatchIndex(tc.text)
+			}
+		})
+	}
+}
+
+// Measure the cost over the lifetime of a freshly compiled expression,
+// including setup that a steady-state submatch benchmark amortizes away.
+func BenchmarkISODateReuse(b *testing.B) {
+	defer SetCacheSize(SetCacheSize(0))
+	for _, uses := range []int{1, 256} {
+		b.Run(strconv.Itoa(uses), func(b *testing.B) {
+			b.ReportAllocs()
+			for i := 0; i < b.N; i++ {
+				re := MustCompile(isoDate)
+				for range uses {
+					re.FindStringSubmatch(isoDateHit)
+				}
+			}
+		})
+	}
 }

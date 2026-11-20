@@ -10,30 +10,53 @@ import (
 	"unsafe"
 )
 
-// smallSub is the number of submatch indexes kept on the stack.
-const smallSub = 20
+// Stack buffers for repeated matches and for a single submatch search.
+const (
+	smallSub      = 20
+	smallSubmatch = 32
+)
 
-// subBuf returns a slice for the submatch indexes of re, in buf if it fits.
-func (re *Regexp) subBuf(buf *[smallSub]int) []int {
+// subBuf returns a slice for the submatch indexes of re, in buf if it is
+// not nil and the indexes fit.
+func (re *Regexp) subBuf(buf []int) []int {
 	n := 2 * (re.c.numSubexp + 1)
-	if n <= smallSub {
+	if n <= len(buf) {
 		return buf[:n]
 	}
 	return make([]int, n)
 }
 
-// submatchAt finds the leftmost match at or after pos and fills dst with
-// its submatch indexes.
-func (re *Regexp) submatchAt(s string, pos int, dst []int) bool {
-	a, b := re.find(s, pos)
+// submatch returns the indexes of the leftmost match in s, in buf when
+// they fit. A miss needs no result allocation.
+func (re *Regexp) submatch(s string, buf []int) []int {
+	c := re.c
+	var fixed []int32
+	if c.anchorStart && c.numSubexp != 0 {
+		if uint(len(s)-c.minLen) > c.lenSpan || c.reqSuffix != "" && !strings.HasSuffix(s, c.reqSuffix) {
+			return nil
+		}
+		e := c.engines()
+		if c.kind != planOnePassLit {
+			fixed = e.fixed
+		}
+		if fixed == nil {
+			if p := e.onePassCaptures(); p != nil {
+				return p.submatch(s, buf)
+			}
+		}
+	}
+	a, b := re.find(s, 0)
 	if a < 0 {
-		return false
+		return nil
 	}
-	dst[0], dst[1] = a, b
-	if len(dst) > 2 {
-		re.c.captures(s, dst)
+	m := re.subBuf(buf)
+	m[0], m[1] = a, b
+	if fixed != nil {
+		fixedCaptures(fixed, m)
+	} else if len(m) > 2 {
+		re.c.captures(s, m)
 	}
-	return true
+	return m
 }
 
 // FindSubmatchIndex returns a slice holding the index pairs identifying the
@@ -50,12 +73,7 @@ func (re *Regexp) FindSubmatchIndex(b []byte) []int {
 // 'Index' descriptions in the package comment. A return value of nil
 // indicates no match.
 func (re *Regexp) FindStringSubmatchIndex(s string) []int {
-	var buf [smallSub]int
-	m := re.subBuf(&buf)
-	if !re.submatchAt(s, 0, m) {
-		return nil
-	}
-	return append([]int(nil), m...)
+	return re.submatch(s, nil)
 }
 
 // FindSubmatch returns a slice of slices holding the text of the leftmost
@@ -63,9 +81,9 @@ func (re *Regexp) FindStringSubmatchIndex(s string) []int {
 // subexpressions, as defined by the 'Submatch' descriptions in the package
 // comment. A return value of nil indicates no match.
 func (re *Regexp) FindSubmatch(b []byte) [][]byte {
-	var buf [smallSub]int
-	m := re.subBuf(&buf)
-	if !re.submatchAt(bstr(b), 0, m) {
+	var buf [smallSubmatch]int
+	m := re.submatch(bstr(b), buf[:])
+	if m == nil {
 		return nil
 	}
 	out := make([][]byte, len(m)/2)
@@ -82,9 +100,9 @@ func (re *Regexp) FindSubmatch(b []byte) [][]byte {
 // its subexpressions, as defined by the 'Submatch' description in the
 // package comment. A return value of nil indicates no match.
 func (re *Regexp) FindStringSubmatch(s string) []string {
-	var buf [smallSub]int
-	m := re.subBuf(&buf)
-	if !re.submatchAt(s, 0, m) {
+	var buf [smallSubmatch]int
+	m := re.submatch(s, buf[:])
+	if m == nil {
 		return nil
 	}
 	out := make([]string, len(m)/2)
@@ -98,13 +116,19 @@ func (re *Regexp) FindStringSubmatch(s string) []string {
 
 // allSubmatches returns the submatch indexes of successive matches, as
 // FindAllStringIndex finds them, flattened with a stride of
-// 2*(NumSubexp()+1). The caller releases p.
-func (re *Regexp) allSubmatches(s string, n int, small *[smallPairs]int) (p *[]int, flat []int, k int) {
+// 2*(NumSubexp()+1).
+func (re *Regexp) allSubmatches(s string, n int, small *[smallPairs]int) (flat []int, k int) {
+	if re.c.anchorStart && n != 0 {
+		if m := re.submatch(s, small[:]); m != nil {
+			return m, 1
+		}
+		return nil, 0
+	}
 	pp, m := re.collect(s, n, small)
 	k = len(m) / 2
 	if k == 0 {
 		release(pp)
-		return nil, nil, 0
+		return nil, 0
 	}
 	stride := 2 * (re.c.numSubexp + 1)
 	flat = make([]int, k*stride)
@@ -116,7 +140,7 @@ func (re *Regexp) allSubmatches(s string, n int, small *[smallPairs]int) (p *[]i
 		}
 	}
 	release(pp)
-	return nil, flat, k
+	return flat, k
 }
 
 // FindAllSubmatchIndex is the 'All' version of FindSubmatchIndex; it
@@ -132,26 +156,67 @@ func (re *Regexp) FindAllSubmatchIndex(b []byte, n int) [][]int {
 // the expression, as defined by the 'All' description in the package
 // comment. A return value of nil indicates no match.
 func (re *Regexp) FindAllStringSubmatchIndex(s string, n int) [][]int {
+	c := re.c
 	var small [smallPairs]int
-	pp, m := re.collect(s, n, &small)
+	var pp *[]int
+	var m []int
+	switch {
+	case c.kind == planLitRun:
+		// This plan already collects pairs directly. Short searches,
+		// including misses, can finish entirely in the stack buffer.
+		if n < 0 {
+			n = len(s) + 1
+		}
+		st := allState{prev: -1}
+		m = c.litRun().appendAll(c.pf, small[:0], s, n, &st, true)
+		if !st.done {
+			pp, m = re.collectMore(s, n, &st, m)
+		}
+	case c.anchorStart && n != 0:
+		return re.anchoredSubmatchIndex(s)
+	default:
+		pp, m = re.collect(s, n, &small)
+	}
 	k := len(m) / 2
 	if k == 0 {
 		release(pp)
 		return nil
 	}
-	stride := 2 * (re.c.numSubexp + 1)
+	stride := 2 * (c.numSubexp + 1)
 	out, flat := subIndexResult(k, stride)
 	for i := 0; i < k; i++ {
 		d := flat[i*stride : (i+1)*stride : (i+1)*stride]
 		d[0], d[1] = m[2*i], m[2*i+1]
 		if stride > 2 {
-			re.c.captures(s, d)
+			c.captures(s, d)
 		}
 		out[i] = d
 	}
 	release(pp)
 	return out
 }
+
+// anchoredSubmatchIndex packs the single possible result as subIndexResult
+// does and lets submatch return owned indexes for larger results.
+func (re *Regexp) anchoredSubmatchIndex(s string) [][]int {
+	var small [packedSubIndexes]int
+	if 2*(re.c.numSubexp+1) > len(small) {
+		if m := re.submatch(s, nil); m != nil {
+			return [][]int{m[:len(m):len(m)]}
+		}
+		return nil
+	}
+	m := re.submatch(s, small[:])
+	if m == nil {
+		return nil
+	}
+	out, flat := subIndexResult(1, len(m))
+	copy(flat, m)
+	out[0] = flat[:len(m):len(m)]
+	return out
+}
+
+const packedSubIndexes = 16
 
 // subIndexResult returns the result slice and the flat index storage of k
 // submatch results of stride ints, in one allocation when they are small.
@@ -163,10 +228,10 @@ func subIndexResult(k, stride int) ([][]int, []int) {
 		})
 		return r.out[:], r.flat[:stride]
 	}
-	if k*stride <= 16 && k <= 4 {
+	if k*stride <= packedSubIndexes && k <= 4 {
 		r := new(struct {
 			out  [4][]int
-			flat [16]int
+			flat [packedSubIndexes]int
 		})
 		return r.out[:k:k], r.flat[:k*stride]
 	}
@@ -179,7 +244,7 @@ func subIndexResult(k, stride int) ([][]int, []int) {
 // match.
 func (re *Regexp) FindAllSubmatch(b []byte, n int) [][][]byte {
 	var small [smallPairs]int
-	_, flat, k := re.allSubmatches(bstr(b), n, &small)
+	flat, k := re.allSubmatches(bstr(b), n, &small)
 	if k == 0 {
 		return nil
 	}
@@ -203,7 +268,7 @@ func (re *Regexp) FindAllSubmatch(b []byte, n int) [][][]byte {
 // indicates no match.
 func (re *Regexp) FindAllStringSubmatch(s string, n int) [][]string {
 	var small [smallPairs]int
-	_, flat, k := re.allSubmatches(s, n, &small)
+	flat, k := re.allSubmatches(s, n, &small)
 	if k == 0 {
 		return nil
 	}
@@ -355,7 +420,7 @@ func (re *Regexp) replaceAll(src string, ncap int, grow int, add func(dst []byte
 	var buf [smallSub]int
 	m := buf[:2]
 	if ncap > 2 {
-		m = re.subBuf(&buf)
+		m = re.subBuf(buf[:])
 	}
 	var out []byte
 	if grow >= 0 {
@@ -435,6 +500,15 @@ func (re *Regexp) ReplaceAll(src, repl []byte) []byte {
 func (re *Regexp) replaceTemplate(src, repl string) ([]byte, bool) {
 	if strings.IndexByte(repl, '$') < 0 {
 		return re.replaceLiteral(src, repl)
+	}
+	if re.c.anchorStart && re.c.numSubexp > 0 {
+		var buf [smallSubmatch]int
+		m := re.submatch(src, buf[:])
+		if m == nil {
+			return nil, false
+		}
+		out := re.expand(make([]byte, 0, len(src)+len(src)/8+16), repl, src, m)
+		return append(out, src[m[1]:]...), true
 	}
 	return re.replaceAll(src, 2*(re.c.numSubexp+1), -1, func(dst []byte, m []int) []byte {
 		return re.expand(dst, repl, src, m)
@@ -638,9 +712,19 @@ func (re *Regexp) allIndex(s string) iter.Seq[[]int] {
 // submatches yields the submatch indexes of successive matches in s. The
 // slice is reused between calls.
 func (re *Regexp) submatches(s string, yield func(m []int) bool) {
-	var buf [smallSub]int
-	d := re.subBuf(&buf)
+	if re.c.anchorStart {
+		if m := re.submatch(s, nil); m != nil {
+			yield(m)
+		}
+		return
+	}
+	// d escapes through yield, so a stack buffer for it would move to the
+	// heap on every call. It is allocated at the first match instead.
+	var d []int
 	re.matches(s, func(x, y int) bool {
+		if d == nil {
+			d = re.subBuf(nil)
+		}
 		d[0], d[1] = x, y
 		if len(d) > 2 {
 			re.c.captures(s, d)
@@ -781,14 +865,10 @@ func (re *Regexp) LiteralPrefix() (prefix string, complete bool) {
 	p := compileProg(re.c.parse(), re.c.numSubexp)
 	insts := p.insts
 	pc := p.start
-	if p.onePass() {
+	if p.onePass(nil) {
 		// A one-pass program starts with \A: the literal follows it, and
 		// it is complete when only \z follows the literal.
-		pc = insts[pc].out
-		for insts[pc].op == opNop {
-			pc = insts[pc].out
-		}
-		lit, pc := p.literalRun(pc, false)
+		lit, pc := p.onePassPrefix()
 		in := &insts[pc]
 		if lit == "" {
 			return "", in.op == opMatch

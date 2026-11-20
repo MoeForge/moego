@@ -2,17 +2,62 @@ package regexp
 
 import (
 	"regexp/syntax"
+	"slices"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"unicode"
+	"unicode/utf8"
 )
+
+// A onePassProg keeps the branch choices proved disjoint by onePass.
+// The rune instructions and capture numbering belong to the original prog.
+type onePassProg struct {
+	prog
+	alts        []onePassAlt
+	first, last bset // possible first and last bytes of nonempty input
+	prefix      string
+	entry       uint32        // after the leading \A and prefix
+	hits        atomic.Uint32 // successful interpreted searches, until table construction
+	large       sync.Pool     // *[]int, for captures that do not fit on the stack
+	table       atomic.Pointer[onePassTable]
+}
+
+type onePassAlt struct {
+	left, right []rune
+	empty       uint32 // branch that can match without reading, or opFail at 0
+}
+
+func (a *onePassAlt) next(in *inst, r rune) uint32 {
+	if classHas(a.left, r) {
+		return in.out
+	}
+	if classHas(a.right, r) {
+		return in.out1
+	}
+	return a.empty
+}
+
+// onePassCaptures builds the anchored capture search independently of the
+// engines that recover captures inside an already known match.
+func (e *engines) onePassCaptures() *onePassProg {
+	e.oneOnce.Do(func() {
+		p := new(onePassProg)
+		if e.prog.onePass(p) {
+			e.one = p
+		}
+	})
+	return e.one
+}
 
 // onePass reports whether the program is one-pass: it starts with \A, and
 // at each alternation the next character
 // selects at most one branch, where at most one branch may reach the match
 // without reading. LiteralPrefix reports a result that depends on this
 // verdict, so it follows the standard library's rules for it, including the
-// loop rewrites below and the size limit.
-func (p *prog) onePass() bool {
+// loop rewrites below and the size limit. If dst is supplied, it also
+// records the branches and prefix for execution.
+func (p *prog) onePass(dst *onePassProg) bool {
 	insts := p.insts
 	n := len(insts)
 	if p.start == 0 || n >= 1000 {
@@ -25,11 +70,11 @@ func (p *prog) onePass() bool {
 	// the match; in a program with alternations, or with onePassEndOnly,
 	// nothing else may either.
 	toMatch := func(pc uint32) bool { return insts[pc].op == opMatch }
-	hasAlt := false
+	nalt := 0
+	endOnly := true
 	for i := range insts {
 		if insts[i].op == opAlt {
-			hasAlt = true
-			break
+			nalt++
 		}
 	}
 	for i := range insts {
@@ -45,8 +90,11 @@ func (p *prog) onePass() bool {
 			}
 		case opMatch, opFail:
 		default:
-			if (hasAlt || onePassEndOnly) && toMatch(in.out) {
-				return false
+			if toMatch(in.out) {
+				if nalt != 0 || onePassEndOnly {
+					return false
+				}
+				endOnly = false
 			}
 		}
 	}
@@ -56,18 +104,24 @@ func (p *prog) onePass() bool {
 	// branch O is not: if B loops straight back to A, that loop leads to O
 	// instead; then, if B's branch that was checked for the loop leads to
 	// O, A skips B and goes to B's other branch.
-	left := make([]uint32, 2*n)
-	right := left[n:]
-	left = left[:n]
-	for i := range insts {
-		left[i], right[i] = insts[i].out, insts[i].out1
+	if nalt != 0 {
+		insts = slices.Clone(insts)
+	}
+	if dst != nil {
+		dst.prog = *p
+		dst.insts = insts
+		dst.alts = make([]onePassAlt, nalt)
 	}
 	isAlt := func(pc uint32) bool { return insts[pc].op == opAlt }
+	alt := uint32(0)
 	for pc := range insts {
 		if !isAlt(uint32(pc)) {
 			continue
 		}
-		toB, other := &right[pc], &left[pc]
+		in := &insts[pc]
+		in.arg = alt
+		alt++
+		toB, other := &in.out1, &in.out
 		if !isAlt(*toB) {
 			toB, other = other, toB
 			if !isAlt(*toB) {
@@ -78,7 +132,7 @@ func (p *prog) onePass() bool {
 			continue
 		}
 		b := *toB
-		loop, rest := &left[b], &right[b]
+		loop, rest := &insts[b].out, &insts[b].out1
 		if *rest == uint32(pc) && *loop != uint32(pc) {
 			loop, rest = rest, loop
 		}
@@ -114,7 +168,7 @@ func (p *prog) onePass() bool {
 		case opMatch, opFail:
 			null[pc] = in.op == opMatch
 		case opAlt:
-			x, y := left[pc], right[pc]
+			x, y := in.out, in.out1
 			if !check(x) || !check(y) || null[x] && null[y] {
 				return false
 			}
@@ -124,6 +178,15 @@ func (p *prog) onePass() bool {
 				return false
 			}
 			first[pc] = m
+			if dst != nil {
+				a := onePassAlt{left: first[x], right: first[y]}
+				if null[x] {
+					a.empty = x
+				} else if null[y] {
+					a.empty = y
+				}
+				dst.alts[in.arg] = a
+			}
 		case opNop, opSave, opEmpty:
 			if !check(in.out) {
 				return false
@@ -150,7 +213,127 @@ func (p *prog) onePass() bool {
 			return false
 		}
 	}
+	if dst != nil {
+		dst.prefix, dst.entry = p.onePassPrefix()
+		if !endOnly || 2*(p.numCap+1) > maxStepSlots || n > maxStepInsts {
+			dst.hits.Store(onePassTableHits)
+		}
+		if null[p.start] && !endOnly {
+			dst.first.addRange(0, 255) // an empty prefix can match on any input
+		} else {
+			dst.first.addRuneBytes(first[p.start])
+		}
+		if !endOnly {
+			dst.last.addRange(0, 255)
+		} else {
+			// The last rune must leave only empty instructions before match.
+			for pc, in := range insts {
+				if read[pc] && null[in.out] {
+					dst.last.addRuneBytes(first[pc])
+				}
+			}
+		}
+	}
 	return true
+}
+
+// addRuneBytes adds the ASCII bytes in rs. A non-ASCII member admits any
+// high byte, including malformed input when the class contains U+FFFD.
+func (b *bset) addRuneBytes(rs []rune) {
+	for i := 0; i < len(rs); i += 2 {
+		lo, hi := rs[i], rs[i+1]
+		if hi >= utf8.RuneSelf {
+			b.addRange(byte(min(lo, utf8.RuneSelf)), 255)
+			break
+		}
+		b.addRange(byte(lo), byte(hi))
+	}
+}
+
+// onePassPrefix returns the literal after the initial begin-text assertion.
+// A capture ends the literal so that execution visits its save instruction.
+func (p *prog) onePassPrefix() (string, uint32) {
+	pc := p.insts[p.start].out
+	for p.insts[pc].op == opNop {
+		pc = p.insts[pc].out
+	}
+	return p.literalRun(pc, false)
+}
+
+// submatch writes into buf when the indexes fit. Otherwise it searches in
+// scratch and allocates the caller's result only after a match.
+func (p *onePassProg) submatch(s string, buf []int) []int {
+	if len(s) > 0 && (!p.first.has(s[0]) || !p.last.has(s[len(s)-1])) || !strings.HasPrefix(s, p.prefix) {
+		return nil
+	}
+	n := 2 * (p.numCap + 1)
+	var small [smallSubmatch]int
+	m := buf
+	switch {
+	case n <= len(buf):
+	case n <= len(small):
+		m = small[:]
+	default:
+		v, _ := p.large.Get().(*[]int)
+		if v == nil {
+			slots := make([]int, n)
+			v = &slots
+		}
+		defer p.large.Put(v)
+		m = *v
+	}
+	if !p.match(s, m[:n]) {
+		return nil
+	}
+	if n <= len(buf) {
+		return buf[:n]
+	}
+	// Older versions of slices.Clone append to m[:0:0], which makes
+	// the local scratch escape even when the search fails.
+	return append([]int(nil), m[:n]...)
+}
+
+// match follows a single instruction path. At an alternation the current
+// rune selects the branch before any of its captures are written.
+func (p *onePassProg) match(s string, m []int) bool {
+	for i := range m {
+		m[i] = -1
+	}
+	pos, pc := len(p.prefix), p.entry
+	if table := p.table.Load(); table != nil {
+		return table.match(s, pos, m)
+	}
+	r, width := decodeAt(s, pos)
+	for {
+		in := &p.insts[pc]
+		switch in.op {
+		case opFail:
+			return false
+		case opMatch:
+			m[0], m[1] = 0, pos
+			if p.hits.Load() < onePassTableHits && p.hits.Add(1) == onePassTableHits {
+				p.table.Store(p.buildTable())
+			}
+			return true
+		case opAlt:
+			pc = p.alts[in.arg].next(in, r)
+			continue
+		case opSave:
+			m[in.arg] = pos
+		case opEmpty:
+			if syntax.EmptyOp(in.arg)&^syntax.EmptyOpContext(runeBefore(s, pos), r) != 0 {
+				return false
+			}
+		case opNop:
+		default:
+			if width == 0 || !p.matchRune(in, r) {
+				return false
+			}
+			pos += width
+			r, width = decodeAt(s, pos)
+		}
+		pc = in.out
+	}
 }
 
 // onePassLit is the plan of one-pass patterns that start with \A and a
@@ -171,14 +354,10 @@ func (p *prog) onePassLitPlan() *onePassLit {
 	if in.op != opEmpty || syntax.EmptyOp(in.arg)&syntax.EmptyBeginText == 0 {
 		return nil
 	}
-	pc := in.out
-	for p.insts[pc].op == opNop {
-		pc = p.insts[pc].out
-	}
 	// literalRun stops at U+FFFD itself, so an encoded U+FFFD in the
 	// literal stands for a surrogate.
-	lit, end := p.literalRun(pc, false)
-	if !strings.Contains(lit, "\uFFFD") || !p.onePass() {
+	lit, end := p.onePassPrefix()
+	if !strings.Contains(lit, "\uFFFD") || !p.onePass(nil) {
 		return nil
 	}
 	return &onePassLit{lit: lit, end: end}

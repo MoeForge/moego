@@ -291,6 +291,83 @@ func TestDiffCaptureSteps(t *testing.T) {
 	}
 }
 
+// TestDiffManyCaptures covers patterns with more submatch indexes than
+// fit on the stack (smallSub) and than the memoized capture walk held
+// before (16): their memoized steps set high slots, cross or end at \n
+// under (?m)$, and meet \b, which they cannot memoize.
+func TestDiffManyCaptures(t *testing.T) {
+	pats := []string{isoDate, `(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)(l)(m)(n)(o)(p)(q)(r)(s)(t)(u)(v)(w)(x)`,
+		`^(\d+)-(\d+)-(\d+)(?:T(\d+):(\d+)(?::(\d+))?)?(Z?)$`, `(?m)^(\w)(\w)(\w)(\w)(\w)(\w)(\w)(\w)(\w)(\w)$`,
+		`(?m)(a)(b)(c)(d)(e)(f)(g)(h)$(\n?)(x*)`, `(\w+)(\b)( ?)(\d*)(\.?)(\d*)(,?)(\s*)(\w*)(\b)(!?)`}
+	parts := []string{"2026", "-11", "-20", "T15", ":29", ":32", ".010", "+08", ":00", "Z", "t", "+", "abcdefgh", "ijklmnop", "qrstuvwx",
+		"a", "x", "\n", " ", "12", ".", ",", "!", "é", "\xff", "日"}
+	r := rand.New(rand.NewPCG(31, 32))
+	for _, p := range pats {
+		for _, in := range []string{"", "2026-11-20T15:29:32.010+08:00", "+202611-20t15:29Z", "Fri, 20 Nov 2026", "abcdefghijklmnopqrstuvwx", "abcdefgh\nxx"} {
+			checkAPI(t, p, in, false)
+			checkAPI(t, p, in, true)
+		}
+		for iter := 0; iter < randomIterations(300); iter++ {
+			var b strings.Builder
+			for k := r.IntN(10); k > 0; k-- {
+				b.WriteString(parts[r.IntN(len(parts))])
+			}
+			checkAPI(t, p, b.String(), iter%4 == 0)
+		}
+		if t.Failed() {
+			t.Fatalf("stopping after first failing pattern %q", p)
+		}
+	}
+}
+
+// TestDiffCaptureLineEnds covers memoized steps through $ in multi-line
+// mode and \z, which they decide from the byte at hand: each pattern has
+// an assertion on one branch and joins the other at the same instruction,
+// so taking the branch wrongly changes which group is set. Inputs hold
+// several matches, so later ones reuse the steps of earlier ones.
+func TestDiffCaptureLineEnds(t *testing.T) {
+	pats := []string{`(?m)a(?:($)|())[b\n]`, `(?m)a(?:()|($))[b\n]`, `(?m)(\w)(?:($)|(\s*?))(\s?)(\w?)`,
+		`a(?:(\z)|())b`, `(?m)a(?:($\n)|(\n?))(b?)`, `(?m)(x)(?:($)|())[^a]`}
+	ins := []string{"ab a\n", "a\n ab", "a\nb", "ab", "a\n", "a b\nc d\n", "x\nxbx\n", "aa\n\nab", "a"}
+	for _, p := range pats {
+		for _, in := range ins {
+			checkAPI(t, p, in, false)
+			checkAPI(t, p, in, true)
+		}
+	}
+}
+
+// TestSubmatchMissAllocs checks that a failed submatch search allocates
+// nothing, also for patterns whose indexes do not fit on the stack.
+func TestSubmatchMissAllocs(t *testing.T) {
+	if raceEnabled {
+		t.Skip("allocations differ under the race detector")
+	}
+	const early = "Fri, 20 Nov 2026 15:29:32 +0800"
+	for _, tc := range []struct{ pat, text string }{
+		{isoDate, early}, {`(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)`, early}, {`(x)(y)`, early},
+		{isoDate, "2026-11-20T15:29:32.010+08:!0"},
+		{"^" + strings.Repeat("(a)", 32) + "(b)?$", strings.Repeat("a", 30) + "!ab"},
+	} {
+		re, in := MustCompile(tc.pat), tc.text
+		b := []byte(in)
+		re.FindStringSubmatch(in)
+		for name, f := range map[string]func(){
+			"FindStringSubmatch":         func() { re.FindStringSubmatch(in) },
+			"FindSubmatch":               func() { re.FindSubmatch(b) },
+			"FindStringSubmatchIndex":    func() { re.FindStringSubmatchIndex(in) },
+			"FindAllStringSubmatch":      func() { re.FindAllStringSubmatch(in, -1) },
+			"FindAllStringSubmatchIndex": func() { re.FindAllStringSubmatchIndex(in, -1) },
+			"AllStringSubmatch":          func() { re.AllStringSubmatch(in)(func([]string) bool { return true }) },
+			"ReplaceAllString":           func() { re.ReplaceAllString(in, "$1") },
+		} {
+			if n := testing.AllocsPerRun(20, f); n != 0 {
+				t.Errorf("%q.%s on a miss: %v allocations, want 0", re, name, n)
+			}
+		}
+	}
+}
+
 // TestDiffLitRun covers patterns of a literal followed by a class run:
 // runs shorter than the minimum, runs capped by the maximum, candidates
 // inside an earlier run, and literals that end in run members.

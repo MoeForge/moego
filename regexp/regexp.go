@@ -64,6 +64,8 @@ type engines struct {
 	pike    sync.Pool
 	capPool sync.Pool   // *capScratch
 	used    atomic.Bool // a search ran since the last collection
+	oneOnce sync.Once
+	one     *onePassProg // capture search for anchored patterns, built by oneOnce
 }
 
 func (e *engines) touch() {
@@ -181,6 +183,9 @@ func compile(expr string, mode syntax.Flags, longest bool) (*Regexp, error) {
 		c.matchFn = matchWild
 	case c.kind == planDFA && c.pf == nil:
 		c.matchFn = matchDFA
+		if c.rejPre.mask|c.rejSuf.mask != 0 || c.reqPrefix != "" || c.reqSuffix != "" {
+			c.matchFn = matchDFAWithLiterals
+		}
 	default:
 		c.matchFn = (*core).match
 	}
@@ -469,11 +474,15 @@ func (re *Regexp) collect(s string, n int, small *[smallPairs]int) (*[]int, []in
 	if st.done {
 		return nil, m
 	}
-	// More matches than the buffer holds: continue in pooled scratch. The
-	// pool keeps the grown slice, so release needs only p.
+	return re.collectMore(s, n, &st, m)
+}
+
+// collectMore continues a full stack buffer in pooled scratch. The pool
+// keeps the grown slice so release needs only its pointer.
+func (re *Regexp) collectMore(s string, n int, st *allState, m []int) (*[]int, []int) {
 	p := pairsPool.Get().(*[]int)
 	pm := append((*p)[:0], m...)
-	pm = re.allMatches(pm, s, n, &st, false)
+	pm = re.allMatches(pm, s, n, st, false)
 	*p = pm
 	return p, pm
 }
@@ -762,18 +771,31 @@ func (c *core) match(s string) bool {
 	return a >= 0
 }
 
-// matchDFA is the match function of DFA patterns without a prefilter.
-func matchDFA(c *core, s string) bool {
-	if len(s) < c.minLen || len(s) >= 8 && (!c.rejPre.ok(load64(s, 0)) || !c.rejSuf.ok(load64(s, len(s)-8))) {
+// matchDFAWithLiterals checks the anchored literals before matching.
+func matchDFAWithLiterals(c *core, s string) bool {
+	if len(s) >= 8 && (!c.rejPre.ok(load64(s, 0)) || !c.rejSuf.ok(load64(s, len(s)-8))) {
 		return false
 	}
 	if e := c.eng.Load(); e != nil {
-		// rejPre and rejSuf hold the first and last 8 bytes of reqPrefix and
-		// reqSuffix, so the full tests matter only for longer literals.
+		// The word tests cover the first and last eight bytes of longer literals.
 		if len(c.reqPrefix) > 8 && !strings.HasPrefix(s, c.reqPrefix) ||
 			len(c.reqSuffix) > 8 && !strings.HasSuffix(s, c.reqSuffix) {
 			return false
 		}
+		e.touch()
+		if d := e.fwd.Load(); d != nil {
+			if ok, res := d.isMatch(s, c.anchorStart); res == resOK {
+				return ok
+			}
+		}
+	}
+	return c.match(s)
+}
+
+// matchDFA is the boolean search for a DFA with no literal tests. Match and
+// MatchString have already checked the input length bounds.
+func matchDFA(c *core, s string) bool {
+	if e := c.eng.Load(); e != nil {
 		e.touch()
 		if d := e.fwd.Load(); d != nil {
 			if ok, res := d.isMatch(s, c.anchorStart); res == resOK {

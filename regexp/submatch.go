@@ -8,16 +8,14 @@ import (
 	"unsafe"
 )
 
-// Submatches. A search finds the match [a, b] first. The captures are then
-// those of the highest-priority path from a that ends exactly at b, which is
-// the path that both leftmost-first and leftmost-longest matching report.
-// They come from, in order of preference:
-//   - fixed offsets, when everything before or after a group boundary has a
-//     fixed byte length, as in <think>(.*?)</think>;
-//   - a single-thread walk, while only one instruction can consume each
-//     character (one-pass windows such as "((?:[^"\\]|\\.)*)");
-//   - the backtracker, when the window is small;
-//   - the Pike machine.
+// An anchored one-pass search can record captures as it reads. For a known
+// match [a, b], the captures are those of the highest-priority path from a
+// that ends exactly at b, for both leftmost-first and leftmost-longest
+// matching. Fixed offsets give the boundaries directly when everything
+// before or after a boundary has a fixed byte length, as in <think>(.*?)</think>.
+// Otherwise a single-thread walk follows the window while only one
+// instruction can consume each character. Ambiguous windows use the
+// backtracker when small enough, then the Pike machine.
 
 // capInfo is computed on the first submatch search of a pattern.
 type capInfo struct {
@@ -30,9 +28,9 @@ type capInfo struct {
 	// steps memoizes the walk's steps on ASCII bytes, per instruction the
 	// walk resumes from (see walker.run), or is nil. A row has an entry per
 	// class of cls: 0 when not known yet, else one of the step* values in
-	// the low half and, for stepOne, the capture slots the step sets in the
-	// high half.
-	steps []atomic.Pointer[atomic.Uint32]
+	// the low stepBits bits and, for stepOne, the capture slots the step
+	// sets in the bits above them.
+	steps []atomic.Pointer[atomic.Uint64]
 	cls   [utf8.RuneSelf]uint8 // see stepClasses
 	ncls  int
 }
@@ -40,17 +38,25 @@ type capInfo struct {
 const (
 	stepNone  = 1 + iota // no instruction consumes the character
 	stepTwo              // two instructions can consume it
-	stepEmpty            // the step tests an empty-width assertion: not memoized
+	stepEmpty            // the step depends on the text before the character: not memoized
 	stepMatch            // the path reaches a match at the window end
 	stepOne              // one instruction consumes it; stepOne+pc resumes at pc
 )
 
-// maxStepSlots is the number of capture slots memoized steps can set, and
-// maxStepInsts the size of the programs whose steps are memoized.
+// stepBits is the width of the step in a memoized entry, maxStepSlots the
+// number of capture slots memoized steps can set, and maxStepInsts the size
+// of the programs whose steps are memoized.
 const (
-	maxStepSlots = 16
+	stepBits     = 16
+	maxStepSlots = 64 - stepBits
 	maxStepInsts = 256
 )
+
+// memoKnown are the empty-width assertions a memoized step decides. There
+// is a character at the step's position, so \z fails, and $ in multi-line
+// mode holds exactly when that character is '\n'. The others depend on the
+// text before it.
+const memoKnown = syntax.EmptyEndText | syntax.EmptyEndLine
 
 // capScratch is the pooled scratch of the capture engines.
 type capScratch struct {
@@ -64,7 +70,7 @@ func (c *core) capInfo(e *engines) *capInfo {
 	}
 	ci := &capInfo{fixed: e.fixed}
 	if p := e.prog; ci.fixed == nil && 2*(p.numCap+1) <= maxStepSlots && len(p.insts) <= maxStepInsts {
-		ci.steps = make([]atomic.Pointer[atomic.Uint32], len(p.insts))
+		ci.steps = make([]atomic.Pointer[atomic.Uint64], len(p.insts))
 		ci.ncls = stepClasses(p, &ci.cls)
 	}
 	if !e.caps.CompareAndSwap(nil, ci) {
@@ -119,7 +125,8 @@ func (c *core) captures(s string, dst []int) {
 }
 
 // stepClasses partitions the ASCII bytes so that each instruction of p
-// accepts all the bytes of a class or none of them. A walk step from an
+// accepts all the bytes of a class or none of them, and, if p tests $ in
+// multi-line mode, '\n' has a class of its own. A walk step from an
 // instruction is then the same on every byte of a class. It returns the
 // number of classes.
 func stepClasses(p *prog, cls *[utf8.RuneSelf]uint8) int {
@@ -135,6 +142,11 @@ func stepClasses(p *prog, cls *[utf8.RuneSelf]uint8) int {
 			}
 			set.addRange(byte(in.arg), byte(in.arg))
 		case opAnyNotNL:
+			set.addRange('\n', '\n')
+		case opEmpty:
+			if syntax.EmptyOp(in.arg)&syntax.EmptyEndLine == 0 {
+				continue
+			}
 			set.addRange('\n', '\n')
 		case opFold1, opClass:
 			rs := p.instRanges(in)
@@ -262,8 +274,8 @@ type walker struct {
 // at b, following the one instruction that can consume each character. ok
 // is false when two instructions can consume the same character; a general
 // engine must decide then. Steps on ASCII bytes that test no empty-width
-// assertion depend only on the instruction and the byte, so they are
-// memoized in ci.steps, per class of ci.cls.
+// assertion outside memoKnown depend only on the instruction and the byte,
+// so they are memoized in ci.steps, per class of ci.cls.
 func (w *walker) run(p *prog, ci *capInfo, s string, a, b int, dst []int) (found, ok bool) {
 	n := len(dst)
 	if cap(w.caps) < n {
@@ -289,26 +301,26 @@ func (w *walker) run(p *prog, ci *capInfo, s string, a, b int, dst []int) (found
 			c := s[pos]
 			row := steps[pc].Load()
 			if row == nil {
-				row = &make([]atomic.Uint32, ci.ncls)[0]
+				row = &make([]atomic.Uint64, ci.ncls)[0]
 				if !steps[pc].CompareAndSwap(nil, row) {
 					row = steps[pc].Load()
 				}
 			}
-			memo := (*atomic.Uint32)(unsafe.Add(unsafe.Pointer(row), 4*uintptr(ci.cls[c])))
+			memo := (*atomic.Uint64)(unsafe.Add(unsafe.Pointer(row), 8*uintptr(ci.cls[c])))
 			v := memo.Load()
 			if v == 0 {
 				v = w.memo(p, pc, c, n)
 				memo.Store(v)
 			}
-			switch k := v & 0xffff; k {
+			switch k := uint32(v & (1<<stepBits - 1)); k {
 			case stepNone:
 				return false, true
 			case stepTwo:
 				return false, false
 			case stepEmpty:
 			default:
-				for m := v >> 16; m != 0; m &= m - 1 {
-					caps[bits.TrailingZeros32(m)] = pos
+				for m := v >> stepBits; m != 0; m &= m - 1 {
+					caps[bits.TrailingZeros64(m)] = pos
 				}
 				pc = k - stepOne
 				pos++
@@ -335,7 +347,7 @@ func (w *walker) run(p *prog, ci *capInfo, s string, a, b int, dst []int) (found
 }
 
 // memo returns the memoized form of the step from pc on the ASCII byte c.
-func (w *walker) memo(p *prog, pc uint32, c byte, n int) uint32 {
+func (w *walker) memo(p *prog, pc uint32, c byte, n int) uint64 {
 	const pos = -2 // a position no capture holds
 	if cap(w.memoCaps) < 2*n {
 		w.memoCaps = make([]int, 2*n)
@@ -344,17 +356,21 @@ func (w *walker) memo(p *prog, pc uint32, c byte, n int) uint32 {
 	for i := range caps {
 		caps[i] = -1
 	}
-	res, npc := w.step(p, pc, pos, pos+1, rune(c), 1, 0, true, caps, next)
-	if res != stepOne {
-		return uint32(res)
+	var flag syntax.EmptyOp // the assertions of memoKnown that hold
+	if c == '\n' {
+		flag = syntax.EmptyEndLine
 	}
-	var m uint32
+	res, npc := w.step(p, pc, pos, pos+1, rune(c), 1, flag, true, caps, next)
+	if res != stepOne {
+		return uint64(res)
+	}
+	var m uint64
 	for i, v := range next {
 		if v == pos {
 			m |= 1 << i
 		}
 	}
-	return m<<16 | (stepOne + npc)
+	return m<<stepBits | uint64(stepOne+npc)
 }
 
 // step follows, in priority order, the instructions reachable from pc0
@@ -362,8 +378,9 @@ func (w *walker) memo(p *prog, pc uint32, c byte, n int) uint32 {
 // starts. It returns stepOne and the instruction after the one that
 // consumes r, with next holding the captures on the path to it; stepMatch
 // with caps holding the captures on the path to a match at b; stepNone or
-// stepTwo. With memo set, it returns stepEmpty at the first empty-width
-// assertion instead of testing it against flag.
+// stepTwo. With memo set, flag holds only the assertions of memoKnown, and
+// step returns stepEmpty at the first assertion it cannot decide without
+// the others.
 func (w *walker) step(p *prog, pc0 uint32, pos, b int, r rune, wd int, flag syntax.EmptyOp, memo bool, caps, next []int) (uint32, uint32) {
 	n := len(caps)
 	insts := p.insts
@@ -395,13 +412,14 @@ walk:
 				pc = in.out
 				continue
 			case opEmpty:
-				if memo {
-					res, npc = stepEmpty, 0
-					break walk
-				}
-				if syntax.EmptyOp(in.arg)&^flag == 0 {
+				op := syntax.EmptyOp(in.arg)
+				if op&^flag == 0 {
 					pc = in.out
 					continue
+				}
+				if memo && op&memoKnown&^flag == 0 {
+					res, npc = stepEmpty, 0
+					break walk
 				}
 			case opSave:
 				if int(in.arg) < n {
