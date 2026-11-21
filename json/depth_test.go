@@ -184,3 +184,16 @@ func TestMarshalDepthLimit(t *testing.T) {
 		t.Errorf("%d levels: %d bytes, %v", limit, len(out), err)
 	}
 }
+
+// TestMarshalWideStructSlice checks that sibling structs do not count as
+// nested objects toward encoding/json/v2's depth limit.
+func TestMarshalWideStructSlice(t *testing.T) {
+	v := make([]struct{}, maxNestingDepth+1)
+	out, err := Marshal(v)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := 3*len(v) + 1; len(out) != want {
+		t.Fatalf("Marshal returned %d bytes, want %d", len(out), want)
+	}
+}
