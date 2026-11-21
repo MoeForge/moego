@@ -1030,6 +1030,9 @@ func (e *encodeState) structValue(b []byte, pl *encPlan, p unsafe.Pointer, addr 
 	if inlineV2 && pl.st.inline != nil {
 		b = e.inlineMembers(b, pl.st.inline, p)
 	}
+	if jsonv2 {
+		e.nest--
+	}
 	e.depth--
 	if len(b) == start {
 		return append(b, "{}"...)
